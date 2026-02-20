@@ -312,12 +312,36 @@
         }
 
         /* Botones de eliminar item */
-        #invoiceFormView button[onclick="removeItem(this)"] {
-            color: var(--text-secondary);
+        .removeItemBtn {
+            padding: 6px 8px;
+            border-radius: 6px;
+            background-color: transparent;
+            border: 1px solid transparent;
+            color: #9ca3af;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        html.dark-mode #invoiceFormView button[onclick="removeItem(this)"]:hover {
-            color: #ef4444 !important;
+        .removeItemBtn:hover {
+            background-color: #fee2e2;
+            color: #dc2626;
+            border-color: #fecaca;
+        }
+
+        html.dark-mode .removeItemBtn {
+            color: #9ca3af;
+            background-color: transparent;
+            border: 1px solid transparent;
+        }
+
+        html.dark-mode .removeItemBtn:hover {
+            background-color: #7f1d1d;
+            color: #fca5a5;
+            border-color: #dc2626;
+            box-shadow: 0 0 8px rgba(220, 38, 38, 0.3);
         }
 
         .icon-sun {
@@ -585,19 +609,19 @@
                             <tbody id="itemsTableBody">
                                 <tr class="border-b border-gray-100">
                                     <td class="py-2 px-2">
-                                        <input type="number" min="1" value="1" class="item-cant w-full px-2 py-1.5 border border-gray-200 rounded text-center text-sm focus:outline-none focus:border-gray-900" onchange="calculateTotals()">
+                                        <input type="number" min="1" value="1" class="item-cant w-full px-2 py-1.5 border border-gray-200 rounded text-center text-sm focus:outline-none focus:border-gray-900" oninput="calculateTotals()">
                                     </td>
                                     <td class="py-2 px-2">
                                         <input type="text" class="item-desc w-full px-2 py-1.5 border border-gray-200 rounded text-sm focus:outline-none focus:border-gray-900" placeholder="Descripción del item">
                                     </td>
                                     <td class="py-2 px-2">
-                                        <input type="number" min="0" step="0.01" class="item-precio w-full px-2 py-1.5 border border-gray-200 rounded text-sm focus:outline-none focus:border-gray-900" placeholder="0.00" onchange="calculateTotals()">
+                                        <input type="number" min="0" step="0.01" class="item-precio w-full px-2 py-1.5 border border-gray-200 rounded text-sm focus:outline-none focus:border-gray-900" placeholder="0.00" oninput="calculateTotals()">
                                     </td>
                                     <td class="py-2 px-2 text-right">
                                         <span class="item-valor text-gray-900 font-medium" style="color: var(--text-primary);">0</span>
                                     </td>
                                     <td class="py-2 px-2 text-center">
-                                        <button type="button" onclick="removeItem(this)" class="text-gray-400 hover:text-red-500 transition-colors">
+                                        <button type="button" class="removeItemBtn" onclick="removeItem(this)">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                                         </button>
                                     </td>
@@ -725,19 +749,19 @@
             document.getElementById('itemsTableBody').innerHTML = `
                 <tr class="border-b border-gray-100">
                     <td class="py-2 px-2">
-                        <input type="number" min="1" value="1" class="item-cant w-full px-2 py-1.5 border border-gray-200 rounded text-center text-sm focus:outline-none focus:border-gray-900" onchange="calculateTotals()">
+                        <input type="number" min="1" value="1" class="item-cant w-full px-2 py-1.5 border border-gray-200 rounded text-center text-sm focus:outline-none focus:border-gray-900" oninput="calculateTotals()">
                     </td>
                     <td class="py-2 px-2">
                         <input type="text" class="item-desc w-full px-2 py-1.5 border border-gray-200 rounded text-sm focus:outline-none focus:border-gray-900" placeholder="Descripción del item">
                     </td>
                     <td class="py-2 px-2">
-                        <input type="number" min="0" step="0.01" class="item-precio w-full px-2 py-1.5 border border-gray-200 rounded text-sm focus:outline-none focus:border-gray-900" placeholder="0.00" onchange="calculateTotals()">
+                        <input type="number" min="0" step="0.01" class="item-precio w-full px-2 py-1.5 border border-gray-200 rounded text-sm focus:outline-none focus:border-gray-900" placeholder="0.00" oninput="calculateTotals()">
                     </td>
                     <td class="py-2 px-2 text-right">
                         <span class="item-valor text-gray-900 font-medium">0</span>
                     </td>
                     <td class="py-2 px-2 text-center">
-                        <button type="button" onclick="removeItem(this)" class="text-gray-400 hover:text-red-500 transition-colors">
+                        <button type="button" class="removeItemBtn" onclick="removeItem(this)">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                         </button>
                     </td>
@@ -751,19 +775,19 @@
             newRow.className = 'border-b border-gray-100';
             newRow.innerHTML = `
                 <td class="py-2 px-2">
-                    <input type="number" min="1" value="1" class="item-cant w-full px-2 py-1.5 border border-gray-200 rounded text-center text-sm focus:outline-none focus:border-gray-900" onchange="calculateTotals()">
+                    <input type="number" min="1" value="1" class="item-cant w-full px-2 py-1.5 border border-gray-200 rounded text-center text-sm focus:outline-none focus:border-gray-900" oninput="calculateTotals()">
                 </td>
                 <td class="py-2 px-2">
                     <input type="text" class="item-desc w-full px-2 py-1.5 border border-gray-200 rounded text-sm focus:outline-none focus:border-gray-900" placeholder="Descripción del item">
                 </td>
                 <td class="py-2 px-2">
-                    <input type="number" min="0" step="0.01" class="item-precio w-full px-2 py-1.5 border border-gray-200 rounded text-sm focus:outline-none focus:border-gray-900" placeholder="0.00" onchange="calculateTotals()">
+                    <input type="number" min="0" step="0.01" class="item-precio w-full px-2 py-1.5 border border-gray-200 rounded text-sm focus:outline-none focus:border-gray-900" placeholder="0.00" oninput="calculateTotals()">
                 </td>
                 <td class="py-2 px-2 text-right">
                     <span class="item-valor text-gray-900 font-medium">0</span>
                 </td>
                 <td class="py-2 px-2 text-center">
-                    <button type="button" onclick="removeItem(this)" class="text-gray-400 hover:text-red-500 transition-colors">
+                    <button type="button" class="removeItemBtn" onclick="removeItem(this)">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                     </button>
                 </td>
@@ -1291,13 +1315,13 @@
                     row.className = 'border-b border-gray-100';
                     row.innerHTML = `
                         <td class="py-2 px-2">
-                            <input type="number" min="1" value="${item.cant}" class="item-cant w-full px-2 py-1.5 border border-gray-200 rounded text-center text-sm focus:outline-none focus:border-gray-900" onchange="calculateTotals()">
+                            <input type="number" min="1" value="${item.cant}" class="item-cant w-full px-2 py-1.5 border border-gray-200 rounded text-center text-sm focus:outline-none focus:border-gray-900" oninput="calculateTotals()">
                         </td>
                         <td class="py-2 px-2">
                             <input type="text" value="${item.desc}" class="item-desc w-full px-2 py-1.5 border border-gray-200 rounded text-sm focus:outline-none focus:border-gray-900" placeholder="Descripción del item">
                         </td>
                         <td class="py-2 px-2">
-                            <input type="number" min="0" step="0.01" value="${item.precio}" class="item-precio w-full px-2 py-1.5 border border-gray-200 rounded text-sm focus:outline-none focus:border-gray-900" placeholder="0.00" onchange="calculateTotals()">
+                            <input type="number" min="0" step="0.01" value="${item.precio}" class="item-precio w-full px-2 py-1.5 border border-gray-200 rounded text-sm focus:outline-none focus:border-gray-900" placeholder="0.00" oninput="calculateTotals()">
                         </td>
                         <td class="py-2 px-2 text-right">
                             <span class="item-valor text-gray-900 font-medium">${item.total.toFixed(2)}</span>

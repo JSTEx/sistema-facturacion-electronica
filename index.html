@@ -186,6 +186,92 @@
             box-shadow: 0 0 16px rgba(34, 197, 94, 0.6);
         }
 
+        /* Estilos para los botones de formulario */
+        #submitBtn {
+            background-color: #1f2937 !important;
+            transition: all 0.3s ease;
+        }
+
+        #submitBtn:hover {
+            background-color: #111827 !important;
+        }
+
+        html.dark-mode #submitBtn {
+            background-color: #22c55e !important;
+            color: white !important;
+            box-shadow: 0 0 12px rgba(34, 197, 94, 0.4);
+        }
+
+        html.dark-mode #submitBtn:hover {
+            background-color: #16a34a !important;
+            box-shadow: 0 0 16px rgba(34, 197, 94, 0.6);
+        }
+
+        /* Botón Cancelar */
+        .invoiceForm button[type="button"] {
+            color: #6b7280;
+            background-color: transparent;
+            border: 1px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .invoiceForm button[type="button"]:hover {
+            color: #1f2937;
+            background-color: #f3f4f6;
+        }
+
+        html.dark-mode .invoiceForm button[type="button"] {
+            color: #d1d5db;
+            background-color: #374151;
+        }
+
+        html.dark-mode .invoiceForm button[type="button"]:hover {
+            color: #f3f4f6;
+            background-color: #4b5563;
+            box-shadow: 0 0 8px rgba(209, 213, 219, 0.2);
+        }
+
+        /* Estilos para el contenedor del formulario en modo oscuro */
+        #invoiceFormView > div {
+            background-color: var(--bg-secondary);
+            border-color: var(--border-color);
+        }
+
+        html.dark-mode #invoiceFormView h2 {
+            color: var(--text-primary);
+            border-color: var(--border-color);
+        }
+
+        html.dark-mode #invoiceFormView input,
+        html.dark-mode #invoiceFormView select,
+        html.dark-mode #invoiceFormView textarea {
+            background-color: var(--input-bg);
+            border-color: var(--input-border);
+            color: var(--text-primary);
+        }
+
+        html.dark-mode #invoiceFormView input::placeholder,
+        html.dark-mode #invoiceFormView textarea::placeholder {
+            color: var(--text-secondary);
+        }
+
+        /* Labels en modo oscuro */
+        html.dark-mode label {
+            color: var(--text-primary);
+        }
+
+        /* Tablas en el formulario */
+        html.dark-mode #invoiceFormView table {
+            background-color: var(--bg-secondary);
+            color: var(--text-primary);
+        }
+
+        html.dark-mode #invoiceFormView table th,
+        html.dark-mode #invoiceFormView table td {
+            border-color: var(--border-color);
+            color: var(--text-primary);
+        }
+
         .icon-sun {
             opacity: 1;
             transform: scale(1) rotate(0deg);
@@ -392,10 +478,10 @@
 
         <!-- Formulario de Factura Provisional (Oculto por defecto) -->
         <div id="invoiceFormView" class="hidden max-w-3xl mx-auto">
-            <div class="bg-white border border-gray-200 rounded-xl p-8 shadow-sm">
-                <h2 class="invoiceFormTitle text-xl font-bold text-center uppercase tracking-wide mb-8 text-gray-900 border-b border-gray-100 pb-4">Crear Factura Provisional</h2>
+            <div class="bg-white border border-gray-200 rounded-xl p-8 shadow-sm" style="background-color: var(--bg-secondary); border-color: var(--border-color);">
+                <h2 class="invoiceFormTitle text-xl font-bold text-center uppercase tracking-wide mb-8 text-gray-900 border-b border-gray-100 pb-4" style="color: var(--text-primary); border-color: var(--border-color);">Crear Factura Provisional</h2>
                 
-                <form id="invoiceForm" onsubmit="handleSubmit(event)">
+                <form id="invoiceForm" class="invoiceForm" onsubmit="handleSubmit(event)">
                     <!-- Fecha y Número -->
                     <div class="grid grid-cols-4 gap-4 mb-6">
                         <div>

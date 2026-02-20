@@ -1231,52 +1231,191 @@
                 <head>
                     <title>Factura #${inv.number}</title>
                     <style>
-                        body { font-family: Arial, sans-serif; margin: 20px; }
-                        .header { text-align: center; margin-bottom: 30px; }
-                        .header h1 { margin: 0; font-size: 28px; }
-                        .info-box { margin-bottom: 20px; }
-                        .info-box p { margin: 5px 0; }
-                        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
-                        table th { background-color: #f5f5f5; padding: 10px; text-align: left; border-bottom: 2px solid #333; }
-                        table td { padding: 8px; border-bottom: 1px solid #ddd; }
-                        .total-box { text-align: right; margin-top: 20px; font-size: 18px; font-weight: bold; }
-                        .footer { margin-top: 40px; text-align: center; font-size: 12px; color: #666; }
+                        * { margin: 0; padding: 0; box-sizing: border-box; }
+                        body { 
+                            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+                            margin: 30px; 
+                            line-height: 1.6;
+                            color: #333;
+                        }
+                        .container { max-width: 900px; margin: 0 auto; }
+                        .header { 
+                            text-align: center; 
+                            margin-bottom: 40px; 
+                            border-bottom: 3px solid #1a1a1a;
+                            padding-bottom: 20px;
+                        }
+                        .header h1 { 
+                            margin: 0 0 5px 0; 
+                            font-size: 32px; 
+                            font-weight: 700;
+                            letter-spacing: 2px;
+                            color: #1a1a1a;
+                        }
+                        .header p { 
+                            font-size: 14px; 
+                            color: #666;
+                            margin: 5px 0 0 0;
+                        }
+                        .info-section {
+                            display: grid;
+                            grid-template-columns: 1fr 1fr;
+                            gap: 30px;
+                            margin-bottom: 35px;
+                            padding: 20px;
+                            background-color: #f9f9f9;
+                            border-radius: 4px;
+                        }
+                        .info-box { margin-bottom: 0; }
+                        .info-box p { 
+                            margin: 8px 0; 
+                            font-size: 13px;
+                        }
+                        .info-box strong { 
+                            color: #1a1a1a;
+                            font-weight: 600;
+                        }
+                        .items-section {
+                            margin-bottom: 30px;
+                        }
+                        table { 
+                            width: 100%; 
+                            border-collapse: collapse; 
+                            margin: 20px 0; 
+                        }
+                        table th { 
+                            background-color: #1a1a1a; 
+                            color: white;
+                            padding: 12px 10px; 
+                            text-align: left; 
+                            font-weight: 600;
+                            font-size: 12px;
+                            text-transform: uppercase;
+                            letter-spacing: 0.5px;
+                        }
+                        table td { 
+                            padding: 12px 10px; 
+                            border-bottom: 1px solid #e0e0e0;
+                            font-size: 13px;
+                        }
+                        table tr:last-child td {
+                            border-bottom: 2px solid #1a1a1a;
+                        }
+                        .total-section {
+                            text-align: right;
+                            margin: 30px 0;
+                            padding: 20px;
+                            background-color: #f9f9f9;
+                            border-radius: 4px;
+                        }
+                        .total-label {
+                            font-size: 12px;
+                            font-weight: 600;
+                            color: #666;
+                            text-transform: uppercase;
+                            letter-spacing: 1px;
+                        }
+                        .total-amount {
+                            font-size: 28px;
+                            font-weight: 700;
+                            color: #1a1a1a;
+                            margin-top: 5px;
+                        }
+                        .signature-section {
+                            margin-top: 50px;
+                            display: grid;
+                            grid-template-columns: 1fr;
+                            gap: 20px;
+                        }
+                        .signature-box {
+                            border-top: 1px solid #999;
+                            padding-top: 30px;
+                            text-align: center;
+                            min-height: 80px;
+                            display: flex;
+                            align-items: flex-end;
+                            justify-content: center;
+                        }
+                        .signature-label {
+                            font-size: 11px;
+                            font-weight: 600;
+                            color: #666;
+                            text-transform: uppercase;
+                            letter-spacing: 0.5px;
+                            margin-top: 5px;
+                        }
+                        .notes {
+                            margin-top: 30px;
+                            padding: 15px;
+                            background-color: #f9f9f9;
+                            border-left: 3px solid #22c55e;
+                            border-radius: 2px;
+                            font-size: 12px;
+                            color: #555;
+                        }
+                        .footer { 
+                            margin-top: 40px; 
+                            text-align: center; 
+                            font-size: 11px; 
+                            color: #999;
+                            border-top: 1px solid #e0e0e0;
+                            padding-top: 15px;
+                        }
                     </style>
                 </head>
                 <body>
-                    <div class="header">
-                        <h1>FACTURA</h1>
-                        <p>Factura #${inv.number}</p>
-                    </div>
-                    
-                    <div class="info-box">
-                        <p><strong>Cliente:</strong> ${inv.client}</p>
-                        <p><strong>Dirección:</strong> ${inv.address || 'N/A'}</p>
-                        <p><strong>Fecha:</strong> ${inv.date}</p>
-                        <p><strong>Estado:</strong> ${getStatusText(inv.status)}</p>
-                    </div>
-                    
-                    <table>
-                        <thead>
-                            <tr>
-                                <th style="width: 10%;">Cantidad</th>
-                                <th style="width: 50%;">Descripción</th>
-                                <th style="width: 20%;">Precio</th>
-                                <th style="width: 20%;">Total</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${itemsRows}
-                        </tbody>
-                    </table>
-                    
-                    <div class="total-box">
-                        Total: $${inv.amount.toFixed(2)}
-                    </div>
-                    
-                    <div class="footer">
-                        <p>No se admiten devoluciones</p>
-                        <p>Generado el ${new Date().toLocaleDateString('es-ES')}</p>
+                    <div class="container">
+                        <div class="header">
+                            <h1>FACTURA</h1>
+                            <p>Factura #${inv.number}</p>
+                        </div>
+                        
+                        <div class="info-section">
+                            <div class="info-box">
+                                <p><strong>Cliente:</strong> ${inv.client}</p>
+                                <p><strong>Dirección:</strong> ${inv.address || 'N/A'}</p>
+                            </div>
+                            <div class="info-box">
+                                <p><strong>Fecha:</strong> ${inv.date}</p>
+                                <p><strong>Estado:</strong> ${getStatusText(inv.status)}</p>
+                            </div>
+                        </div>
+                        
+                        <div class="items-section">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th style="width: 10%;">Cantidad</th>
+                                        <th style="width: 50%;">Descripción</th>
+                                        <th style="width: 20%;">Precio</th>
+                                        <th style="width: 20%;">Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${itemsRows}
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <div class="total-section">
+                            <div class="total-label">Total</div>
+                            <div class="total-amount">$ ${inv.amount.toFixed(2)}</div>
+                        </div>
+                        
+                        <div class="signature-section">
+                            <div>
+                                <div class="signature-box"></div>
+                                <div class="signature-label">Recibido por:</div>
+                            </div>
+                        </div>
+                        
+                        <div class="notes">
+                            <strong>Notas:</strong> No se admiten devoluciones
+                        </div>
+                        
+                        <div class="footer">
+                            <p>Generado el ${new Date().toLocaleDateString('es-ES')} - Facturación Electrónica</p>
+                        </div>
                     </div>
                 </body>
                 </html>

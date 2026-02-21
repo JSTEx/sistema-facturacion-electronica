@@ -17,7 +17,9 @@
             --input-bg: #ffffff;
             --input-border: #d1d5db;
             --nav-bg: #ffffff;
+            --card-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
         }
+
         html.dark-mode {
             --bg-primary: #0f1419;
             --bg-secondary: #1a1f2e;
@@ -27,17 +29,52 @@
             --input-bg: #1e293b;
             --input-border: #475569;
             --nav-bg: #0f1419;
+            --card-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.3), 0 2px 4px -2px rgb(0 0 0 / 0.3);
         }
-        body { font-family: 'Inter', sans-serif; background-color: var(--bg-primary); color: var(--text-primary); }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
         nav.admin-nav { background-color: var(--nav-bg); border-bottom: 1px solid var(--border-color); }
-        .dark-mode-toggle { width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer }
-        .status-badge { font-size:11px;font-weight:600;padding:4px 8px;border-radius:6px;text-transform:capitalize }
-        .status-paid{background:#dcfce7;color:#166534}
-        .status-pending{background:#fef3c7;color:#92400e}
-        .status-late{background:#fee2e2;color:#991b1b}
-        html.dark-mode .status-paid{background:#064e3b;color:#86efac}
-        html.dark-mode .status-pending{background:#78350f;color:#fcd34d}
-        html.dark-mode .status-late{background:#7f1d1d;color:#fca5a5}
+
+        .dark-mode-toggle {
+            position: relative; width:40px; height:40px; border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer; border:1px solid rgba(229,231,235,0.6); background:rgba(255,255,255,0.85);
+        }
+
+        .toggle-icon { width: 24px; height: 24px; display:flex; align-items:center; justify-content:center; position:relative }
+        .icon-sun, .icon-moon { position:absolute; width:20px; height:20px; transition:all 0.3s ease; }
+        .icon-sun { color:#f59e0e; }
+        .icon-moon { color:#6366f1; transform: scale(0.5) rotate(180deg); opacity:0 }
+        html.dark-mode .icon-sun { transform: scale(0.5) rotate(-180deg); opacity:0 }
+        html.dark-mode .icon-moon { transform: scale(1) rotate(0deg); opacity:1 }
+
+        /* status badges */
+        .status-badge { font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 6px; text-transform: capitalize; }
+        .status-paid { background-color: #dcfce7; color: #166534; }
+        .status-pending { background-color: #fef3c7; color: #92400e; }
+        .status-late { background-color: #fee2e2; color: #991b1b; }
+        html.dark-mode .status-paid { background-color: #064e3b; color: #86efac; }
+        html.dark-mode .status-pending { background-color: #78350f; color: #fcd34d; }
+        html.dark-mode .status-late { background-color: #7f1d1d; color: #fca5a5; }
+
+        /* form and table styles */
+        input, select, textarea { background-color: var(--input-bg); border: 1px solid var(--input-border); color: var(--text-primary); }
+        .bg-white { background-color: var(--bg-secondary) !important; }
+        .rounded-xl { border-radius: 12px; }
+        .shadow-sm { box-shadow: var(--card-shadow); }
+
+        /* SweetAlert2 dark adjustments */
+        html.dark-mode .swal2-popup { background-color: var(--bg-secondary) !important; color: var(--text-primary) !important; }
+        html.dark-mode .swal2-title, html.dark-mode .swal2-html-container { color: var(--text-primary) !important; }
+
+        /* responsive tweaks */
+        @media (max-width: 768px) {
+            .dark-mode-toggle { display: none; }
+        }
     </style>
 </head>
 <body class="min-h-screen bg-gray-50 p-8">
@@ -48,7 +85,10 @@
         </div>
         <div class="flex items-center gap-4">
             <button class="dark-mode-toggle" onclick="toggleDarkMode()" title="Alternar modo oscuro">
-                <svg class="icon-sun" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle></svg>
+                <div class="toggle-icon">
+                    <svg class="icon-sun" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle></svg>
+                    <svg class="icon-moon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                </div>
             </button>
             <span id="currentUserEmail" class="text-sm" style="color: var(--text-secondary);"></span>
             <button onclick="logout()" class="text-sm">Logout</button>

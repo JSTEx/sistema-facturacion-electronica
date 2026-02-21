@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Login - Facturación</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="min-h-screen bg-gray-50 flex items-center justify-center">
+    <div class="w-full max-w-md bg-white p-8 rounded-lg shadow">
+        <h1 class="text-2xl font-bold mb-4 text-center">Iniciar sesión</h1>
+        <p class="text-sm text-gray-500 mb-4">Si es la primera vez, se ha creado un usuario administrador por defecto: <strong>admin@admin.com / admin123</strong></p>
+
+        <form id="loginForm" class="space-y-4">
+            <div>
+                <label class="block text-sm font-medium text-gray-700">Email</label>
+                <input id="email" type="email" required class="mt-1 block w-full border-gray-200 rounded-md shadow-sm" />
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700">Contraseña</label>
+                <input id="password" type="password" required class="mt-1 block w-full border-gray-200 rounded-md shadow-sm" />
+            </div>
+            <div class="flex items-center justify-between">
+                <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded">Entrar</button>
+                <a href="admin.html" id="adminLink" class="text-sm text-blue-600">Administración</a>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        // Inicializar usuarios si no existen
+        function ensureDefaultAdmin() {
+            const users = JSON.parse(localStorage.getItem('users') || '[]');
+            if (!users.find(u => u.role === 'admin')) {
+                users.push({ email: 'admin@admin.com', password: 'admin123', role: 'admin' });
+                localStorage.setItem('users', JSON.stringify(users));
+            }
+        }
+
+        ensureDefaultAdmin();
+
+        document.getElementById('loginForm').addEventListener('submit', function(e){
+            e.preventDefault();
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+            const users = JSON.parse(localStorage.getItem('users') || '[]');
+            const match = users.find(u => u.email.toLowerCase() === email.toLowerCase() && u.password === password);
+            if (match) {
+                localStorage.setItem('currentUser', JSON.stringify({ email: match.email, role: match.role }));
+                window.location.href = 'index.html';
+            } else {
+                alert('Credenciales no válidas');
+            }
+        });
+    </script>
+</body>
+</html>

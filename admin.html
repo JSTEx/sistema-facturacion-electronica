@@ -48,11 +48,11 @@
             justify-content: center;
             width: 40px;
             height: 36px;
-            background: transparent;
-            border: 1px solid transparent;
+            background: rgba(0, 0, 0, 0.06);
+            border: 1.5px solid rgba(0, 0, 0, 0.12);
             border-radius: 8px;
             cursor: pointer;
-            transition: background-color 0.2s ease, transform 0.12s ease;
+            transition: background-color 0.2s ease, transform 0.12s ease, border-color 0.2s ease;
             margin-right: 6px;
             padding: 4px;
         }
@@ -63,12 +63,14 @@
         }
 
         .dark-mode-toggle:hover {
-            background: rgba(0,0,0,0.04);
+            background: rgba(0,0,0,0.1);
+            border-color: rgba(0, 0, 0, 0.2);
             transform: translateY(-1px);
         }
 
         html.dark-mode .dark-mode-toggle:hover {
-            background: rgba(255,255,255,0.04);
+            background: rgba(255,255,255,0.08);
+            border-color: rgba(255,255,255,0.1);
         }
 
         .dark-mode-toggle:active { transform: translateY(0); }
@@ -159,6 +161,73 @@
         html.dark-mode .swal2-popup { background-color: var(--bg-secondary) !important; color: var(--text-primary) !important; }
         html.dark-mode .swal2-title, html.dark-mode .swal2-html-container { color: var(--text-primary) !important; }
 
+        .edit-user-popup {
+            border-radius: 14px !important;
+            padding: 1rem 1.2rem 1.2rem !important;
+            border: 1px solid var(--border-color) !important;
+            box-shadow: var(--card-shadow) !important;
+        }
+
+        .edit-user-title {
+            font-weight: 700 !important;
+            font-size: 1.75rem !important;
+            line-height: 1.2 !important;
+            margin-bottom: 0.25rem !important;
+            color: var(--text-primary) !important;
+        }
+
+        .edit-user-html {
+            text-align: left !important;
+            margin: 0.4rem 0 0 !important;
+        }
+
+        .edit-user-form {
+            display: grid;
+            gap: 12px;
+        }
+
+        .edit-user-label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: var(--text-secondary);
+        }
+
+        .edit-user-field {
+            width: 100% !important;
+            margin: 0 !important;
+            height: 42px;
+            border-radius: 8px !important;
+            border: 1px solid var(--input-border) !important;
+            background-color: var(--input-bg) !important;
+            color: var(--text-primary) !important;
+            padding: 0 12px !important;
+            box-sizing: border-box !important;
+        }
+
+        .edit-user-field:focus {
+            border-color: #60a5fa !important;
+            box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.2) !important;
+            outline: none !important;
+        }
+
+        .edit-user-confirm {
+            background-color: #6366f1 !important;
+            color: #fff !important;
+            border-radius: 8px !important;
+            min-width: 96px;
+        }
+
+        .edit-user-cancel {
+            border-radius: 8px !important;
+            min-width: 96px;
+        }
+
+        .edit-user-actions {
+            gap: 10px !important;
+        }
+
         /* responsive tweaks */
         @media (max-width: 768px) {
             .dark-mode-toggle { display: none; }
@@ -196,7 +265,7 @@
                     <p class="text-sm text-gray-500" style="color:var(--text-secondary);">Gestiona usuarios, exporta/importa y revisa acciones del administrador.</p>
                 </div>
                 <div class="w-full lg:w-auto flex flex-col sm:flex-row sm:items-stretch gap-3">
-                    <div class="w-full sm:min-w-[320px] flex items-center border rounded overflow-hidden" style="border-color:var(--border-color); background-color:var(--bg-primary);">
+                    <div class="w-full sm:min-w-[320px] flex items-center border rounded-full overflow-hidden" style="border-color:var(--border-color); background-color:var(--bg-primary);">
                         <input id="userSearch" type="text" placeholder="Buscar por email" class="flex-1 px-3 h-10 text-sm" style="border:0;outline:none;background:transparent; color:var(--text-primary);" />
                         <select id="pageSize" class="px-3 h-10 text-sm border-l" style="border-left:1px solid var(--border-color); background:transparent; color:var(--text-primary);">
                             <option value="5">5</option>
@@ -236,6 +305,7 @@
                 <table class="min-w-full text-sm users-table">
                     <thead>
                         <tr>
+                            <th class="p-3 text-center" style="color:var(--text-secondary); width: 50px;">#</th>
                             <th class="p-3 text-left" style="color:var(--text-secondary);">Email</th>
                             <th class="p-3 text-center" style="color:var(--text-secondary);">Rol</th>
                             <th class="p-3 text-center" style="color:var(--text-secondary);">Acciones</th>
@@ -260,12 +330,8 @@
         (function checkAdmin(){
             const current = JSON.parse(localStorage.getItem('currentUser') || 'null');
             if (!current || current.role !== 'admin') {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Acceso denegado',
-                    text: 'Debes iniciar sesión como administrador.',
-                    confirmButtonColor: '#1f2937'
-                }).then(() => window.location.href = 'login.html');
+                window.location.replace('login.html');
+                return;
             }
         })();
 
@@ -322,8 +388,9 @@
             pageItems.forEach((u, idx) => {
                 const globalIndex = allUsers.indexOf(u);
                 const isCurrent = current && current.email && (u.email.toLowerCase() === current.email.toLowerCase());
+                const rowNumber = start + idx + 1;
                 const tr = document.createElement('tr');
-                tr.innerHTML = `<td class="p-2">${u.email}${isCurrent? ' <span class="text-xs muted-text">(Cuenta actual)</span>':''}</td><td class="p-2 text-center">${u.role}</td><td class="p-2 text-center">${isCurrent? '<span class="text-xs muted-text">-</span>' : `<button data-index="${globalIndex}" class="editBtn px-2 py-1 bg-blue-500 text-white rounded mr-2">Editar</button><button data-index="${globalIndex}" class="delBtn px-2 py-1 bg-red-500 text-white rounded">Eliminar</button>`}</td>`;
+                tr.innerHTML = `<td class="p-2 text-center font-semibold" style="color: #60a5fa;">${rowNumber}</td><td class="p-2">${u.email}${isCurrent? ' <span class="text-xs muted-text">(Cuenta actual)</span>':''}</td><td class="p-2 text-center">${u.role}</td><td class="p-2 text-center">${isCurrent? '<span class="text-xs muted-text">-</span>' : `<button data-index="${globalIndex}" class="editBtn px-2 py-1 bg-blue-500 text-white rounded mr-2">Editar</button><button data-index="${globalIndex}" class="delBtn px-2 py-1 bg-red-500 text-white rounded">Eliminar</button>`}</td>`;
                 tbody.appendChild(tr);
             });
 
@@ -377,6 +444,20 @@
             const email = document.getElementById('uemail').value.trim();
             const pass = document.getElementById('upass').value;
             const role = document.getElementById('urole').value;
+            
+            // Validar que sea un email de dominio conocido
+            const allowedDomains = ['gmail.com', 'yahoo.com', 'outlook.com', 'hotmail.com', 'protonmail.com', 'aol.com', 'icloud.com', 'mail.com', 'zoho.com', 'yandex.com'];
+            const emailDomain = email.split('@')[1]?.toLowerCase();
+            if (!emailDomain || !allowedDomains.includes(emailDomain)) {
+                Swal.fire({
+                    icon:'warning', 
+                    title:'Dominio no permitido', 
+                    text:`Solo se permiten emails de: ${allowedDomains.join(', ')}`,
+                    confirmButtonColor:'#f97316'
+                });
+                return;
+            }
+            
             const users = loadUsers();
             if (users.find(u => u.email.toLowerCase() === email.toLowerCase())){
                 Swal.fire({icon:'error', title:'Error', text:'El usuario ya existe', confirmButtonColor:'#1f2937'});
@@ -399,10 +480,32 @@
             const { value: formValues } = await Swal.fire({
                 title: `Editar ${target.email}`,
                 html:
-                    `<input id="swal-pass" class="swal2-input" placeholder="Nueva contraseña (dejar vacío para mantener)">`+
-                    `<select id="swal-role" class="swal2-select"><option value="user">Usuario</option><option value="admin">Administrador</option></select>`,
+                    `<div class="edit-user-form">`+
+                    `<div>`+
+                    `<label class="edit-user-label" for="swal-pass">Nueva contraseña</label>`+
+                    `<input id="swal-pass" type="password" class="swal2-input edit-user-field" placeholder="Dejar vacío para mantener">`+
+                    `</div>`+
+                    `<div>`+
+                    `<label class="edit-user-label" for="swal-role">Rol del usuario</label>`+
+                    `<select id="swal-role" class="swal2-select edit-user-field"><option value="user">Usuario</option><option value="admin">Administrador</option></select>`+
+                    `</div>`+
+                    `</div>`,
                 focusConfirm: false,
                 showCancelButton: true,
+                confirmButtonText: 'Guardar',
+                cancelButtonText: 'Cancelar',
+                customClass: {
+                    popup: 'edit-user-popup',
+                    title: 'edit-user-title',
+                    htmlContainer: 'edit-user-html',
+                    confirmButton: 'edit-user-confirm',
+                    cancelButton: 'edit-user-cancel',
+                    actions: 'edit-user-actions'
+                },
+                didOpen: () => {
+                    const roleSelect = document.getElementById('swal-role');
+                    if (roleSelect) roleSelect.value = target.role;
+                },
                 preConfirm: () => {
                     return {
                         newPass: document.getElementById('swal-pass').value,

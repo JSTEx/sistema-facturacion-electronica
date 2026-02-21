@@ -103,7 +103,7 @@
         <div class="flex flex-col items-center mb-5">
             <div class="login-brand mb-3">$</div>
             <h1 class="text-4xl font-bold mb-2 text-center">Iniciar sesión</h1>
-            <p class="text-sm text-center text-gray-500 login-muted">Primera vez: usa el administrador por defecto <strong>admin@admin.com / admin123</strong></p>
+            <p class="text-sm text-center text-gray-500 login-muted">Usa el administrador o ingresa tu usuario <strong>admin@admin.com / admin123</strong></p>
         </div>
 
         <form id="loginForm" class="space-y-4">
@@ -163,6 +163,15 @@
         }
 
         ensureDefaultAdmin();
+
+        // Si ya hay usuario logueado, redirigir a la página apropiada
+        (function checkAlreadyLoggedIn(){
+            const current = JSON.parse(localStorage.getItem('currentUser') || 'null');
+            if (current) {
+                window.location.replace(current.role === 'admin' ? 'admin.html' : 'index.html');
+                return;
+            }
+        })();
 
         document.getElementById('loginForm').addEventListener('submit', async function(e){
             e.preventDefault();

@@ -56,6 +56,57 @@
             border-radius: 4px;
             text-transform: capitalize;
         }
+
+        .owner-edit-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 3px 8px;
+            border-radius: 9999px;
+            background-color: #dcfce7;
+            color: #166534;
+        }
+
+        html.dark-mode .owner-edit-badge {
+            background-color: #064e3b;
+            color: #86efac;
+        }
+
+        .creator-info-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 3px 8px;
+            border-radius: 9999px;
+            background-color: #dbeafe;
+            color: #1e40af;
+        }
+
+        html.dark-mode .creator-info-badge {
+            background-color: #1e3a8a;
+            color: #bfdbfe;
+        }
+
+        .not-owner-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 3px 8px;
+            border-radius: 9999px;
+            background-color: #fee2e2;
+            color: #991b1b;
+        }
+
+        html.dark-mode .not-owner-badge {
+            background-color: #7f1d1d;
+            color: #fca5a5;
+        }
         
         .status-paid {
             background-color: #dcfce7;
@@ -95,11 +146,11 @@
                 justify-content: center;
                 width: 40px;
                 height: 36px;
-                background: transparent;
-                border: 1px solid transparent;
+                background: rgba(0, 0, 0, 0.06);
+                border: 1.5px solid rgba(0, 0, 0, 0.12);
                 border-radius: 8px;
                 cursor: pointer;
-                transition: background-color 0.2s ease, transform 0.12s ease;
+                transition: background-color 0.2s ease, transform 0.12s ease, border-color 0.2s ease;
                 margin-right: 6px;
                 padding: 4px;
             }
@@ -110,12 +161,14 @@
             }
 
             .dark-mode-toggle:hover {
-                background: rgba(0,0,0,0.04);
+                background: rgba(0,0,0,0.1);
+                border-color: rgba(0, 0, 0, 0.2);
                 transform: translateY(-1px);
             }
 
             html.dark-mode .dark-mode-toggle:hover {
-                background: rgba(255,255,255,0.04);
+                background: rgba(255,255,255,0.08);
+                border-color: rgba(255,255,255,0.1);
             }
 
             .dark-mode-toggle:active { transform: translateY(0); }
@@ -460,7 +513,7 @@
             <span id="currentUserEmail" class="text-sm" style="color: var(--text-secondary);"></span>
             <button onclick="logout()" class="text-sm flex items-center gap-2 transition-colors nav-link-btn">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
-                Logout
+                Salir
             </button>
         </div>
     </nav>
@@ -546,8 +599,8 @@
                             <input type="text" id="direccion" class="w-full px-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:border-gray-900 transition-colors">
                         </div>
                         <div>
-                            <label class="block text-xs font-semibold text-gray-700 uppercase mb-1.5">Estado</label>
-                            <select id="estado" class="w-full px-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:border-gray-900 bg-white cursor-pointer">
+                            <label class="block text-xs font-bold text-orange-500 uppercase mb-1.5 tracking-wider" style="color: #f97316; letter-spacing: 0.05em;">Estado</label>
+                            <select id="estado" class="w-full px-3 py-2 border-2 rounded-md text-sm focus:outline-none bg-white cursor-pointer font-semibold" style="border-color: #f97316; color: #ffffff;">
                                 <option value="Pendiente">Pendiente</option>
                                 <option value="Pagada">Pagada</option>
                                 <option value="Vencida">Vencida</option>
@@ -625,6 +678,15 @@
     </main>
 
     <script>
+        // Verificar autenticación obligatoria
+        (function checkAuth(){
+            const current = JSON.parse(localStorage.getItem('currentUser') || 'null');
+            if (!current) {
+                window.location.replace('login.html');
+                return;
+            }
+        })();
+
         let currentUser = null;
 
         function loadCurrentUser() {
@@ -635,16 +697,58 @@
             }
         }
 
-        function canEditInvoices() {
-            return currentUser && currentUser.role === 'admin';
+        function canCreateInvoices() {
+            return !!currentUser;
         }
 
-        function ensureCanEditInvoices() {
-            if (canEditInvoices()) return true;
+        function isInvoiceOwner(invoice) {
+            return !!(currentUser && invoice && invoice.createdByEmail && invoice.createdByEmail.toLowerCase() === currentUser.email.toLowerCase());
+        }
+
+        function getInvoiceCreatorText(invoice) {
+            if (!invoice || !invoice.createdByEmail) return 'Creada por: Usuario no registrado';
+            return `Creada por: ${invoice.createdByEmail}`;
+        }
+
+        function getInvoiceOwnershipBadge(invoice) {
+            if (isInvoiceOwner(invoice) && canEditInvoice(invoice)) {
+                return '<p class="mt-2"><span class="owner-edit-badge">Creada por ti · editable</span></p>';
+            }
+
+            if (currentUser && currentUser.role === 'admin') {
+                return `<p class="mt-2"><span class="creator-info-badge">${getInvoiceCreatorText(invoice)}</span></p>`;
+            }
+
+            if (currentUser && currentUser.role === 'user' && !isInvoiceOwner(invoice)) {
+                return '<p class="mt-2"><span class="not-owner-badge">Creada por otro usuario</span></p>';
+            }
+
+            return '';
+        }
+
+        function canEditInvoice(invoice) {
+            if (!currentUser) return false;
+            if (currentUser.role === 'admin') return true;
+            return isInvoiceOwner(invoice);
+        }
+
+        function ensureCanCreateInvoices() {
+            if (canCreateInvoices()) return true;
             Swal.fire({
                 icon: 'error',
                 title: 'Sin permisos',
-                text: 'Tu usuario no tiene permisos para modificar facturas.',
+                text: 'Tu usuario no tiene permisos para crear facturas.',
+                confirmButtonColor: '#1a1a1a'
+            });
+            return false;
+        }
+
+        function ensureCanEditInvoice(invoice) {
+            if (canEditInvoice(invoice)) return true;
+            Swal.fire({
+                icon: 'error',
+                title: 'Sin permisos',
+                text: 'Solo puedes editar las facturas creadas por tu usuario.',
                 confirmButtonColor: '#1a1a1a'
             });
             return false;
@@ -665,7 +769,7 @@
                     if (el) el.textContent = current.email;
 
                     const newInvoiceBtn = document.getElementById('btnNewInvoice');
-                    if (newInvoiceBtn && !canEditInvoices()) {
+                    if (newInvoiceBtn && !canCreateInvoices()) {
                         newInvoiceBtn.classList.add('hidden');
                     }
 
@@ -711,7 +815,7 @@
         const invoicesPerPage = 30;
 
         function showInvoiceForm() {
-            if (!ensureCanEditInvoices()) return;
+            if (!ensureCanCreateInvoices()) return;
             editingId = null;
             document.getElementById('invoiceListView').classList.add('hidden');
             document.getElementById('invoiceFormView').classList.remove('hidden');
@@ -800,7 +904,7 @@
         }
 
         function addItem() {
-            if (!ensureCanEditInvoices()) return;
+            if (!ensureCanCreateInvoices()) return;
             const tbody = document.getElementById('itemsTableBody');
             const newRow = document.createElement('tr');
             newRow.className = 'border-b border-gray-100';
@@ -827,7 +931,7 @@
         }
 
         function removeItem(btn) {
-            if (!ensureCanEditInvoices()) return;
+            if (!ensureCanCreateInvoices()) return;
             const rows = document.querySelectorAll('#itemsTableBody tr');
             if (rows.length > 1) {
                 btn.closest('tr').remove();
@@ -859,7 +963,7 @@
 
         function handleSubmit(e) {
             e.preventDefault();
-            if (!ensureCanEditInvoices()) return;
+            if (!ensureCanCreateInvoices()) return;
             
             const dia = document.getElementById('dia').value;
             const mes = document.getElementById('mes').value;
@@ -964,13 +1068,18 @@
         }
 
         function saveInvoice() {
-            if (!ensureCanEditInvoices()) return;
+            if (!ensureCanCreateInvoices()) return;
             const total = parseFloat(document.getElementById('totalAmount').textContent);
             const estadoMap = {
                 'Pagada': 'paid',
                 'Pendiente': 'pending',
                 'Vencida': 'late'
             };
+
+            if (editingId) {
+                const existing = invoices.find(inv => inv.id === editingId);
+                if (!existing || !ensureCanEditInvoice(existing)) return;
+            }
             
             const items = [];
             document.querySelectorAll('#itemsTableBody tr').forEach(row => {
@@ -994,7 +1103,8 @@
                         amount: total,
                         status: estadoMap[document.getElementById('estado').value],
                         address: document.getElementById('direccion').value,
-                        items: items
+                        items: items,
+                        createdByEmail: invoices[invoiceIndex].createdByEmail || (currentUser ? currentUser.email : null)
                     };
                     saveInvoices();
                     Swal.fire({
@@ -1018,7 +1128,8 @@
                     amount: total,
                     status: estadoMap[document.getElementById('estado').value],
                     address: document.getElementById('direccion').value,
-                    items: items
+                    items: items,
+                    createdByEmail: currentUser ? currentUser.email : null
                 };
                 
                 invoices.push(newInvoice);
@@ -1107,7 +1218,7 @@
             } else {
                 paginationContainer.classList.add('hidden');
             }
-            const canEdit = canEditInvoices();
+            const canDelete = currentUser && currentUser.role === 'admin';
             
             listContainer.innerHTML = paginatedInvoices.map(inv => {
                 const statusClass = inv.status === 'paid' ? 'status-paid' : 
@@ -1120,10 +1231,12 @@
                         <button onclick="viewInvoice(${inv.id})" class="text-gray-400 hover:text-gray-600 transition-colors" title="Ver">
                             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
                         </button>
-                        ${canEdit ? `
+                        ${canEditInvoice(inv) ? `
                         <button onclick="editInvoice(${inv.id})" class="text-gray-400 hover:text-blue-600 transition-colors" title="Editar">
                             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
                         </button>
+                        ` : ''}
+                        ${canDelete ? `
                         <button onclick="deleteInvoice(${inv.id})" class="text-gray-400 hover:text-red-600 transition-colors" title="Eliminar">
                             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
                         </button>
@@ -1133,6 +1246,7 @@
                     <div class="mb-4">
                         <h3 class="text-lg font-semibold text-gray-900 leading-tight">${inv.client}</h3>
                         <p class="text-sm text-gray-500 mt-0.5">Factura #${inv.number}</p>
+                        ${getInvoiceOwnershipBadge(inv)}
                     </div>
                     
                     <div class="flex justify-between items-end">
@@ -1254,9 +1368,10 @@
             if (!inv) return;
 
             let itemsRows = '';
-            inv.items.forEach(item => {
+            inv.items.forEach((item, index) => {
                 itemsRows += `
                     <tr style="border-bottom: 1px solid #ddd;">
+                        <td style="padding: 8px; text-align: center;"><span class="item-index-badge">${index + 1}</span></td>
                         <td style="padding: 8px; text-align: center;">${item.cant}</td>
                         <td style="padding: 8px;">${item.desc}</td>
                         <td style="padding: 8px; text-align: right;">$${item.precio.toFixed(2)}</td>
@@ -1274,57 +1389,94 @@
                         * { margin: 0; padding: 0; box-sizing: border-box; }
                         body { 
                             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-                            margin: 30px; 
+                            margin: 0;
+                            padding: 24px;
                             line-height: 1.6;
-                            color: #333;
+                            color: #1f2937;
+                            background: #f3f6fb;
                         }
-                        .container { max-width: 900px; margin: 0 auto; }
+                        .container {
+                            max-width: 900px;
+                            margin: 0 auto;
+                            background: #ffffff;
+                            border: 1px solid #e5e7eb;
+                            border-radius: 14px;
+                            box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+                            padding: 28px;
+                        }
                         .header { 
-                            text-align: center; 
-                            margin-bottom: 40px; 
-                            border-bottom: 3px solid #1a1a1a;
-                            padding-bottom: 20px;
+                            display: flex;
+                            justify-content: space-between;
+                            align-items: flex-start;
+                            margin-bottom: 28px;
+                            border-bottom: 2px solid #e5e7eb;
+                            padding-bottom: 16px;
+                            gap: 20px;
                         }
                         .header h1 { 
-                            margin: 0 0 5px 0; 
-                            font-size: 32px; 
+                            margin: 0;
+                            font-size: 30px; 
                             font-weight: 700;
-                            letter-spacing: 2px;
-                            color: #1a1a1a;
+                            letter-spacing: 1px;
+                            color: #0f172a;
                         }
                         .header p { 
                             font-size: 14px; 
-                            color: #666;
-                            margin: 5px 0 0 0;
+                            color: #64748b;
+                            margin: 2px 0 0 0;
+                        }
+                        .header-meta {
+                            text-align: right;
+                        }
+                        .header-meta p {
+                            margin: 0;
+                            font-size: 13px;
+                            color: #334155;
+                        }
+                        .invoice-chip {
+                            display: inline-block;
+                            margin-top: 8px;
+                            padding: 4px 10px;
+                            border-radius: 9999px;
+                            font-size: 11px;
+                            font-weight: 700;
+                            letter-spacing: 0.4px;
+                            text-transform: uppercase;
+                            color: #1d4ed8;
+                            background: #dbeafe;
                         }
                         .info-section {
                             display: grid;
                             grid-template-columns: 1fr 1fr;
-                            gap: 30px;
-                            margin-bottom: 35px;
-                            padding: 20px;
-                            background-color: #f9f9f9;
-                            border-radius: 4px;
+                            gap: 24px;
+                            margin-bottom: 28px;
+                            padding: 16px 18px;
+                            background-color: #f8fafc;
+                            border: 1px solid #e2e8f0;
+                            border-radius: 10px;
                         }
                         .info-box { margin-bottom: 0; }
                         .info-box p { 
-                            margin: 8px 0; 
+                            margin: 6px 0; 
                             font-size: 13px;
                         }
                         .info-box strong { 
-                            color: #1a1a1a;
+                            color: #0f172a;
                             font-weight: 600;
                         }
                         .items-section {
-                            margin-bottom: 30px;
+                            margin-bottom: 24px;
                         }
                         table { 
                             width: 100%; 
                             border-collapse: collapse; 
-                            margin: 20px 0; 
+                            margin: 14px 0; 
+                            border: 1px solid #e5e7eb;
+                            border-radius: 10px;
+                            overflow: hidden;
                         }
                         table th { 
-                            background-color: #1a1a1a; 
+                            background-color: #0f172a; 
                             color: white;
                             padding: 12px 10px; 
                             text-align: left; 
@@ -1338,31 +1490,48 @@
                             border-bottom: 1px solid #e0e0e0;
                             font-size: 13px;
                         }
+                        table tbody tr:nth-child(even) {
+                            background-color: #f8fafc;
+                        }
                         table tr:last-child td {
-                            border-bottom: 2px solid #1a1a1a;
+                            border-bottom: none;
+                        }
+                        .item-index-badge {
+                            display: inline-flex;
+                            align-items: center;
+                            justify-content: center;
+                            min-width: 28px;
+                            height: 28px;
+                            padding: 0 8px;
+                            border-radius: 50%;
+                            background: #2563eb;
+                            color: #ffffff;
+                            font-weight: 800;
+                            font-size: 13px;
+                            line-height: 1;
+                            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
                         }
                         .total-section {
                             text-align: right;
-                            margin: 30px 0;
-                            padding: 20px;
-                            background-color: #f9f9f9;
-                            border-radius: 4px;
+                            margin: 20px 0 10px;
+                            padding: 16px 0 0;
+                            border-top: 2px solid #e5e7eb;
                         }
                         .total-label {
                             font-size: 12px;
                             font-weight: 600;
-                            color: #666;
+                            color: #64748b;
                             text-transform: uppercase;
                             letter-spacing: 1px;
                         }
                         .total-amount {
                             font-size: 28px;
                             font-weight: 700;
-                            color: #1a1a1a;
+                            color: #0f172a;
                             margin-top: 5px;
                         }
                         .signature-section {
-                            margin-top: 50px;
+                            margin-top: 36px;
                             display: grid;
                             grid-template-columns: 1fr;
                             gap: 20px;
@@ -1379,22 +1548,13 @@
                         .signature-label {
                             font-size: 11px;
                             font-weight: 600;
-                            color: #666;
+                            color: #64748b;
                             text-transform: uppercase;
                             letter-spacing: 0.5px;
                             margin-top: 5px;
                         }
-                        .notes {
-                            margin-top: 30px;
-                            padding: 15px;
-                            background-color: #f9f9f9;
-                            border-left: 3px solid #22c55e;
-                            border-radius: 2px;
-                            font-size: 12px;
-                            color: #555;
-                        }
                         .footer { 
-                            margin-top: 40px; 
+                            margin-top: 24px; 
                             text-align: center; 
                             font-size: 11px; 
                             color: #999;
@@ -1406,8 +1566,14 @@
                 <body>
                     <div class="container">
                         <div class="header">
-                            <h1>FACTURA</h1>
-                            <p>Factura #${inv.number}</p>
+                            <div>
+                                <h1>FACTURA</h1>
+                                <p>Comprobante de venta</p>
+                            </div>
+                            <div class="header-meta">
+                                <p><strong>N°:</strong> ${inv.number}</p>
+                                <span class="invoice-chip">${getStatusText(inv.status)}</span>
+                            </div>
                         </div>
                         
                         <div class="info-section">
@@ -1425,8 +1591,9 @@
                             <table>
                                 <thead>
                                     <tr>
-                                        <th style="width: 10%;">Cantidad</th>
-                                        <th style="width: 50%;">Descripción</th>
+                                        <th style="width: 8%; text-align: center;">#</th>
+                                        <th style="width: 12%;">Cantidad</th>
+                                        <th style="width: 40%;">Descripción</th>
                                         <th style="width: 20%;">Precio</th>
                                         <th style="width: 20%;">Total</th>
                                     </tr>
@@ -1449,10 +1616,6 @@
                             </div>
                         </div>
                         
-                        <div class="notes">
-                            <strong>Notas:</strong> No se admiten devoluciones
-                        </div>
-                        
                         <div class="footer">
                             <p>Generado el ${new Date().toLocaleDateString('es-ES')} - Facturación Electrónica</p>
                         </div>
@@ -1468,9 +1631,9 @@
         }
 
         function editInvoice(id) {
-            if (!ensureCanEditInvoices()) return;
             const inv = invoices.find(i => i.id === id);
             if (!inv) return;
+            if (!ensureCanEditInvoice(inv)) return;
 
             editingId = id;
             document.getElementById('invoiceListView').classList.add('hidden');
@@ -1523,7 +1686,15 @@
         }
 
         function deleteInvoice(id) {
-            if (!ensureCanEditInvoices()) return;
+            if (!(currentUser && currentUser.role === 'admin')) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Sin permisos',
+                    text: 'Solo los administradores pueden eliminar facturas.',
+                    confirmButtonColor: '#1a1a1a'
+                });
+                return;
+            }
             Swal.fire({
                 title: '¿Eliminar factura?',
                 text: "Esta acción no se puede deshacer",
@@ -1597,7 +1768,7 @@
             } else {
                 paginationContainer.classList.add('hidden');
             }
-            const canEdit = canEditInvoices();
+            const canDelete = currentUser && currentUser.role === 'admin';
             
             listContainer.innerHTML = paginatedInvoices.map(inv => {
                 const statusClass = inv.status === 'paid' ? 'status-paid' : 
@@ -1610,10 +1781,12 @@
                         <button onclick="viewInvoice(${inv.id})" class="text-gray-400 hover:text-gray-600 transition-colors">
                             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
                         </button>
-                        ${canEdit ? `
+                        ${canEditInvoice(inv) ? `
                         <button onclick="editInvoice(${inv.id})" class="text-gray-400 hover:text-blue-600 transition-colors">
                             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
                         </button>
+                        ` : ''}
+                        ${canDelete ? `
                         <button onclick="deleteInvoice(${inv.id})" class="text-gray-400 hover:text-red-600 transition-colors">
                             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
                         </button>
@@ -1622,6 +1795,7 @@
                     <div class="mb-4">
                         <h3 class="text-lg font-semibold text-gray-900 leading-tight">${inv.client}</h3>
                         <p class="text-sm text-gray-500 mt-0.5">Factura #${inv.number}</p>
+                        ${getInvoiceOwnershipBadge(inv)}
                     </div>
                     <div class="flex justify-between items-end">
                         <span class="text-2xl font-bold text-gray-900">$${inv.amount.toFixed(2)}</span>

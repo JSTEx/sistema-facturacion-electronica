@@ -22,7 +22,6 @@
             </div>
             <div class="flex items-center justify-between">
                 <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded">Entrar</button>
-                <a href="admin.html" id="adminLink" class="text-sm text-blue-600">Administración</a>
             </div>
         </form>
     </div>
@@ -47,7 +46,12 @@
             const match = users.find(u => u.email.toLowerCase() === email.toLowerCase() && u.password === password);
             if (match) {
                 localStorage.setItem('currentUser', JSON.stringify({ email: match.email, role: match.role }));
-                window.location.href = 'index.html';
+                // Si es admin, abrir panel de administración (CRUD). Si es otro rol, abrir la app principal.
+                if (match.role === 'admin') {
+                    window.location.href = 'admin.html';
+                } else {
+                    window.location.href = 'index.html';
+                }
             } else {
                 alert('Credenciales no válidas');
             }

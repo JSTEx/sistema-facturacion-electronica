@@ -5,10 +5,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Admin - Usuarios</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body class="min-h-screen bg-gray-50 p-8">
     <div class="max-w-3xl mx-auto bg-white p-6 rounded shadow">
         <h1 class="text-2xl font-bold mb-4">Panel de Administración - Usuarios</h1>
+        <div class="flex gap-2 mb-4">
+            <input id="userSearch" type="text" placeholder="Buscar por email" class="px-3 py-2 border rounded w-1/2" />
+            <select id="pageSize" class="px-3 py-2 border rounded w-24">
+                <option value="5">5</option>
+                <option value="10" selected>10</option>
+                <option value="20">20</option>
+            </select>
+            <button id="exportBtn" class="ml-auto px-3 py-2 bg-gray-200 rounded">Exportar JSON</button>
+            <input id="importFile" type="file" accept="application/json" class="hidden" />
+            <button id="importBtn" class="px-3 py-2 bg-gray-200 rounded">Importar JSON</button>
+        </div>
         <div class="mb-4">
             <form id="userForm" class="grid grid-cols-3 gap-3 items-end">
                 <div>
@@ -40,6 +52,13 @@
             </thead>
             <tbody id="usersBody"></tbody>
         </table>
+        <div class="flex justify-between items-center mt-4">
+            <div>
+                <button id="prevPage" class="px-3 py-1 bg-gray-100 rounded">Anterior</button>
+                <button id="nextPage" class="px-3 py-1 bg-gray-100 rounded">Siguiente</button>
+            </div>
+            <div class="text-sm text-gray-600">Página <span id="currentPage">1</span></div>
+        </div>
     </div>
 
     <script>
@@ -47,10 +66,31 @@
         (function checkAdmin(){
             const current = JSON.parse(localStorage.getItem('currentUser') || 'null');
             if (!current || current.role !== 'admin') {
-                alert('Acceso denegado. Debes iniciar sesión como administrador.');
-                window.location.href = 'login.html';
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Acceso denegado',
+                    text: 'Debes iniciar sesión como administrador.',
+                    confirmButtonColor: '#1f2937'
+                }).then(() => window.location.href = 'login.html');
             }
         })();
+
+        // Helper: SHA-256 hash to hex
+        async function hashPassword(pw) {
+            const enc = new TextEncoder();
+            const data = enc.encode(pw);
+            const hash = await crypto.subtle.digest('SHA-256', data);
+            const arr = Array.from(new Uint8Array(hash));
+            return arr.map(b => b.toString(16).padStart(2,'0')).join('');
+        }
+
+        // Audit log
+        function logAction(action, target) {
+            const admin = JSON.parse(localStorage.getItem('currentUser') || 'null');
+            const audits = JSON.parse(localStorage.getItem('adminAudit') || '[]');
+            audits.push({ time: new Date().toISOString(), admin: admin? admin.email : null, action, target });
+            localStorage.setItem('adminAudit', JSON.stringify(audits));
+        }
 
         function loadUsers(){
             return JSON.parse(localStorage.getItem('users') || '[]');
@@ -60,41 +100,178 @@
             localStorage.setItem('users', JSON.stringify(list));
         }
 
+        // helpers
+        function countAdmins(list){
+            return list.filter(u => u.role === 'admin').length;
+        }
+
+        // pagination/search state
+        let currentPage = 1;
+        let pageSize = parseInt(document.getElementById('pageSize').value || '10');
+        let currentFilter = '';
+
         function render(){
-            const users = loadUsers();
+            const allUsers = loadUsers();
             const tbody = document.getElementById('usersBody');
+            const current = JSON.parse(localStorage.getItem('currentUser') || 'null');
+            // apply search filter
+            const filter = (currentFilter || '').toLowerCase();
+            const filtered = allUsers.filter(u => u.email.toLowerCase().includes(filter));
+            // pagination
+            pageSize = parseInt(document.getElementById('pageSize').value || '10');
+            const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
+            if (currentPage > totalPages) currentPage = totalPages;
+            const start = (currentPage - 1) * pageSize;
+            const pageItems = filtered.slice(start, start + pageSize);
+
             tbody.innerHTML = '';
-            users.forEach((u, i) => {
+            pageItems.forEach((u, idx) => {
+                const globalIndex = allUsers.indexOf(u);
+                const isCurrent = current && current.email && (u.email.toLowerCase() === current.email.toLowerCase());
                 const tr = document.createElement('tr');
-                tr.innerHTML = `<td class="p-2">${u.email}</td><td class="p-2 text-center">${u.role}</td><td class="p-2 text-center"><button data-index="${i}" class="delBtn px-2 py-1 bg-red-500 text-white rounded">Eliminar</button></td>`;
+                tr.innerHTML = `<td class="p-2">${u.email}${isCurrent? ' <span class="text-xs text-gray-500">(Cuenta actual)</span>':''}</td><td class="p-2 text-center">${u.role}</td><td class="p-2 text-center">${isCurrent? '<span class="text-xs text-gray-500">-</span>' : `<button data-index="${globalIndex}" class="editBtn px-2 py-1 bg-blue-500 text-white rounded mr-2">Editar</button><button data-index="${globalIndex}" class="delBtn px-2 py-1 bg-red-500 text-white rounded">Eliminar</button>`}</td>`;
                 tbody.appendChild(tr);
             });
+
+            document.getElementById('currentPage').textContent = currentPage;
+
+            // Attach events
             document.querySelectorAll('.delBtn').forEach(b => b.addEventListener('click', function(){
                 const idx = parseInt(this.getAttribute('data-index'));
                 const users = loadUsers();
-                users.splice(idx,1);
-                saveUsers(users);
-                render();
+                const target = users[idx];
+                // Prevent deleting last admin or self
+                const adminCount = countAdmins(users);
+                const isTargetAdmin = target.role === 'admin';
+                const currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
+                if (currentUser && currentUser.email && currentUser.email.toLowerCase() === target.email.toLowerCase()){
+                    Swal.fire({icon:'error', title:'No permitido', text:'No puedes eliminar la cuenta con la que estás logueado.'});
+                    return;
+                }
+                if (isTargetAdmin && adminCount <= 1){
+                    Swal.fire({icon:'error', title:'No permitido', text:'Debe existir al menos un administrador.'});
+                    return;
+                }
+                Swal.fire({
+                    title: 'Eliminar usuario? ',
+                    text: `Eliminar ${target.email} no se puede deshacer.`,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#dc2626',
+                    cancelButtonColor: '#16a34a',
+                    confirmButtonText: 'Sí, eliminar',
+                    cancelButtonText: 'No, cancelar'
+                }).then((res) => {
+                    if (res.isConfirmed) {
+                        users.splice(idx,1);
+                        saveUsers(users);
+                        logAction('delete', target.email);
+                        Swal.fire({icon:'success', title:'Eliminado', timer:900, showConfirmButton:false});
+                        render();
+                    }
+                });
+            }));
+
+            document.querySelectorAll('.editBtn').forEach(b => b.addEventListener('click', function(){
+                const idx = parseInt(this.getAttribute('data-index'));
+                openEditDialog(idx);
             }));
         }
 
-        document.getElementById('userForm').addEventListener('submit', function(e){
+        document.getElementById('userForm').addEventListener('submit', async function(e){
             e.preventDefault();
             const email = document.getElementById('uemail').value.trim();
             const pass = document.getElementById('upass').value;
             const role = document.getElementById('urole').value;
             const users = loadUsers();
             if (users.find(u => u.email.toLowerCase() === email.toLowerCase())){
-                alert('El usuario ya existe');
+                Swal.fire({icon:'error', title:'Error', text:'El usuario ya existe', confirmButtonColor:'#1f2937'});
                 return;
             }
-            users.push({ email, password: pass, role });
+            const hashed = await hashPassword(pass);
+            users.push({ email, password: hashed, role });
             saveUsers(users);
             this.reset();
+            logAction('create', email);
+            Swal.fire({icon:'success', title:'Usuario creado', showConfirmButton:false, timer:900});
             render();
         });
 
-        render();
+        // Edit dialog
+        async function openEditDialog(index){
+            const users = loadUsers();
+            const target = users[index];
+            const current = JSON.parse(localStorage.getItem('currentUser') || 'null');
+            const { value: formValues } = await Swal.fire({
+                title: `Editar ${target.email}`,
+                html:
+                    `<input id="swal-pass" class="swal2-input" placeholder="Nueva contraseña (dejar vacío para mantener)">`+
+                    `<select id="swal-role" class="swal2-select"><option value="user">Usuario</option><option value="admin">Administrador</option></select>`,
+                focusConfirm: false,
+                showCancelButton: true,
+                preConfirm: () => {
+                    return {
+                        newPass: document.getElementById('swal-pass').value,
+                        newRole: document.getElementById('swal-role').value
+                    }
+                }
+            });
+            if (formValues) {
+                // prevent demoting self
+                if (current && current.email && current.email.toLowerCase() === target.email.toLowerCase() && formValues.newRole !== 'admin'){
+                    Swal.fire({icon:'error', title:'Acción no permitida', text:'No puedes despromover tu propia cuenta.'});
+                    return;
+                }
+                if (formValues.newPass) {
+                    const hashed = await hashPassword(formValues.newPass);
+                    target.password = hashed;
+                }
+                target.role = formValues.newRole;
+                saveUsers(users);
+                logAction('edit', target.email);
+                Swal.fire({icon:'success', title:'Actualizado', timer:900, showConfirmButton:false});
+                render();
+            }
+        }
+
+        // Export / Import
+        document.getElementById('exportBtn').addEventListener('click', function(){
+            const data = localStorage.getItem('users') || '[]';
+            const blob = new Blob([data], {type: 'application/json'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a'); a.href = url; a.download = 'users.json'; a.click(); URL.revokeObjectURL(url);
+        });
+
+        document.getElementById('importBtn').addEventListener('click', function(){
+            document.getElementById('importFile').click();
+        });
+
+        document.getElementById('importFile').addEventListener('change', function(e){
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(){
+                try{
+                    const imported = JSON.parse(reader.result);
+                    if (!Array.isArray(imported)) throw new Error('Formato incorrecto');
+                    // basic validation
+                    const valid = imported.every(u => u.email && u.password && u.role);
+                    if (!valid) throw new Error('Formato incorrecto');
+                    localStorage.setItem('users', JSON.stringify(imported));
+                    Swal.fire({icon:'success', title:'Importado', timer:900, showConfirmButton:false});
+                    render();
+                }catch(err){
+                    Swal.fire({icon:'error', title:'Error', text: err.message || 'Archivo inválido'});
+                }
+            };
+            reader.readAsText(file);
+        });
+
+        // Search and pagination controls
+        document.getElementById('userSearch').addEventListener('input', function(e){ currentFilter = e.target.value; currentPage = 1; render(); });
+        document.getElementById('pageSize').addEventListener('change', function(e){ pageSize = parseInt(e.target.value); currentPage = 1; render(); });
+        document.getElementById('prevPage').addEventListener('click', function(){ if (currentPage>1) { currentPage--; render(); } });
+        document.getElementById('nextPage').addEventListener('click', function(){ currentPage++; render(); });
     </script>
 </body>
 </html>

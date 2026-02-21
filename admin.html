@@ -54,58 +54,72 @@
             <button onclick="logout()" class="text-sm">Logout</button>
         </div>
     </nav>
-    <div class="max-w-3xl mx-auto bg-white p-6 rounded shadow">
-        <h1 class="text-2xl font-bold mb-4">Panel de Administración - Usuarios</h1>
-        <div class="flex gap-2 mb-4">
-            <input id="userSearch" type="text" placeholder="Buscar por email" class="px-3 py-2 border rounded w-1/2" />
-            <select id="pageSize" class="px-3 py-2 border rounded w-24">
-                <option value="5">5</option>
-                <option value="10" selected>10</option>
-                <option value="20">20</option>
-            </select>
-            <button id="exportBtn" class="ml-auto px-3 py-2 bg-gray-200 rounded">Exportar JSON</button>
-            <input id="importFile" type="file" accept="application/json" class="hidden" />
-            <button id="importBtn" class="px-3 py-2 bg-gray-200 rounded">Importar JSON</button>
-        </div>
-        <div class="mb-4">
-            <form id="userForm" class="grid grid-cols-3 gap-3 items-end">
+    <main class="flex-1 max-w-6xl w-full mx-auto px-6 py-8">
+        <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-6" style="background-color:var(--bg-secondary); border-color:var(--border-color);">
+            <div class="flex items-start justify-between mb-6">
                 <div>
-                    <label class="block text-sm">Email</label>
-                    <input id="uemail" type="email" class="mt-1 block w-full border-gray-200 rounded" required />
+                    <h1 class="text-2xl font-bold" style="color:var(--text-primary);">Panel de Administración</h1>
+                    <p class="text-sm text-gray-500" style="color:var(--text-secondary);">Gestiona usuarios, exporta/importa y revisa acciones del administrador.</p>
                 </div>
-                <div>
-                    <label class="block text-sm">Contraseña</label>
-                    <input id="upass" type="password" class="mt-1 block w-full border-gray-200 rounded" required />
+                <div class="flex items-center gap-3">
+                    <div class="flex items-center border rounded overflow-hidden" style="border-color:var(--border-color); background-color:var(--bg-primary);">
+                        <input id="userSearch" type="text" placeholder="Buscar por email" class="px-3 py-2 text-sm" style="border:0;outline:none;background:transparent;min-width:280px; color:var(--text-primary);" />
+                        <select id="pageSize" class="px-3 py-2 text-sm border-l" style="border-left:1px solid var(--border-color); background:transparent; color:var(--text-primary);">
+                            <option value="5">5</option>
+                            <option value="10" selected>10</option>
+                            <option value="20">20</option>
+                        </select>
+                    </div>
+                    <button id="exportBtn" class="px-3 py-2 bg-gray-100 rounded text-sm" style="border:1px solid var(--border-color);">Exportar JSON</button>
+                    <input id="importFile" type="file" accept="application/json" class="hidden" />
+                    <button id="importBtn" class="px-3 py-2 bg-gray-100 rounded text-sm" style="border:1px solid var(--border-color);">Importar JSON</button>
                 </div>
-                <div>
-                    <label class="block text-sm">Rol</label>
-                    <select id="urole" class="mt-1 block w-full border-gray-200 rounded">
+            </div>
+
+            <form id="userForm" class="grid grid-cols-12 gap-3 items-end mb-6">
+                <div class="col-span-5">
+                    <label class="block text-xs font-semibold mb-1" style="color:var(--text-secondary);">Email</label>
+                    <input id="uemail" type="email" class="w-full px-3 py-2 border rounded" required style="background-color:var(--input-bg); border-color:var(--input-border); color:var(--text-primary);" />
+                </div>
+                <div class="col-span-4">
+                    <label class="block text-xs font-semibold mb-1" style="color:var(--text-secondary);">Contraseña</label>
+                    <input id="upass" type="password" class="w-full px-3 py-2 border rounded" required style="background-color:var(--input-bg); border-color:var(--input-border); color:var(--text-primary);" />
+                </div>
+                <div class="col-span-2">
+                    <label class="block text-xs font-semibold mb-1" style="color:var(--text-secondary);">Rol</label>
+                    <select id="urole" class="w-full px-3 py-2 border rounded" style="background-color:var(--input-bg); border-color:var(--input-border); color:var(--text-primary);">
                         <option value="user">Usuario</option>
                         <option value="admin">Administrador</option>
                     </select>
                 </div>
-                <div class="col-span-3 text-right">
+                <div class="col-span-1 text-right">
                     <button type="submit" class="px-4 py-2 bg-green-600 text-white rounded">Crear usuario</button>
-                    <a href="index.html" class="ml-3 text-sm text-blue-600">Volver a la app</a>
                 </div>
             </form>
-        </div>
 
-        <h2 class="text-lg font-semibold mt-4 mb-2">Usuarios existentes</h2>
-        <table class="w-full text-sm border-collapse">
-            <thead>
-                <tr class="bg-gray-100"><th class="p-2 text-left">Email</th><th class="p-2">Rol</th><th class="p-2">Acciones</th></tr>
-            </thead>
-            <tbody id="usersBody"></tbody>
-        </table>
-        <div class="flex justify-between items-center mt-4">
-            <div>
-                <button id="prevPage" class="px-3 py-1 bg-gray-100 rounded">Anterior</button>
-                <button id="nextPage" class="px-3 py-1 bg-gray-100 rounded">Siguiente</button>
+            <h2 class="text-lg font-semibold mt-4 mb-2" style="color:var(--text-primary);">Usuarios existentes</h2>
+            <div class="overflow-x-auto bg-white rounded border" style="border-color:var(--border-color);">
+                <table class="min-w-full text-sm">
+                    <thead>
+                        <tr class="bg-gray-50">
+                            <th class="p-3 text-left" style="color:var(--text-secondary);">Email</th>
+                            <th class="p-3 text-center" style="color:var(--text-secondary);">Rol</th>
+                            <th class="p-3 text-center" style="color:var(--text-secondary);">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="usersBody"></tbody>
+                </table>
             </div>
-            <div class="text-sm text-gray-600">Página <span id="currentPage">1</span></div>
+
+            <div class="flex justify-between items-center mt-4">
+                <div>
+                    <button id="prevPage" class="px-3 py-1 bg-gray-100 rounded">Anterior</button>
+                    <button id="nextPage" class="px-3 py-1 bg-gray-100 rounded">Siguiente</button>
+                </div>
+                <div class="text-sm text-gray-600" style="color:var(--text-secondary);">Página <span id="currentPage">1</span></div>
+            </div>
         </div>
-    </div>
+    </main>
 
     <script>
         // Requerir que el usuario logueado sea admin

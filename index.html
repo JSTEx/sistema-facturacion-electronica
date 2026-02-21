@@ -88,83 +88,47 @@
             color: #fca5a5;
         }
 
-        /* Dark Mode Toggle Button */
-        .dark-mode-toggle {
-            position: fixed;
-            top: 10px;
-            right: 270px;
-            z-index: 1000;
-            width: 48px;
-            height: 48px;
-            background: rgba(255, 255, 255, 0.8);
-            border: 1px solid rgba(229, 231, 235, 0.5);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-            backdrop-filter: blur(10px);
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
-        }
+        /* Dark Mode Toggle Button (inline in navbar) */
+            .dark-mode-toggle {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                width: 40px;
+                height: 36px;
+                background: transparent;
+                border: 1px solid transparent;
+                border-radius: 8px;
+                cursor: pointer;
+                transition: background-color 0.2s ease, transform 0.12s ease;
+                margin-right: 6px;
+                padding: 4px;
+            }
 
-        html.dark-mode .dark-mode-toggle {
-            background: rgba(42, 47, 64, 0.8);
-            border-color: rgba(58, 63, 82, 0.5);
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
-        }
+            html.dark-mode .dark-mode-toggle {
+                background: rgba(255,255,255,0.03);
+                border-color: rgba(255,255,255,0.03);
+            }
 
-        .dark-mode-toggle:hover {
-            background: rgba(255, 255, 255, 0.95);
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
-            transform: scale(1.05);
-        }
+            .dark-mode-toggle:hover {
+                background: rgba(0,0,0,0.04);
+                transform: translateY(-1px);
+            }
 
-        html.dark-mode .dark-mode-toggle:hover {
-            background: rgba(42, 47, 64, 0.95);
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
-        }
+            html.dark-mode .dark-mode-toggle:hover {
+                background: rgba(255,255,255,0.04);
+            }
 
-        .dark-mode-toggle:active {
-            transform: scale(0.95);
-        }
+            .dark-mode-toggle:active { transform: translateY(0); }
 
-        .toggle-icon {
-            width: 24px;
-            height: 24px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-        }
+            .toggle-icon { width: 20px; height: 20px; position: relative; display:inline-block; }
 
-        .icon-sun,
-        .icon-moon {
-            position: absolute;
-            width: 20px;
-            height: 20px;
-            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-            opacity: 1;
-            transform: scale(1) rotate(0deg);
-        }
+            .icon-sun, .icon-moon { position: absolute; width: 20px; height: 20px; transition: all 0.28s ease; }
 
-        .icon-sun {
-            color: #f59e0e;
-        }
+            .icon-sun { color: #f59e0e; }
+            .icon-moon { color: #6366f1; opacity: 0; transform: scale(0.8) rotate(-20deg); }
 
-        .icon-moon {
-            color: #6366f1;
-        }
-
-        html.dark-mode .icon-sun {
-            opacity: 0;
-            transform: scale(0.5) rotate(-180deg);
-        }
-
-        html.dark-mode .icon-moon {
-            opacity: 1;
-            transform: scale(1) rotate(0deg);
-        }
+            html.dark-mode .icon-sun { opacity: 0; transform: scale(0.8) rotate(20deg); }
+            html.dark-mode .icon-moon { opacity: 1; transform: scale(1) rotate(0deg); }
 
         /* Estilo para el botón Nueva Factura en modo oscuro */
         #btnNewInvoice {
@@ -462,42 +426,39 @@
         html.dark-mode strong {
             color: var(--text-primary) !important;
         }
+
+        .nav-link-btn {
+            color: var(--text-secondary);
+        }
+
+        .nav-link-btn:hover {
+            color: var(--text-primary);
+        }
     </style>
 </head>
 <body class="bg-white text-gray-900 min-h-screen flex flex-col">
 
-    <!-- Dark Mode Toggle Button -->
-    <button class="dark-mode-toggle" onclick="toggleDarkMode()" title="Alternar modo oscuro">
-        <div class="toggle-icon">
-            <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="12" cy="12" r="5"></circle>
-                <line x1="12" y1="1" x2="12" y2="3"></line>
-                <line x1="12" y1="21" x2="12" y2="23"></line>
-                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
-                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
-                <line x1="1" y1="12" x2="3" y2="12"></line>
-                <line x1="21" y1="12" x2="23" y2="12"></line>
-                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
-                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
-            </svg>
-            <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
-            </svg>
-        </div>
-    </button>
+    
 
     <!-- Navbar -->
     <nav class="border-b border-gray-200 px-6 py-4 flex justify-between items-center bg-white sticky top-0 z-50" style="border-color: var(--border-color); background-color: var(--nav-bg);">
-        <div class="flex items-center gap-6">
+        <div class="flex items-center gap-4">
             <span class="text-lg font-semibold" style="color: var(--text-primary);">Facturación Electrónica</span>
             <button id="btnNewInvoice" onclick="showInvoiceForm()" class="bg-gray-800 hover:bg-gray-800 text-white px-4 py-2 rounded-md text-sm font-medium flex items-center gap-2 transition-colors" style="background-color: #22c55e;">            
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                 Nueva Factura
             </button>
+            <div id="adminPanelBtnContainer"></div>
         </div>
         <div class="flex items-center gap-6">
+            <button class="dark-mode-toggle" onclick="toggleDarkMode()" title="Alternar modo oscuro" aria-label="Alternar modo oscuro">
+                <div class="toggle-icon">
+                    <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="20" height="20"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+                    <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="20" height="20"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                </div>
+            </button>
             <span id="currentUserEmail" class="text-sm" style="color: var(--text-secondary);"></span>
-            <button onclick="logout()" class="text-sm flex items-center gap-2 transition-colors" style="color: var(--text-secondary); hover: var(--text-primary);">
+            <button onclick="logout()" class="text-sm flex items-center gap-2 transition-colors nav-link-btn">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
                 Logout
             </button>
@@ -516,11 +477,11 @@
                 </div>
             </div>
 
-            <div class="flex gap-4 mb-8">
+            <div class="flex flex-col sm:flex-row gap-4 mb-8">
                 <div class="flex-1 relative">
-                    <input type="text" id="searchInput" placeholder="Buscar facturas..." class="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-gray-900 transition-colors">
+                    <input type="text" id="searchInput" placeholder="Buscar facturas..." class="w-full h-10 px-4 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-gray-900 transition-colors">
                 </div>
-                <select id="filterSelect" class="px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-gray-900 bg-white min-w-[160px] cursor-pointer">
+                <select id="filterSelect" class="h-10 px-4 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-gray-900 bg-white min-w-[180px] cursor-pointer">
                     <option value="all">Todas las facturas</option>
                     <option value="paid">Pagadas</option>
                     <option value="pending">Pendientes</option>
@@ -538,11 +499,11 @@
 
             <!-- Paginación -->
             <div id="paginationContainer" class="hidden mt-8 flex justify-center items-center gap-2">
-                <button onclick="previousPage()" class="px-4 py-2 border border-gray-200 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors">
+                <button onclick="previousPage()" class="h-10 px-4 border border-gray-200 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors">
                     ← Anterior
                 </button>
                 <div id="pageButtons" class="flex gap-2"></div>
-                <button onclick="nextPage()" class="px-4 py-2 border border-gray-200 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors">
+                <button onclick="nextPage()" class="h-10 px-4 border border-gray-200 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors">
                     Siguiente →
                 </button>
             </div>
@@ -664,18 +625,66 @@
     </main>
 
     <script>
+        let currentUser = null;
+
+        function loadCurrentUser() {
+            try {
+                return JSON.parse(localStorage.getItem('currentUser') || 'null');
+            } catch {
+                return null;
+            }
+        }
+
+        function canEditInvoices() {
+            return currentUser && currentUser.role === 'admin';
+        }
+
+        function ensureCanEditInvoices() {
+            if (canEditInvoices()) return true;
+            Swal.fire({
+                icon: 'error',
+                title: 'Sin permisos',
+                text: 'Tu usuario no tiene permisos para modificar facturas.',
+                confirmButtonColor: '#1a1a1a'
+            });
+            return false;
+        }
+
         // Require login: si no hay usuario logueado, redirigir a login
         (function ensureLogin(){
             try {
-                const current = JSON.parse(localStorage.getItem('currentUser') || 'null');
+                const current = loadCurrentUser();
                 if (!current) {
                     window.location.href = 'login.html';
                     return;
                 }
+                currentUser = current;
                 // Mostrar email en navbar si existe el elemento
                 document.addEventListener('DOMContentLoaded', () => {
                     const el = document.getElementById('currentUserEmail');
                     if (el) el.textContent = current.email;
+
+                    const newInvoiceBtn = document.getElementById('btnNewInvoice');
+                    if (newInvoiceBtn && !canEditInvoices()) {
+                        newInvoiceBtn.classList.add('hidden');
+                    }
+
+                    // Mostrar botón 'Panel de Usuarios' solo para administradores
+                    try {
+                        const adminContainer = document.getElementById('adminPanelBtnContainer');
+                        if (adminContainer) {
+                            adminContainer.innerHTML = '';
+                            if (current && current.role === 'admin') {
+                                const btn = document.createElement('button');
+                                btn.id = 'btnAdminPanel';
+                                btn.className = 'px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md text-sm font-medium transition-colors';
+                                btn.style.marginRight = '6px';
+                                btn.textContent = 'Usuarios';
+                                btn.onclick = () => { window.location.href = 'admin.html'; };
+                                adminContainer.appendChild(btn);
+                            }
+                        }
+                    } catch(e) { console.error('admin button render error', e); }
                 });
             } catch(e) {
                 console.error('Auth check error', e);
@@ -702,6 +711,7 @@
         const invoicesPerPage = 30;
 
         function showInvoiceForm() {
+            if (!ensureCanEditInvoices()) return;
             editingId = null;
             document.getElementById('invoiceListView').classList.add('hidden');
             document.getElementById('invoiceFormView').classList.remove('hidden');
@@ -790,6 +800,7 @@
         }
 
         function addItem() {
+            if (!ensureCanEditInvoices()) return;
             const tbody = document.getElementById('itemsTableBody');
             const newRow = document.createElement('tr');
             newRow.className = 'border-b border-gray-100';
@@ -816,6 +827,7 @@
         }
 
         function removeItem(btn) {
+            if (!ensureCanEditInvoices()) return;
             const rows = document.querySelectorAll('#itemsTableBody tr');
             if (rows.length > 1) {
                 btn.closest('tr').remove();
@@ -847,6 +859,7 @@
 
         function handleSubmit(e) {
             e.preventDefault();
+            if (!ensureCanEditInvoices()) return;
             
             const dia = document.getElementById('dia').value;
             const mes = document.getElementById('mes').value;
@@ -951,6 +964,7 @@
         }
 
         function saveInvoice() {
+            if (!ensureCanEditInvoices()) return;
             const total = parseFloat(document.getElementById('totalAmount').textContent);
             const estadoMap = {
                 'Pagada': 'paid',
@@ -1093,6 +1107,7 @@
             } else {
                 paginationContainer.classList.add('hidden');
             }
+            const canEdit = canEditInvoices();
             
             listContainer.innerHTML = paginatedInvoices.map(inv => {
                 const statusClass = inv.status === 'paid' ? 'status-paid' : 
@@ -1101,22 +1116,18 @@
                 
                 return `
                 <div class="invoice-card bg-white border border-gray-200 rounded-lg p-5 relative">
-                    <div style="position:absolute;left:16px;top:16px;">
-                        <span class="status-badge ${statusClass}">${statusText}</span>
-                    </div>
-                    <div style="position:absolute;left:16px;top:16px;">
-                        <span class="status-badge ${statusClass}">${statusText}</span>
-                    </div>
                     <div class="flex justify-end gap-3 mb-2">
                         <button onclick="viewInvoice(${inv.id})" class="text-gray-400 hover:text-gray-600 transition-colors" title="Ver">
                             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
                         </button>
+                        ${canEdit ? `
                         <button onclick="editInvoice(${inv.id})" class="text-gray-400 hover:text-blue-600 transition-colors" title="Editar">
                             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
                         </button>
                         <button onclick="deleteInvoice(${inv.id})" class="text-gray-400 hover:text-red-600 transition-colors" title="Eliminar">
                             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
                         </button>
+                        ` : ''}
                     </div>
                     
                     <div class="mb-4">
@@ -1128,6 +1139,7 @@
                         <span class="text-2xl font-bold text-gray-900">$${inv.amount.toFixed(2)}</span>
                         <div class="flex items-center gap-6"></div>
                     </div>
+                    <span class="status-badge ${statusClass} absolute bottom-3 right-3">${statusText}</span>
                 </div>
                 `;
             }).join('');
@@ -1456,6 +1468,7 @@
         }
 
         function editInvoice(id) {
+            if (!ensureCanEditInvoices()) return;
             const inv = invoices.find(i => i.id === id);
             if (!inv) return;
 
@@ -1510,6 +1523,7 @@
         }
 
         function deleteInvoice(id) {
+            if (!ensureCanEditInvoices()) return;
             Swal.fire({
                 title: '¿Eliminar factura?',
                 text: "Esta acción no se puede deshacer",
@@ -1583,6 +1597,7 @@
             } else {
                 paginationContainer.classList.add('hidden');
             }
+            const canEdit = canEditInvoices();
             
             listContainer.innerHTML = paginatedInvoices.map(inv => {
                 const statusClass = inv.status === 'paid' ? 'status-paid' : 
@@ -1595,12 +1610,14 @@
                         <button onclick="viewInvoice(${inv.id})" class="text-gray-400 hover:text-gray-600 transition-colors">
                             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
                         </button>
+                        ${canEdit ? `
                         <button onclick="editInvoice(${inv.id})" class="text-gray-400 hover:text-blue-600 transition-colors">
                             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
                         </button>
                         <button onclick="deleteInvoice(${inv.id})" class="text-gray-400 hover:text-red-600 transition-colors">
                             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
                         </button>
+                        ` : ''}
                     </div>
                     <div class="mb-4">
                         <h3 class="text-lg font-semibold text-gray-900 leading-tight">${inv.client}</h3>
@@ -1653,21 +1670,26 @@
         function initDarkMode() {
             const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
             const savedMode = localStorage.getItem('darkMode');
+            const isSavedDark = savedMode === '1' || savedMode === 'true';
             
             if (savedMode !== null) {
-                if (savedMode === 'true') {
+                if (isSavedDark) {
                     document.documentElement.classList.add('dark-mode');
+                } else {
+                    document.documentElement.classList.remove('dark-mode');
                 }
             } else if (prefersDark) {
                 document.documentElement.classList.add('dark-mode');
-                localStorage.setItem('darkMode', 'true');
+                localStorage.setItem('darkMode', '1');
+            } else {
+                localStorage.setItem('darkMode', '0');
             }
         }
 
         function toggleDarkMode() {
             const html = document.documentElement;
             const isDarkMode = html.classList.toggle('dark-mode');
-            localStorage.setItem('darkMode', isDarkMode);
+            localStorage.setItem('darkMode', isDarkMode ? '1' : '0');
         }
 
         // Inicializar Dark Mode al cargar la página

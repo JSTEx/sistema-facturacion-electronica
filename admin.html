@@ -41,49 +41,46 @@
 
         nav.admin-nav { background-color: var(--nav-bg); border-bottom: 1px solid var(--border-color); }
 
+        /* Dark Mode Toggle Button (inline in navbar) */
         .dark-mode-toggle {
-            position: fixed;
-            top: 10px;
-            right: 270px;
-            z-index: 1000;
-            width: 48px;
-            height: 48px;
-            background: rgba(255, 255, 255, 0.8);
-            border: 1px solid rgba(229, 231, 235, 0.5);
-            border-radius: 50%;
-            display: flex;
+            display: inline-flex;
             align-items: center;
             justify-content: center;
+            width: 40px;
+            height: 36px;
+            background: transparent;
+            border: 1px solid transparent;
+            border-radius: 8px;
             cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-            backdrop-filter: blur(10px);
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+            transition: background-color 0.2s ease, transform 0.12s ease;
+            margin-right: 6px;
+            padding: 4px;
         }
 
         html.dark-mode .dark-mode-toggle {
-            background: rgba(42, 47, 64, 0.8);
-            border-color: rgba(58, 63, 82, 0.5);
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+            background: rgba(255,255,255,0.03);
+            border-color: rgba(255,255,255,0.03);
         }
 
         .dark-mode-toggle:hover {
-            background: rgba(255, 255, 255, 0.95);
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
-            transform: scale(1.05);
+            background: rgba(0,0,0,0.04);
+            transform: translateY(-1px);
         }
 
         html.dark-mode .dark-mode-toggle:hover {
-            background: rgba(42, 47, 64, 0.95);
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+            background: rgba(255,255,255,0.04);
         }
 
-        .dark-mode-toggle:active { transform: scale(0.95); }
+        .dark-mode-toggle:active { transform: translateY(0); }
 
-        .toggle-icon { width: 24px; height: 24px; display:flex; align-items:center; justify-content:center; position:relative }
-        .icon-sun, .icon-moon { position:absolute; width:20px; height:20px; transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); opacity:1; transform:scale(1) rotate(0deg); }
+        .toggle-icon { width: 20px; height: 20px; position: relative; display:inline-block; }
+
+        .icon-sun, .icon-moon { position: absolute; width: 20px; height: 20px; transition: all 0.28s ease; }
+
         .icon-sun { color: #f59e0e; }
-        .icon-moon { color: #6366f1; }
-        html.dark-mode .icon-sun { opacity: 0; transform: scale(0.5) rotate(-180deg); }
+        .icon-moon { color: #6366f1; opacity: 0; transform: scale(0.8) rotate(-20deg); }
+
+        html.dark-mode .icon-sun { opacity: 0; transform: scale(0.8) rotate(20deg); }
         html.dark-mode .icon-moon { opacity: 1; transform: scale(1) rotate(0deg); }
 
         /* status badges */
@@ -97,9 +94,66 @@
 
         /* form and table styles */
         input, select, textarea { background-color: var(--input-bg); border: 1px solid var(--input-border); color: var(--text-primary); }
+        input::placeholder, textarea::placeholder { color: var(--text-secondary); }
+        select option { background-color: var(--bg-secondary); color: var(--text-primary); }
         .bg-white { background-color: var(--bg-secondary) !important; }
         .rounded-xl { border-radius: 12px; }
         .shadow-sm { box-shadow: var(--card-shadow); }
+
+        .soft-btn {
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+        }
+
+        .back-invoices-btn {
+            background-color: #22c55e;
+            color: #ffffff;
+            border: 1px solid #22c55e;
+            box-shadow: 0 2px 8px rgba(34, 197, 94, 0.22);
+        }
+
+        .back-invoices-btn:hover {
+            background-color: #16a34a;
+            border-color: #16a34a;
+            box-shadow: 0 4px 14px rgba(34, 197, 94, 0.35);
+        }
+
+        html.dark-mode .back-invoices-btn {
+            background-color: #22c55e;
+            color: #ffffff;
+            border-color: #22c55e;
+            box-shadow: 0 0 14px rgba(34, 197, 94, 0.4);
+        }
+
+        html.dark-mode .back-invoices-btn:hover {
+            background-color: #16a34a;
+            border-color: #16a34a;
+            box-shadow: 0 0 18px rgba(34, 197, 94, 0.55);
+        }
+
+        .users-table thead tr {
+            background-color: var(--bg-primary);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .users-table tbody tr {
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .users-table tbody td {
+            color: var(--text-primary);
+        }
+
+        .muted-text { color: var(--text-secondary); }
+
+        .nav-link-btn {
+            color: var(--text-secondary);
+        }
+
+        .nav-link-btn:hover {
+            color: var(--text-primary);
+        }
 
         /* SweetAlert2 dark adjustments */
         html.dark-mode .swal2-popup { background-color: var(--bg-secondary) !important; color: var(--text-primary) !important; }
@@ -111,71 +165,77 @@
         }
     </style>
 </head>
-<body class="min-h-screen bg-gray-50 p-8">
+<body class="bg-white text-gray-900 min-h-screen flex flex-col">
     <!-- Navbar similar to index.html -->
-    <nav class="admin-nav px-6 py-4 flex justify-between items-center sticky top-0 z-50">
+    <nav class="border-b border-gray-200 px-6 py-4 flex justify-between items-center bg-white sticky top-0 z-50" style="border-color: var(--border-color); background-color: var(--nav-bg);">
         <div class="flex items-center gap-6">
             <span class="text-lg font-semibold" style="color: var(--text-primary);">Facturación Electrónica - Admin</span>
+            <button onclick="window.location.href='index.html'" class="px-3 py-2 rounded-md text-sm font-medium transition-colors back-invoices-btn">
+                Volver a Facturas
+            </button>
         </div>
-        <div class="flex items-center gap-4">
-            <button class="dark-mode-toggle" onclick="toggleDarkMode()" title="Alternar modo oscuro">
+        <div class="flex items-center gap-6">
+            <button class="dark-mode-toggle" onclick="toggleDarkMode()" title="Alternar modo oscuro" aria-label="Alternar modo oscuro">
                 <div class="toggle-icon">
-                    <svg class="icon-sun" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle></svg>
-                    <svg class="icon-moon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                    <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="20" height="20"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+                    <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="20" height="20"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
                 </div>
             </button>
             <span id="currentUserEmail" class="text-sm" style="color: var(--text-secondary);"></span>
-            <button onclick="logout()" class="text-sm">Logout</button>
+            <button onclick="logout()" class="text-sm flex items-center gap-2 transition-colors nav-link-btn">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+                Logout
+            </button>
         </div>
     </nav>
     <main class="flex-1 max-w-6xl w-full mx-auto px-6 py-8">
         <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-6" style="background-color:var(--bg-secondary); border-color:var(--border-color);">
-            <div class="flex items-start justify-between mb-6">
+            <div class="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4 mb-7">
                 <div>
                     <h1 class="text-2xl font-bold" style="color:var(--text-primary);">Panel de Administración</h1>
                     <p class="text-sm text-gray-500" style="color:var(--text-secondary);">Gestiona usuarios, exporta/importa y revisa acciones del administrador.</p>
                 </div>
-                <div class="flex items-center gap-3">
-                    <div class="flex items-center border rounded overflow-hidden" style="border-color:var(--border-color); background-color:var(--bg-primary);">
-                        <input id="userSearch" type="text" placeholder="Buscar por email" class="px-3 py-2 text-sm" style="border:0;outline:none;background:transparent;min-width:280px; color:var(--text-primary);" />
-                        <select id="pageSize" class="px-3 py-2 text-sm border-l" style="border-left:1px solid var(--border-color); background:transparent; color:var(--text-primary);">
+                <div class="w-full lg:w-auto flex flex-col sm:flex-row sm:items-stretch gap-3">
+                    <div class="w-full sm:min-w-[320px] flex items-center border rounded overflow-hidden" style="border-color:var(--border-color); background-color:var(--bg-primary);">
+                        <input id="userSearch" type="text" placeholder="Buscar por email" class="flex-1 px-3 h-10 text-sm" style="border:0;outline:none;background:transparent; color:var(--text-primary);" />
+                        <select id="pageSize" class="px-3 h-10 text-sm border-l" style="border-left:1px solid var(--border-color); background:transparent; color:var(--text-primary);">
                             <option value="5">5</option>
                             <option value="10" selected>10</option>
                             <option value="20">20</option>
                         </select>
                     </div>
-                    <button id="exportBtn" class="px-3 py-2 bg-gray-100 rounded text-sm" style="border:1px solid var(--border-color);">Exportar JSON</button>
+                    <button id="exportBtn" class="h-10 px-3 rounded text-sm soft-btn whitespace-nowrap">Exportar JSON</button>
                     <input id="importFile" type="file" accept="application/json" class="hidden" />
-                    <button id="importBtn" class="px-3 py-2 bg-gray-100 rounded text-sm" style="border:1px solid var(--border-color);">Importar JSON</button>
+                    <button id="importBtn" class="h-10 px-3 rounded text-sm soft-btn whitespace-nowrap">Importar JSON</button>
                 </div>
             </div>
 
-            <form id="userForm" class="grid grid-cols-12 gap-3 items-end mb-6">
-                <div class="col-span-5">
+            <form id="userForm" class="grid grid-cols-12 gap-3 items-end mb-7">
+                <div class="col-span-12 md:col-span-4">
                     <label class="block text-xs font-semibold mb-1" style="color:var(--text-secondary);">Email</label>
                     <input id="uemail" type="email" class="w-full px-3 py-2 border rounded" required style="background-color:var(--input-bg); border-color:var(--input-border); color:var(--text-primary);" />
                 </div>
-                <div class="col-span-4">
+                <div class="col-span-12 md:col-span-4">
                     <label class="block text-xs font-semibold mb-1" style="color:var(--text-secondary);">Contraseña</label>
                     <input id="upass" type="password" class="w-full px-3 py-2 border rounded" required style="background-color:var(--input-bg); border-color:var(--input-border); color:var(--text-primary);" />
                 </div>
-                <div class="col-span-2">
+                <div class="col-span-12 sm:col-span-6 md:col-span-2">
                     <label class="block text-xs font-semibold mb-1" style="color:var(--text-secondary);">Rol</label>
-                    <select id="urole" class="w-full px-3 py-2 border rounded" style="background-color:var(--input-bg); border-color:var(--input-border); color:var(--text-primary);">
+                    <select id="urole" class="w-full h-10 px-3 border rounded" style="background-color:var(--input-bg); border-color:var(--input-border); color:var(--text-primary);">
                         <option value="user">Usuario</option>
                         <option value="admin">Administrador</option>
                     </select>
                 </div>
-                <div class="col-span-1 text-right">
-                    <button type="submit" class="px-4 py-2 bg-green-600 text-white rounded">Crear usuario</button>
+                <div class="col-span-12 sm:col-span-6 md:col-span-2">
+                    <button type="submit" class="w-full h-10 px-4 bg-green-600 text-white rounded whitespace-nowrap">Crear usuario</button>
                 </div>
             </form>
 
             <h2 class="text-lg font-semibold mt-4 mb-2" style="color:var(--text-primary);">Usuarios existentes</h2>
             <div class="overflow-x-auto bg-white rounded border" style="border-color:var(--border-color);">
-                <table class="min-w-full text-sm">
+                <table class="min-w-full text-sm users-table">
                     <thead>
-                        <tr class="bg-gray-50">
+                        <tr>
                             <th class="p-3 text-left" style="color:var(--text-secondary);">Email</th>
                             <th class="p-3 text-center" style="color:var(--text-secondary);">Rol</th>
                             <th class="p-3 text-center" style="color:var(--text-secondary);">Acciones</th>
@@ -186,9 +246,9 @@
             </div>
 
             <div class="flex justify-between items-center mt-4">
-                <div>
-                    <button id="prevPage" class="px-3 py-1 bg-gray-100 rounded">Anterior</button>
-                    <button id="nextPage" class="px-3 py-1 bg-gray-100 rounded">Siguiente</button>
+                <div class="flex items-center gap-2">
+                    <button id="prevPage" class="h-10 px-4 rounded soft-btn">Anterior</button>
+                    <button id="nextPage" class="h-10 px-4 rounded soft-btn">Siguiente</button>
                 </div>
                 <div class="text-sm text-gray-600" style="color:var(--text-secondary);">Página <span id="currentPage">1</span></div>
             </div>
@@ -263,7 +323,7 @@
                 const globalIndex = allUsers.indexOf(u);
                 const isCurrent = current && current.email && (u.email.toLowerCase() === current.email.toLowerCase());
                 const tr = document.createElement('tr');
-                tr.innerHTML = `<td class="p-2">${u.email}${isCurrent? ' <span class="text-xs text-gray-500">(Cuenta actual)</span>':''}</td><td class="p-2 text-center">${u.role}</td><td class="p-2 text-center">${isCurrent? '<span class="text-xs text-gray-500">-</span>' : `<button data-index="${globalIndex}" class="editBtn px-2 py-1 bg-blue-500 text-white rounded mr-2">Editar</button><button data-index="${globalIndex}" class="delBtn px-2 py-1 bg-red-500 text-white rounded">Eliminar</button>`}</td>`;
+                tr.innerHTML = `<td class="p-2">${u.email}${isCurrent? ' <span class="text-xs muted-text">(Cuenta actual)</span>':''}</td><td class="p-2 text-center">${u.role}</td><td class="p-2 text-center">${isCurrent? '<span class="text-xs muted-text">-</span>' : `<button data-index="${globalIndex}" class="editBtn px-2 py-1 bg-blue-500 text-white rounded mr-2">Editar</button><button data-index="${globalIndex}" class="delBtn px-2 py-1 bg-red-500 text-white rounded">Eliminar</button>`}</td>`;
                 tbody.appendChild(tr);
             });
 
@@ -416,7 +476,12 @@
 
         function initDarkMode(){
             const dm = localStorage.getItem('darkMode');
-            if (dm === '1') document.documentElement.classList.add('dark-mode');
+            const isDark = dm === '1' || dm === 'true';
+            if (isDark) {
+                document.documentElement.classList.add('dark-mode');
+            } else {
+                document.documentElement.classList.remove('dark-mode');
+            }
         }
 
         // Logout helper

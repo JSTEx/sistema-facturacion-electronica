@@ -5,28 +5,144 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Login - Facturación</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root {
+            --bg-primary: #f9fafb;
+            --card-bg: #ffffff;
+            --text-primary: #111827;
+            --text-secondary: #6b7280;
+            --border-color: #e5e7eb;
+            --input-bg: #ffffff;
+            --accent: #2563eb;
+            --accent-hover: #1d4ed8;
+        }
+
+        html.dark-mode {
+            --bg-primary: #0f172a;
+            --card-bg: #1e293b;
+            --text-primary: #f1f5f9;
+            --text-secondary: #cbd5e1;
+            --border-color: #334155;
+            --input-bg: #0b1220;
+            --accent: #3b82f6;
+            --accent-hover: #2563eb;
+        }
+
+        body {
+            background-color: var(--bg-primary) !important;
+            color: var(--text-primary);
+            transition: background-color 0.25s ease, color 0.25s ease;
+            background-image: radial-gradient(1200px 600px at 20% -20%, rgba(37,99,235,0.12), transparent 55%), radial-gradient(900px 500px at 100% 120%, rgba(14,165,233,0.10), transparent 50%);
+        }
+
+        .login-card {
+            background-color: var(--card-bg) !important;
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            border-radius: 14px;
+            box-shadow: 0 18px 45px rgba(2, 6, 23, 0.12);
+            backdrop-filter: blur(2px);
+        }
+
+        .login-muted {
+            color: var(--text-secondary) !important;
+        }
+
+        .login-input {
+            background-color: var(--input-bg) !important;
+            border: 1px solid var(--border-color) !important;
+            color: var(--text-primary) !important;
+            height: 42px;
+            padding: 0 12px;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .login-input:focus {
+            outline: none;
+            border-color: var(--accent) !important;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+        }
+
+        .login-label {
+            color: var(--text-primary) !important;
+        }
+
+        .login-submit {
+            height: 42px;
+            width: 100%;
+            font-weight: 600;
+            background-color: var(--accent);
+            transition: background-color 0.2s ease, transform 0.12s ease;
+        }
+
+        .login-submit:hover {
+            background-color: var(--accent-hover);
+            transform: translateY(-1px);
+        }
+
+        .login-submit:active {
+            transform: translateY(0);
+        }
+
+        .login-brand {
+            width: 42px;
+            height: 42px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+            color: #fff;
+            font-weight: 800;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 10px 25px rgba(34, 197, 94, 0.35);
+        }
+    </style>
 </head>
 <body class="min-h-screen bg-gray-50 flex items-center justify-center">
-    <div class="w-full max-w-md bg-white p-8 rounded-lg shadow">
-        <h1 class="text-2xl font-bold mb-4 text-center">Iniciar sesión</h1>
-        <p class="text-sm text-gray-500 mb-4">Si es la primera vez, se ha creado un usuario administrador por defecto: <strong>admin@admin.com / admin123</strong></p>
+    <div class="w-full max-w-md bg-white p-8 rounded-lg shadow login-card">
+        <div class="flex flex-col items-center mb-5">
+            <div class="login-brand mb-3">$</div>
+            <h1 class="text-4xl font-bold mb-2 text-center">Iniciar sesión</h1>
+            <p class="text-sm text-center text-gray-500 login-muted">Primera vez: usa el administrador por defecto <strong>admin@admin.com / admin123</strong></p>
+        </div>
 
         <form id="loginForm" class="space-y-4">
             <div>
-                <label class="block text-sm font-medium text-gray-700">Email</label>
-                <input id="email" type="email" required class="mt-1 block w-full border-gray-200 rounded-md shadow-sm" />
+                <label class="block text-sm font-medium text-gray-700 login-label">Email</label>
+                <input id="email" type="email" required class="mt-1 block w-full border-gray-200 rounded-md shadow-sm login-input" />
             </div>
             <div>
-                <label class="block text-sm font-medium text-gray-700">Contraseña</label>
-                <input id="password" type="password" required class="mt-1 block w-full border-gray-200 rounded-md shadow-sm" />
+                <label class="block text-sm font-medium text-gray-700 login-label">Contraseña</label>
+                <input id="password" type="password" required class="mt-1 block w-full border-gray-200 rounded-md shadow-sm login-input" />
             </div>
-            <div class="flex items-center justify-between">
-                <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded">Entrar</button>
+            <div class="flex items-center justify-between pt-1">
+                <button type="submit" class="px-4 text-white rounded login-submit">Entrar</button>
             </div>
         </form>
     </div>
 
     <script>
+        function initDarkMode() {
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            const savedMode = localStorage.getItem('darkMode');
+            const isSavedDark = savedMode === '1' || savedMode === 'true';
+
+            if (savedMode !== null) {
+                if (isSavedDark) {
+                    document.documentElement.classList.add('dark-mode');
+                } else {
+                    document.documentElement.classList.remove('dark-mode');
+                }
+            } else if (prefersDark) {
+                document.documentElement.classList.add('dark-mode');
+                localStorage.setItem('darkMode', '1');
+            } else {
+                localStorage.setItem('darkMode', '0');
+            }
+        }
+
+        initDarkMode();
+
         // Helper: SHA-256 hash to hex (compatible con admin.html)
         async function hashPassword(pw) {
             const enc = new TextEncoder();

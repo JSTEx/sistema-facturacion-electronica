@@ -6,8 +6,54 @@
     <title>Admin - Usuarios</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        :root {
+            --bg-primary: #ffffff;
+            --bg-secondary: #f9fafb;
+            --text-primary: #1a1a1a;
+            --text-secondary: #6b7280;
+            --border-color: #e5e7eb;
+            --input-bg: #ffffff;
+            --input-border: #d1d5db;
+            --nav-bg: #ffffff;
+        }
+        html.dark-mode {
+            --bg-primary: #0f1419;
+            --bg-secondary: #1a1f2e;
+            --text-primary: #e5e7eb;
+            --text-secondary: #cbd5e1;
+            --border-color: #334155;
+            --input-bg: #1e293b;
+            --input-border: #475569;
+            --nav-bg: #0f1419;
+        }
+        body { font-family: 'Inter', sans-serif; background-color: var(--bg-primary); color: var(--text-primary); }
+        nav.admin-nav { background-color: var(--nav-bg); border-bottom: 1px solid var(--border-color); }
+        .dark-mode-toggle { width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer }
+        .status-badge { font-size:11px;font-weight:600;padding:4px 8px;border-radius:6px;text-transform:capitalize }
+        .status-paid{background:#dcfce7;color:#166534}
+        .status-pending{background:#fef3c7;color:#92400e}
+        .status-late{background:#fee2e2;color:#991b1b}
+        html.dark-mode .status-paid{background:#064e3b;color:#86efac}
+        html.dark-mode .status-pending{background:#78350f;color:#fcd34d}
+        html.dark-mode .status-late{background:#7f1d1d;color:#fca5a5}
+    </style>
 </head>
 <body class="min-h-screen bg-gray-50 p-8">
+    <!-- Navbar similar to index.html -->
+    <nav class="admin-nav px-6 py-4 flex justify-between items-center sticky top-0 z-50">
+        <div class="flex items-center gap-6">
+            <span class="text-lg font-semibold" style="color: var(--text-primary);">Facturación Electrónica - Admin</span>
+        </div>
+        <div class="flex items-center gap-4">
+            <button class="dark-mode-toggle" onclick="toggleDarkMode()" title="Alternar modo oscuro">
+                <svg class="icon-sun" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle></svg>
+            </button>
+            <span id="currentUserEmail" class="text-sm" style="color: var(--text-secondary);"></span>
+            <button onclick="logout()" class="text-sm">Logout</button>
+        </div>
+    </nav>
     <div class="max-w-3xl mx-auto bg-white p-6 rounded shadow">
         <h1 class="text-2xl font-bold mb-4">Panel de Administración - Usuarios</h1>
         <div class="flex gap-2 mb-4">
@@ -272,6 +318,29 @@
         document.getElementById('pageSize').addEventListener('change', function(e){ pageSize = parseInt(e.target.value); currentPage = 1; render(); });
         document.getElementById('prevPage').addEventListener('click', function(){ if (currentPage>1) { currentPage--; render(); } });
         document.getElementById('nextPage').addEventListener('click', function(){ currentPage++; render(); });
+
+        // Dark mode toggle persistence
+        function toggleDarkMode(){
+            const htmlEl = document.documentElement;
+            const isDark = htmlEl.classList.toggle('dark-mode');
+            localStorage.setItem('darkMode', isDark ? '1' : '0');
+        }
+
+        function applySavedDarkMode(){
+            const dm = localStorage.getItem('darkMode');
+            if (dm === '1') document.documentElement.classList.add('dark-mode');
+        }
+
+        // Logout helper
+        function logout(){ localStorage.removeItem('currentUser'); window.location.href='login.html'; }
+
+        // Set current user email in navbar
+        document.addEventListener('DOMContentLoaded', function(){
+            applySavedDarkMode();
+            const cur = JSON.parse(localStorage.getItem('currentUser')||'null');
+            const el = document.getElementById('currentUserEmail'); if (el && cur) el.textContent = cur.email;
+            render();
+        });
     </script>
 </body>
 </html>

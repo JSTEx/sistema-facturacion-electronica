@@ -7,6 +7,38 @@
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%2322c55e' width='100' height='100' rx='20'/><text y='70' font-size='60' fill='white' text-anchor='middle' x='50' font-weight='bold'>$</text></svg>">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js';
+        import { getDatabase, ref, set, get, child, onValue } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js';
+        import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
+        
+        const firebaseConfig = {
+            apiKey: "AIzaSyB3spppto5IEYRAxFOe0jdBGAnMvJRn8K8",
+            authDomain: "facturacionelectronica-c2155.firebaseapp.com",
+            databaseURL: "https://facturacionelectronica-c2155-default-rtdb.firebaseio.com",
+            projectId: "facturacionelectronica-c2155",
+            storageBucket: "facturacionelectronica-c2155.firebasestorage.app",
+            messagingSenderId: "1071386903920",
+            appId: "1:1071386903920:web:c58b1a0148d3856b5a3bb5",
+            measurementId: "G-13S9Z6SMB4"
+        };
+        
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+        const auth = getAuth(app);
+        
+        window.firebaseDB = database;
+        window.firebaseAuth = auth;
+        window.firebaseRef = ref;
+        window.firebaseGet = get;
+        window.firebaseSet = set;
+        window.firebaseChild = child;
+        window.firebaseOnValue = onValue;
+        window.firebaseAuthStateChanged = onAuthStateChanged;
+    </script>
+    
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
         
@@ -678,7 +710,19 @@
     </main>
 
     <script>
-        // Verificar autenticación obligatoria
+        // Verificar autenticación obligatoria con Firebase Auth
+        let authCheckComplete = false;
+        
+        window.firebaseAuthStateChanged(window.firebaseAuth, (user) => {
+            if (!user && !authCheckComplete) {
+                // No hay usuario autenticado en Firebase, redirigir al login
+                window.location.replace('login.html');
+                return;
+            }
+            authCheckComplete = true;
+        });
+        
+        // Verificar localStorage también (redundante pero útil para compatibilidad)
         (function checkAuth(){
             const current = JSON.parse(localStorage.getItem('currentUser') || 'null');
             if (!current) {
@@ -795,24 +839,56 @@
             }
         })();
 
-        // Funciones de localStorage
-        function loadInvoices() {
-            const stored = localStorage.getItem('invoices');
-            if (stored) {
-                return JSON.parse(stored);
+        // Firebase Helper Functions
+        async function getFirebaseData(path) {
+            try {
+                const dbRef = window.firebaseRef(window.firebaseDB);
+                const snapshot = await window.firebaseGet(window.firebaseChild(dbRef, path));
+                return snapshot.exists() ? snapshot.val() : null;
+            } catch (error) {
+                console.error('Error reading from Firebase:', error);
+                return null;
             }
-            return [];
         }
 
-        function saveInvoices() {
-            localStorage.setItem('invoices', JSON.stringify(invoices));
+        async function setFirebaseData(path, data) {
+            try {
+                await window.firebaseSet(window.firebaseRef(window.firebaseDB, path), data);
+                return true;
+            } catch (error) {
+                console.error('Error writing to Firebase:', error);
+                return false;
+            }
         }
 
-        let invoices = loadInvoices();
+        // Funciones de carga y guardado
+        async function loadInvoices() {
+            const data = await getFirebaseData('invoices');
+            return data || [];
+        }
+
+        async function saveInvoices(invoicesList) {
+            await setFirebaseData('invoices', invoicesList);
+        }
+
+        let invoices = [];
         let currentFilter = 'all';
         let editingId = null;
         let currentPage = 1;
         const invoicesPerPage = 30;
+
+        // Cargar facturas al inicio
+        (async function initInvoices() {
+            invoices = await loadInvoices();
+            render();
+            
+            // Escuchar cambios en tiempo real
+            const invoicesRef = window.firebaseRef(window.firebaseDB, 'invoices');
+            window.firebaseOnValue(invoicesRef, (snapshot) => {
+                invoices = snapshot.val() || [];
+                render();
+            });
+        })();
 
         function showInvoiceForm() {
             if (!ensureCanCreateInvoices()) return;
@@ -1067,7 +1143,7 @@
             saveInvoice();
         }
 
-        function saveInvoice() {
+        async function saveInvoice() {
             if (!ensureCanCreateInvoices()) return;
             const total = parseFloat(document.getElementById('totalAmount').textContent);
             const estadoMap = {
@@ -1106,7 +1182,7 @@
                         items: items,
                         createdByEmail: invoices[invoiceIndex].createdByEmail || (currentUser ? currentUser.email : null)
                     };
-                    saveInvoices();
+                    await saveInvoices(invoices);
                     Swal.fire({
                         icon: 'success',
                         title: '¡Factura actualizada!',
@@ -1133,7 +1209,7 @@
                 };
                 
                 invoices.push(newInvoice);
-                saveInvoices();
+                await saveInvoices(invoices);
                 
                 Swal.fire({
                     icon: 'success',
@@ -1259,7 +1335,8 @@
             }).join('');
         }
 
-        function logout(){
+        async function logout(){
+            await window.firebaseAuth.signOut();
             localStorage.removeItem('currentUser');
             window.location.href = 'login.html';
         }
@@ -1704,10 +1781,10 @@
                 cancelButtonColor: '#1a1a1a',
                 confirmButtonText: 'Sí, eliminar',
                 cancelButtonText: 'Cancelar'
-            }).then((result) => {
+            }).then(async (result) => {
                 if (result.isConfirmed) {
                     invoices = invoices.filter(inv => inv.id !== id);
-                    saveInvoices();
+                    await saveInvoices(invoices);
                     updateInvoiceList();
                     Swal.fire({
                         icon: 'success',
@@ -1813,7 +1890,7 @@
             updateInvoiceList();
         });
 
-        function logout() {
+        async function logout() {
             Swal.fire({
                 title: 'Cerrar sesión',
                 text: "¿Estás seguro de que deseas salir?",
@@ -1823,7 +1900,7 @@
                 cancelButtonColor: '#d33',
                 confirmButtonText: 'Sí, salir',
                 cancelButtonText: 'Cancelar'
-            }).then((result) => {
+            }).then(async (result) => {
                 if (result.isConfirmed) {
                     Swal.fire({
                         icon: 'success',
@@ -1833,7 +1910,8 @@
                         timer: 1500,
                         showConfirmButton: false
                     });
-                    // Limpiar sesión y redirigir al login
+                    // Cerrar sesión en Firebase Auth y limpiar localStorage
+                    await window.firebaseAuth.signOut();
                     localStorage.removeItem('currentUser');
                     setTimeout(() => { window.location.href = 'login.html'; }, 600);
                 }

@@ -6,6 +6,39 @@
     <title>Admin - Usuarios</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js';
+        import { getDatabase, ref, set, get, child, onValue } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js';
+        import { getAuth, createUserWithEmailAndPassword, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
+        
+        const firebaseConfig = {
+            apiKey: "AIzaSyB3spppto5IEYRAxFOe0jdBGAnMvJRn8K8",
+            authDomain: "facturacionelectronica-c2155.firebaseapp.com",
+            databaseURL: "https://facturacionelectronica-c2155-default-rtdb.firebaseio.com",
+            projectId: "facturacionelectronica-c2155",
+            storageBucket: "facturacionelectronica-c2155.firebasestorage.app",
+            messagingSenderId: "1071386903920",
+            appId: "1:1071386903920:web:c58b1a0148d3856b5a3bb5",
+            measurementId: "G-13S9Z6SMB4"
+        };
+        
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+        const auth = getAuth(app);
+        
+        window.firebaseDB = database;
+        window.firebaseAuth = auth;
+        window.firebaseRef = ref;
+        window.firebaseGet = get;
+        window.firebaseSet = set;
+        window.firebaseChild = child;
+        window.firebaseOnValue = onValue;
+        window.firebaseAuthStateChanged = onAuthStateChanged;
+        window.firebaseCreateUser = createUserWithEmailAndPassword;
+    </script>
+    
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
         :root {
@@ -326,7 +359,33 @@
     </main>
 
     <script>
-        // Requerir que el usuario logueado sea admin
+        // Verificar autenticación con Firebase Auth y que sea admin
+        let authCheckComplete = false;
+        
+        window.firebaseAuthStateChanged(window.firebaseAuth, async (user) => {
+            if (!user && !authCheckComplete) {
+                // No hay usuario autenticado en Firebase
+                window.location.replace('login.html');
+                return;
+            }
+            
+            if (user && !authCheckComplete) {
+                // Verificar que el usuario sea admin en la base de datos
+                const users = await getFirebaseData('users') || [];
+                const userData = users.find(u => u.email.toLowerCase() === user.email.toLowerCase());
+                
+                if (!userData || userData.role !== 'admin') {
+                    // Usuario no es admin, redirigir a index o login
+                    await window.firebaseAuth.signOut();
+                    window.location.replace('login.html');
+                    return;
+                }
+                
+                authCheckComplete = true;
+            }
+        });
+        
+        // Verificar localStorage también (redundante pero útil)
         (function checkAdmin(){
             const current = JSON.parse(localStorage.getItem('currentUser') || 'null');
             if (!current || current.role !== 'admin') {
@@ -335,29 +394,42 @@
             }
         })();
 
-        // Helper: SHA-256 hash to hex
-        async function hashPassword(pw) {
-            const enc = new TextEncoder();
-            const data = enc.encode(pw);
-            const hash = await crypto.subtle.digest('SHA-256', data);
-            const arr = Array.from(new Uint8Array(hash));
-            return arr.map(b => b.toString(16).padStart(2,'0')).join('');
+        // Firebase Helper Functions
+        async function getFirebaseData(path) {
+            try {
+                const dbRef = window.firebaseRef(window.firebaseDB);
+                const snapshot = await window.firebaseGet(window.firebaseChild(dbRef, path));
+                return snapshot.exists() ? snapshot.val() : null;
+            } catch (error) {
+                console.error('Error reading from Firebase:', error);
+                return null;
+            }
+        }
+
+        async function setFirebaseData(path, data) {
+            try {
+                await window.firebaseSet(window.firebaseRef(window.firebaseDB, path), data);
+                return true;
+            } catch (error) {
+                console.error('Error writing to Firebase:', error);
+                return false;
+            }
         }
 
         // Audit log
-        function logAction(action, target) {
+        async function logAction(action, target) {
             const admin = JSON.parse(localStorage.getItem('currentUser') || 'null');
-            const audits = JSON.parse(localStorage.getItem('adminAudit') || '[]');
+            const audits = await getFirebaseData('adminAudit') || [];
             audits.push({ time: new Date().toISOString(), admin: admin? admin.email : null, action, target });
-            localStorage.setItem('adminAudit', JSON.stringify(audits));
+            await setFirebaseData('adminAudit', audits);
         }
 
-        function loadUsers(){
-            return JSON.parse(localStorage.getItem('users') || '[]');
+        async function loadUsers(){
+            return await getFirebaseData('users') || [];
         }
 
-        function saveUsers(list){
-            localStorage.setItem('users', JSON.stringify(list));
+        async function saveUsers(list){
+            await setFirebaseData('users', list);
         }
 
         // helpers
@@ -370,8 +442,8 @@
         let pageSize = parseInt(document.getElementById('pageSize').value || '10');
         let currentFilter = '';
 
-        function render(){
-            const allUsers = loadUsers();
+        async function render(){
+            const allUsers = await loadUsers();
             const tbody = document.getElementById('usersBody');
             const current = JSON.parse(localStorage.getItem('currentUser') || 'null');
             // apply search filter
@@ -397,9 +469,9 @@
             document.getElementById('currentPage').textContent = currentPage;
 
             // Attach events
-            document.querySelectorAll('.delBtn').forEach(b => b.addEventListener('click', function(){
+            document.querySelectorAll('.delBtn').forEach(b => b.addEventListener('click', async function(){
                 const idx = parseInt(this.getAttribute('data-index'));
-                const users = loadUsers();
+                const users = await loadUsers();
                 const target = users[idx];
                 // Prevent deleting last admin or self
                 const adminCount = countAdmins(users);
@@ -414,21 +486,21 @@
                     return;
                 }
                 Swal.fire({
-                    title: 'Eliminar usuario? ',
-                    text: `Eliminar ${target.email} no se puede deshacer.`,
+                    title: 'Eliminar usuario?',
+                    html: `<p>Eliminar <strong>${target.email}</strong> no se puede deshacer.</p><p style="color: #9ca3af; font-size: 0.875rem; margin-top: 0.5rem;">Nota: Este usuario se eliminará de la base de datos pero permanecerá en Firebase Authentication. Para eliminarlo completamente, usa la consola de Firebase.</p>`,
                     icon: 'warning',
                     showCancelButton: true,
                     confirmButtonColor: '#dc2626',
                     cancelButtonColor: '#16a34a',
                     confirmButtonText: 'Sí, eliminar',
                     cancelButtonText: 'No, cancelar'
-                }).then((res) => {
+                }).then(async (res) => {
                     if (res.isConfirmed) {
                         users.splice(idx,1);
-                        saveUsers(users);
-                        logAction('delete', target.email);
+                        await saveUsers(users);
+                        await logAction('delete', target.email);
                         Swal.fire({icon:'success', title:'Eliminado', timer:900, showConfirmButton:false});
-                        render();
+                        await render();
                     }
                 });
             }));
@@ -458,33 +530,45 @@
                 return;
             }
             
-            const users = loadUsers();
+            const users = await loadUsers();
             if (users.find(u => u.email.toLowerCase() === email.toLowerCase())){
                 Swal.fire({icon:'error', title:'Error', text:'El usuario ya existe', confirmButtonColor:'#1f2937'});
                 return;
             }
-            const hashed = await hashPassword(pass);
-            users.push({ email, password: hashed, role });
-            saveUsers(users);
-            this.reset();
-            logAction('create', email);
-            Swal.fire({icon:'success', title:'Usuario creado', showConfirmButton:false, timer:900});
-            render();
+            
+            try {
+                // Crear usuario en Firebase Authentication
+                await window.firebaseCreateUser(window.firebaseAuth, email, pass);
+                
+                // Guardar usuario en la base de datos (sin contraseña, Firebase Auth la maneja)
+                users.push({ email, role });
+                await saveUsers(users);
+                this.reset();
+                await logAction('create', email);
+                Swal.fire({icon:'success', title:'Usuario creado en Firebase Auth', showConfirmButton:false, timer:1200});
+                await render();
+            } catch (error) {
+                console.error('Error creando usuario:', error);
+                if (error.code === 'auth/email-already-in-use') {
+                    Swal.fire({icon:'error', title:'Error', text:'El email ya está registrado en Firebase', confirmButtonColor:'#dc2626'});
+                } else if (error.code === 'auth/weak-password') {
+                    Swal.fire({icon:'error', title:'Error', text:'La contraseña debe tener al menos 6 caracteres', confirmButtonColor:'#dc2626'});
+                } else {
+                    Swal.fire({icon:'error', title:'Error', text:'Error al crear usuario: ' + error.message, confirmButtonColor:'#dc2626'});
+                }
+            }
         });
 
         // Edit dialog
         async function openEditDialog(index){
-            const users = loadUsers();
+            const users = await loadUsers();
             const target = users[index];
             const current = JSON.parse(localStorage.getItem('currentUser') || 'null');
             const { value: formValues } = await Swal.fire({
                 title: `Editar ${target.email}`,
                 html:
                     `<div class="edit-user-form">`+
-                    `<div>`+
-                    `<label class="edit-user-label" for="swal-pass">Nueva contraseña</label>`+
-                    `<input id="swal-pass" type="password" class="swal2-input edit-user-field" placeholder="Dejar vacío para mantener">`+
-                    `</div>`+
+                    `<p style="color: #6b7280; font-size: 0.875rem; margin-bottom: 1rem;">Las contraseñas se gestionan mediante Firebase Authentication. Los usuarios pueden cambiarlas desde su perfil.</p>`+
                     `<div>`+
                     `<label class="edit-user-label" for="swal-role">Rol del usuario</label>`+
                     `<select id="swal-role" class="swal2-select edit-user-field"><option value="user">Usuario</option><option value="admin">Administrador</option></select>`+
@@ -508,7 +592,6 @@
                 },
                 preConfirm: () => {
                     return {
-                        newPass: document.getElementById('swal-pass').value,
                         newRole: document.getElementById('swal-role').value
                     }
                 }
@@ -519,21 +602,18 @@
                     Swal.fire({icon:'error', title:'Acción no permitida', text:'No puedes despromover tu propia cuenta.'});
                     return;
                 }
-                if (formValues.newPass) {
-                    const hashed = await hashPassword(formValues.newPass);
-                    target.password = hashed;
-                }
                 target.role = formValues.newRole;
-                saveUsers(users);
-                logAction('edit', target.email);
+                await saveUsers(users);
+                await logAction('edit', target.email);
                 Swal.fire({icon:'success', title:'Actualizado', timer:900, showConfirmButton:false});
-                render();
+                await render();
             }
         }
 
         // Export / Import
-        document.getElementById('exportBtn').addEventListener('click', function(){
-            const data = localStorage.getItem('users') || '[]';
+        document.getElementById('exportBtn').addEventListener('click', async function(){
+            const users = await loadUsers();
+            const data = JSON.stringify(users);
             const blob = new Blob([data], {type: 'application/json'});
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a'); a.href = url; a.download = 'users.json'; a.click(); URL.revokeObjectURL(url);
@@ -547,16 +627,16 @@
             const file = e.target.files[0];
             if (!file) return;
             const reader = new FileReader();
-            reader.onload = function(){
+            reader.onload = async function(){
                 try{
                     const imported = JSON.parse(reader.result);
                     if (!Array.isArray(imported)) throw new Error('Formato incorrecto');
                     // basic validation
                     const valid = imported.every(u => u.email && u.password && u.role);
                     if (!valid) throw new Error('Formato incorrecto');
-                    localStorage.setItem('users', JSON.stringify(imported));
+                    await setFirebaseData('users', imported);
                     Swal.fire({icon:'success', title:'Importado', timer:900, showConfirmButton:false});
-                    render();
+                    await render();
                 }catch(err){
                     Swal.fire({icon:'error', title:'Error', text: err.message || 'Archivo inválido'});
                 }
@@ -588,14 +668,24 @@
         }
 
         // Logout helper
-        function logout(){ localStorage.removeItem('currentUser'); window.location.href='login.html'; }
+        async function logout(){ 
+            await window.firebaseAuth.signOut();
+            localStorage.removeItem('currentUser'); 
+            window.location.href='login.html'; 
+        }
 
         // Set current user email in navbar
-        document.addEventListener('DOMContentLoaded', function(){
+        document.addEventListener('DOMContentLoaded', async function(){
             initDarkMode();
             const cur = JSON.parse(localStorage.getItem('currentUser')||'null');
             const el = document.getElementById('currentUserEmail'); if (el && cur) el.textContent = cur.email;
-            render();
+            await render();
+            
+            // Escuchar cambios en tiempo real
+            const usersRef = window.firebaseRef(window.firebaseDB, 'users');
+            window.firebaseOnValue(usersRef, (snapshot) => {
+                render();
+            });
         });
     </script>
 </body>

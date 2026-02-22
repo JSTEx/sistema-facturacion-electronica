@@ -160,6 +160,11 @@
             color: #1e40af;
         }
 
+        .status-abono {
+            background-color: #ccfbf1;
+            color: #115e59;
+        }
+
         .status-saldo {
             background-color: #ede9fe;
             color: #5b21b6;
@@ -208,6 +213,11 @@
         html.dark-mode .status-dispatch {
             background-color: #1e3a8a;
             color: #bfdbfe;
+        }
+
+        html.dark-mode .status-abono {
+            background-color: #134e4a;
+            color: #99f6e4;
         }
 
         html.dark-mode .status-saldo {
@@ -1842,7 +1852,7 @@
         function getStatusClass(status) {
             const normalized = String(status || '').toLowerCase();
             if (normalized === 'dispatch' || normalized === 'despacho') return 'status-dispatch';
-            if (normalized === 'abono') return 'status-paid';
+            if (normalized === 'abono') return 'status-abono';
             if (normalized === 'saldo_actual' || normalized === 'saldo actual' || normalized === 'sado actual') return 'status-saldo';
             if (normalized === 'paid' || normalized === 'pagada' || normalized === 'pagadas') return 'status-paid';
             if (normalized === 'late' || normalized === 'vencida' || normalized === 'vencidas') return 'status-late';

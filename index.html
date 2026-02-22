@@ -171,6 +171,14 @@
             display: none;
         }
 
+        .item-desc-area {
+            resize: vertical;
+            min-height: 38px;
+            max-height: 140px;
+            line-height: 1.25;
+            overflow-y: hidden;
+        }
+
         html.dark-mode .status-paid {
             background-color: #064e3b;
             color: #86efac;
@@ -635,7 +643,8 @@
             }
 
             #invoiceFormView table {
-                min-width: 520px;
+                min-width: 100%;
+                table-layout: fixed;
             }
 
             #invoiceFormView thead {
@@ -664,11 +673,11 @@
 
             #invoiceFormView tbody td:nth-child(5) {
                 grid-column: 1 / -1;
-                text-align: right;
+                text-align: left;
             }
 
             #invoiceFormView .removeItemBtn {
-                width: auto;
+                width: 100%;
                 height: 36px;
                 padding: 0 10px;
                 display: inline-flex;
@@ -696,6 +705,10 @@
 
             #invoiceFormView tbody td.remove-cell::before {
                 content: "Accion";
+            }
+
+            #invoiceFormView .item-desc-area {
+                min-height: 64px;
             }
         }
 
@@ -869,7 +882,7 @@
                                         <input type="number" min="1" value="1" class="item-cant w-full px-2 py-1.5 border border-gray-200 rounded text-center text-sm focus:outline-none focus:border-gray-900" oninput="calculateTotals()">
                                     </td>
                                     <td class="py-2 px-2" data-label="Descripcion">
-                                        <input type="text" class="item-desc w-full px-2 py-1.5 border border-gray-200 rounded text-sm focus:outline-none focus:border-gray-900" placeholder="Descripción del item">
+                                        <textarea class="item-desc item-desc-area w-full px-2 py-1.5 border border-gray-200 rounded text-sm focus:outline-none focus:border-gray-900" placeholder="Descripción del item" rows="2"></textarea>
                                     </td>
                                     <td class="py-2 px-2" data-label="Precio">
                                         <input type="number" min="0" step="0.01" class="item-precio w-full px-2 py-1.5 border border-gray-200 rounded text-sm focus:outline-none focus:border-gray-900" placeholder="0.00" oninput="calculateTotals()">
@@ -1336,7 +1349,7 @@
                         <input type="number" min="1" value="1" class="item-cant w-full px-2 py-1.5 border border-gray-200 rounded text-center text-sm focus:outline-none focus:border-gray-900" oninput="calculateTotals()">
                     </td>
                     <td class="py-2 px-2" data-label="Descripcion">
-                        <input type="text" class="item-desc w-full px-2 py-1.5 border border-gray-200 rounded text-sm focus:outline-none focus:border-gray-900" placeholder="Descripción del item">
+                        <textarea class="item-desc item-desc-area w-full px-2 py-1.5 border border-gray-200 rounded text-sm focus:outline-none focus:border-gray-900" placeholder="Descripción del item" rows="2"></textarea>
                     </td>
                     <td class="py-2 px-2" data-label="Precio">
                         <input type="number" min="0" step="0.01" class="item-precio w-full px-2 py-1.5 border border-gray-200 rounded text-sm focus:outline-none focus:border-gray-900" placeholder="0.00" oninput="calculateTotals()">
@@ -1352,6 +1365,7 @@
                     </td>
                 </tr>
             `;
+            syncAllItemDescHeights();
         }
 
         function addItem() {
@@ -1364,7 +1378,7 @@
                     <input type="number" min="1" value="1" class="item-cant w-full px-2 py-1.5 border border-gray-200 rounded text-center text-sm focus:outline-none focus:border-gray-900" oninput="calculateTotals()">
                 </td>
                 <td class="py-2 px-2" data-label="Descripcion">
-                    <input type="text" class="item-desc w-full px-2 py-1.5 border border-gray-200 rounded text-sm focus:outline-none focus:border-gray-900" placeholder="Descripción del item">
+                    <textarea class="item-desc item-desc-area w-full px-2 py-1.5 border border-gray-200 rounded text-sm focus:outline-none focus:border-gray-900" placeholder="Descripción del item" rows="2"></textarea>
                 </td>
                 <td class="py-2 px-2" data-label="Precio">
                     <input type="number" min="0" step="0.01" class="item-precio w-full px-2 py-1.5 border border-gray-200 rounded text-sm focus:outline-none focus:border-gray-900" placeholder="0.00" oninput="calculateTotals()">
@@ -1380,6 +1394,7 @@
                 </td>
             `;
             tbody.appendChild(newRow);
+            syncAllItemDescHeights();
         }
 
         function removeItem(btn) {
@@ -1396,6 +1411,18 @@
                     confirmButtonColor: '#1a1a1a'
                 });
             }
+        }
+
+        function autoResizeItemDesc(textarea) {
+            if (!textarea) return;
+            textarea.style.height = 'auto';
+            const maxHeight = 180;
+            textarea.style.height = Math.min(textarea.scrollHeight, maxHeight) + 'px';
+            textarea.style.overflowY = textarea.scrollHeight > maxHeight ? 'auto' : 'hidden';
+        }
+
+        function syncAllItemDescHeights() {
+            document.querySelectorAll('.item-desc-area').forEach(autoResizeItemDesc);
         }
 
         function calculateTotals() {
@@ -2140,7 +2167,7 @@
                             <input type="number" min="1" value="${item.cant}" class="item-cant w-full px-2 py-1.5 border border-gray-200 rounded text-center text-sm focus:outline-none focus:border-gray-900" oninput="calculateTotals()">
                         </td>
                         <td class="py-2 px-2" data-label="Descripcion">
-                            <input type="text" value="${item.desc}" class="item-desc w-full px-2 py-1.5 border border-gray-200 rounded text-sm focus:outline-none focus:border-gray-900" placeholder="Descripción del item">
+                            <textarea class="item-desc item-desc-area w-full px-2 py-1.5 border border-gray-200 rounded text-sm focus:outline-none focus:border-gray-900" placeholder="Descripción del item" rows="2">${item.desc}</textarea>
                         </td>
                         <td class="py-2 px-2" data-label="Precio">
                             <input type="number" min="0" step="0.01" value="${item.precio}" class="item-precio w-full px-2 py-1.5 border border-gray-200 rounded text-sm focus:outline-none focus:border-gray-900" placeholder="0.00" oninput="calculateTotals()">
@@ -2157,6 +2184,7 @@
                     `;
                     tbody.appendChild(row);
                 });
+                syncAllItemDescHeights();
             }
 
             document.querySelector('.invoiceFormTitle').textContent = 'Editar Factura';
@@ -2236,6 +2264,12 @@
                 renderSearchResults(filtered);
             } else {
                 updateInvoiceList();
+            }
+        });
+
+        document.getElementById('itemsTableBody').addEventListener('input', function(e) {
+            if (e.target && e.target.classList.contains('item-desc-area')) {
+                autoResizeItemDesc(e.target);
             }
         });
 

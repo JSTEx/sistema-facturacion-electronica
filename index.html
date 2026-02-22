@@ -780,7 +780,9 @@
                 }
 
                 localStorage.setItem('currentUser', JSON.stringify({ email: userData.email, role: userData.role }));
+                currentUser = { email: userData.email, role: userData.role };
                 document.body.style.display = '';
+                initInvoicesRealtime();
             });
         })();
 
@@ -946,19 +948,22 @@
         let editingId = null;
         let currentPage = 1;
         const invoicesPerPage = 30;
+        let invoicesInitialized = false;
 
-        // Cargar facturas al inicio
-        (async function initInvoices() {
+        // Cargar facturas solo después de validar autenticación Firebase
+        async function initInvoicesRealtime() {
+            if (invoicesInitialized) return;
+            invoicesInitialized = true;
+
             invoices = await loadInvoices();
             render();
-            
-            // Escuchar cambios en tiempo real
+
             const invoicesRef = window.firebaseRef(window.firebaseDB, 'invoices');
             window.firebaseOnValue(invoicesRef, (snapshot) => {
                 invoices = normalizeInvoices(snapshot.val());
                 render();
             });
-        })();
+        }
 
         function showInvoiceForm() {
             if (!ensureCanCreateInvoices()) return;

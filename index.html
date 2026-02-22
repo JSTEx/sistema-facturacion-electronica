@@ -192,13 +192,13 @@
                             <tbody id="itemsTableBody">
                                 <tr class="border-b border-gray-100">
                                     <td class="py-2 px-2" data-label="Cant.">
-                                        <input type="text" inputmode="decimal" value="1" class="item-cant w-full px-2 py-1.5 border border-gray-200 rounded text-center text-sm focus:outline-none focus:border-gray-900" oninput="normalizeQuantityInput(this); calculateTotals()">
+                                        <input type="number" min="1" value="1" class="item-cant w-full px-2 py-1.5 border border-gray-200 rounded text-center text-sm focus:outline-none focus:border-gray-900" oninput="calculateTotals()">
                                     </td>
                                     <td class="py-2 px-2" data-label="Descripcion">
                                         <textarea class="item-desc item-desc-area w-full px-2 py-1.5 border border-gray-200 rounded text-sm focus:outline-none focus:border-gray-900" placeholder="Descripción del item" rows="2"></textarea>
                                     </td>
                                     <td class="py-2 px-2" data-label="Precio">
-                                        <input type="text" inputmode="decimal" class="item-precio w-full px-2 py-1.5 border border-gray-200 rounded text-sm focus:outline-none focus:border-gray-900" placeholder="0.00" oninput="normalizePriceInput(this); calculateTotals()">
+                                        <input type="number" min="0" step="0.01" class="item-precio w-full px-2 py-1.5 border border-gray-200 rounded text-sm focus:outline-none focus:border-gray-900" placeholder="0.00" oninput="calculateTotals()">
                                     </td>
                                     <td class="py-2 px-2 text-right" data-label="Valor">
                                         <span class="item-valor text-gray-900 font-medium">0</span>
@@ -572,13 +572,13 @@
                         row.className = 'border-b border-gray-100';
                         row.innerHTML = `
                             <td class="py-2 px-2" data-label="Cant.">
-                                <input type="text" inputmode="decimal" value="${item.cant || 1}" class="item-cant w-full px-2 py-1.5 border border-gray-200 rounded text-center text-sm focus:outline-none focus:border-gray-900" oninput="normalizeQuantityInput(this); calculateTotals()">
+                                <input type="number" min="1" value="${item.cant || 1}" class="item-cant w-full px-2 py-1.5 border border-gray-200 rounded text-center text-sm focus:outline-none focus:border-gray-900" oninput="calculateTotals()">
                             </td>
                             <td class="py-2 px-2" data-label="Descripcion">
                                 <textarea class="item-desc item-desc-area w-full px-2 py-1.5 border border-gray-200 rounded text-sm focus:outline-none focus:border-gray-900" placeholder="Descripción del item" rows="2">${item.desc || ''}</textarea>
                             </td>
                             <td class="py-2 px-2" data-label="Precio">
-                                <input type="text" inputmode="decimal" value="${item.precio || ''}" class="item-precio w-full px-2 py-1.5 border border-gray-200 rounded text-sm focus:outline-none focus:border-gray-900" placeholder="0.00" oninput="normalizePriceInput(this); calculateTotals()">
+                                <input type="number" min="0" step="0.01" value="${item.precio || ''}" class="item-precio w-full px-2 py-1.5 border border-gray-200 rounded text-sm focus:outline-none focus:border-gray-900" placeholder="0.00" oninput="calculateTotals()">
                             </td>
                             <td class="py-2 px-2 text-right" data-label="Valor">
                                 <span class="item-valor text-gray-900 font-medium">0.00</span>
@@ -703,13 +703,13 @@
             document.getElementById('itemsTableBody').innerHTML = `
                 <tr class="border-b border-gray-100">
                     <td class="py-2 px-2" data-label="Cant.">
-                        <input type="text" inputmode="decimal" value="1" class="item-cant w-full px-2 py-1.5 border border-gray-200 rounded text-center text-sm focus:outline-none focus:border-gray-900" oninput="normalizeQuantityInput(this); calculateTotals()">
+                        <input type="number" min="1" value="1" class="item-cant w-full px-2 py-1.5 border border-gray-200 rounded text-center text-sm focus:outline-none focus:border-gray-900" oninput="calculateTotals()">
                     </td>
                     <td class="py-2 px-2" data-label="Descripcion">
                         <textarea class="item-desc item-desc-area w-full px-2 py-1.5 border border-gray-200 rounded text-sm focus:outline-none focus:border-gray-900" placeholder="Descripción del item" rows="2"></textarea>
                     </td>
                     <td class="py-2 px-2" data-label="Precio">
-                        <input type="text" inputmode="decimal" class="item-precio w-full px-2 py-1.5 border border-gray-200 rounded text-sm focus:outline-none focus:border-gray-900" placeholder="0.00" oninput="normalizePriceInput(this); calculateTotals()">
+                        <input type="number" min="0" step="0.01" class="item-precio w-full px-2 py-1.5 border border-gray-200 rounded text-sm focus:outline-none focus:border-gray-900" placeholder="0.00" oninput="calculateTotals()">
                     </td>
                     <td class="py-2 px-2 text-right" data-label="Valor">
                         <span class="item-valor text-gray-900 font-medium">0</span>
@@ -732,13 +732,13 @@
             newRow.className = 'border-b border-gray-100';
             newRow.innerHTML = `
                 <td class="py-2 px-2" data-label="Cant.">
-                    <input type="text" inputmode="decimal" value="1" class="item-cant w-full px-2 py-1.5 border border-gray-200 rounded text-center text-sm focus:outline-none focus:border-gray-900" oninput="normalizeQuantityInput(this); calculateTotals()">
+                    <input type="number" min="1" value="1" class="item-cant w-full px-2 py-1.5 border border-gray-200 rounded text-center text-sm focus:outline-none focus:border-gray-900" oninput="calculateTotals()">
                 </td>
                 <td class="py-2 px-2" data-label="Descripcion">
                     <textarea class="item-desc item-desc-area w-full px-2 py-1.5 border border-gray-200 rounded text-sm focus:outline-none focus:border-gray-900" placeholder="Descripción del item" rows="2"></textarea>
                 </td>
                 <td class="py-2 px-2" data-label="Precio">
-                    <input type="text" inputmode="decimal" class="item-precio w-full px-2 py-1.5 border border-gray-200 rounded text-sm focus:outline-none focus:border-gray-900" placeholder="0.00" oninput="normalizePriceInput(this); calculateTotals()">
+                    <input type="number" min="0" step="0.01" class="item-precio w-full px-2 py-1.5 border border-gray-200 rounded text-sm focus:outline-none focus:border-gray-900" placeholder="0.00" oninput="calculateTotals()">
                 </td>
                 <td class="py-2 px-2 text-right" data-label="Valor">
                     <span class="item-valor text-gray-900 font-medium">0</span>
@@ -784,40 +784,13 @@
             document.querySelectorAll('.item-desc-area').forEach(autoResizeItemDesc);
         }
 
-        function parseDecimal(value) {
-            const normalized = String(value ?? '').replace(',', '.').trim();
-            const parsed = parseFloat(normalized);
-            return Number.isFinite(parsed) ? parsed : 0;
-        }
-
-        function normalizeQuantityInput(input) {
-            if (!input) return;
-            let value = String(input.value || '').replace(',', '.');
-            value = value.replace(/[^0-9.]/g, '');
-
-            const firstDot = value.indexOf('.');
-            if (firstDot !== -1) {
-                value = value.slice(0, firstDot + 1) + value.slice(firstDot + 1).replace(/\./g, '');
-            }
-
-            if (value.startsWith('.')) {
-                value = `0${value}`;
-            }
-
-            input.value = value;
-        }
-
-        function normalizePriceInput(input) {
-            normalizeQuantityInput(input);
-        }
-
         function calculateTotals() {
             const rows = document.querySelectorAll('#itemsTableBody tr');
             let total = 0;
             
             rows.forEach(row => {
-                const cant = parseDecimal(row.querySelector('.item-cant').value);
-                const precio = parseDecimal(row.querySelector('.item-precio').value);
+                const cant = parseFloat(row.querySelector('.item-cant').value) || 0;
+                const precio = parseFloat(row.querySelector('.item-precio').value) || 0;
                 const valor = cant * precio;
                 row.querySelector('.item-valor').textContent = valor.toFixed(2);
                 total += valor;
@@ -893,7 +866,7 @@
             
             rows.forEach(row => {
                 const desc = row.querySelector('.item-desc').value.trim();
-                const precio = parseDecimal(row.querySelector('.item-precio').value);
+                const precio = parseFloat(row.querySelector('.item-precio').value) || 0;
                 
                 if (desc && precio > 0) {
                     hasItems = true;
@@ -946,8 +919,8 @@
             const items = [];
             document.querySelectorAll('#itemsTableBody tr').forEach(row => {
                 const desc = row.querySelector('.item-desc').value.trim();
-                const cant = parseDecimal(row.querySelector('.item-cant').value);
-                const precio = parseDecimal(row.querySelector('.item-precio').value);
+                const cant = parseFloat(row.querySelector('.item-cant').value) || 0;
+                const precio = parseFloat(row.querySelector('.item-precio').value) || 0;
                 
                 if (desc && precio > 0) {
                     items.push({ desc, cant, precio, total: cant * precio });
@@ -1444,13 +1417,13 @@
                     row.className = 'border-b border-gray-100';
                     row.innerHTML = `
                         <td class="py-2 px-2" data-label="Cant.">
-                            <input type="text" inputmode="decimal" value="${item.cant}" class="item-cant w-full px-2 py-1.5 border border-gray-200 rounded text-center text-sm focus:outline-none focus:border-gray-900" oninput="normalizeQuantityInput(this); calculateTotals()">
+                            <input type="number" min="1" value="${item.cant}" class="item-cant w-full px-2 py-1.5 border border-gray-200 rounded text-center text-sm focus:outline-none focus:border-gray-900" oninput="calculateTotals()">
                         </td>
                         <td class="py-2 px-2" data-label="Descripcion">
                             <textarea class="item-desc item-desc-area w-full px-2 py-1.5 border border-gray-200 rounded text-sm focus:outline-none focus:border-gray-900" placeholder="Descripción del item" rows="2">${item.desc}</textarea>
                         </td>
                         <td class="py-2 px-2" data-label="Precio">
-                            <input type="text" inputmode="decimal" value="${item.precio}" class="item-precio w-full px-2 py-1.5 border border-gray-200 rounded text-sm focus:outline-none focus:border-gray-900" placeholder="0.00" oninput="normalizePriceInput(this); calculateTotals()">
+                            <input type="number" min="0" step="0.01" value="${item.precio}" class="item-precio w-full px-2 py-1.5 border border-gray-200 rounded text-sm focus:outline-none focus:border-gray-900" placeholder="0.00" oninput="calculateTotals()">
                         </td>
                         <td class="py-2 px-2 text-right" data-label="Valor">
                             <span class="item-valor text-gray-900 font-medium">${item.total.toFixed(2)}</span>

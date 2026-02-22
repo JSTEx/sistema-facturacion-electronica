@@ -619,8 +619,9 @@
                 const globalIndex = allUsers.indexOf(u);
                 const isCurrent = current && current.email && (u.email.toLowerCase() === current.email.toLowerCase());
                 const rowNumber = start + idx + 1;
+                const descriptionIndicator = u.description ? ` <span class="text-xs" style="color: #60a5fa;" title="${u.description}">📝</span>` : '';
                 const tr = document.createElement('tr');
-                tr.innerHTML = `<td class="p-2 text-center font-semibold" style="color: #60a5fa;">${rowNumber}</td><td class="p-2">${u.email}${isCurrent? ' <span class="text-xs muted-text">(Cuenta actual)</span>':''}</td><td class="p-2 text-center">${u.role}</td><td class="p-2 text-center">${isCurrent? '<span class="text-xs muted-text">-</span>' : `<button data-index="${globalIndex}" class="editBtn px-2 py-1 bg-blue-500 text-white rounded mr-2">Editar</button><button data-index="${globalIndex}" class="delBtn px-2 py-1 bg-red-500 text-white rounded">Eliminar</button>`}</td>`;
+                tr.innerHTML = `<td class="p-2 text-center font-semibold" style="color: #60a5fa;">${rowNumber}</td><td class="p-2">${u.email}${descriptionIndicator}${isCurrent? ' <span class="text-xs muted-text">(Cuenta actual)</span>':''}</td><td class="p-2 text-center">${u.role}</td><td class="p-2 text-center">${isCurrent? '<span class="text-xs muted-text">-</span>' : `<button data-index="${globalIndex}" class="editBtn px-2 py-1 bg-blue-500 text-white rounded mr-2">Editar</button><button data-index="${globalIndex}" class="delBtn px-2 py-1 bg-red-500 text-white rounded">Eliminar</button>`}</td>`;
                 tbody.appendChild(tr);
             });
 
@@ -786,9 +787,13 @@
                 html:
                     `<div class="edit-user-form">`+
                     `<p style="color: #6b7280; font-size: 0.875rem; margin-bottom: 1rem;">Las contraseñas se gestionan mediante Firebase Authentication. Los usuarios pueden cambiarlas desde su perfil.</p>`+
-                    `<div>`+
+                    `<div style="margin-bottom: 1rem;">`+
                     `<label class="edit-user-label" for="swal-role">Rol del usuario</label>`+
                     `<select id="swal-role" class="swal2-select edit-user-field"><option value="user">Usuario</option><option value="admin">Administrador</option></select>`+
+                    `</div>`+
+                    `<div style="margin-bottom: 0.5rem;">`+
+                    `<label class="edit-user-label" for="swal-description" style="display:block; margin-bottom:0.5rem;">Descripción</label>`+
+                    `<textarea id="swal-description" class="swal2-input" style="resize:vertical; min-height:80px; font-family:'Inter',sans-serif; font-size:0.875rem; padding:0.5rem;" placeholder="Agrega notas sobre este usuario (proyectos, empresa, etc.)"></textarea>`+
                     `</div>`+
                     `</div>`,
                 focusConfirm: false,
@@ -806,10 +811,13 @@
                 didOpen: () => {
                     const roleSelect = document.getElementById('swal-role');
                     if (roleSelect) roleSelect.value = target.role;
+                    const descField = document.getElementById('swal-description');
+                    if (descField) descField.value = target.description || '';
                 },
                 preConfirm: () => {
                     return {
-                        newRole: document.getElementById('swal-role').value
+                        newRole: document.getElementById('swal-role').value,
+                        newDescription: (document.getElementById('swal-description')?.value || '').trim()
                     }
                 }
             });
@@ -820,6 +828,7 @@
                     return;
                 }
                 target.role = formValues.newRole;
+                target.description = formValues.newDescription;
                 await saveUsers(users);
                 await logAction('edit', target.email);
                 Swal.fire({icon:'success', title:'Actualizado', timer:900, showConfirmButton:false});

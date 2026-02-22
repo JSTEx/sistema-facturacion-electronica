@@ -141,14 +141,18 @@
         <form id="loginForm" class="space-y-4">
             <div>
                 <label class="block text-sm font-medium text-gray-700 login-label">Email</label>
-                <input id="email" type="email" required class="mt-1 block w-full border-gray-200 rounded-md shadow-sm login-input" />
+                <input id="email" type="email" required class="mt-1 block w-full border-gray-200 rounded-md shadow-sm login-input" placeholder="admin@admin.com" />
             </div>
             <div>
                 <label class="block text-sm font-medium text-gray-700 login-label">Contraseña</label>
-                <input id="password" type="password" required class="mt-1 block w-full border-gray-200 rounded-md shadow-sm login-input" />
+                <input id="password" type="password" required class="mt-1 block w-full border-gray-200 rounded-md shadow-sm login-input" placeholder="••••••" />
             </div>
+            <div id="errorMessage" class="hidden text-red-600 text-sm"></div>
             <div class="flex items-center justify-between pt-1">
-                <button type="submit" class="px-4 text-white rounded login-submit">Entrar</button>
+                <button id="submitBtn" type="submit" class="px-4 text-white rounded login-submit">
+                    <span id="btnText">Entrar</span>
+                    <span id="btnLoading" class="hidden">Verificando...</span>
+                </button>
             </div>
         </form>
     </div>
@@ -231,6 +235,17 @@
             e.preventDefault();
             isLoggingIn = true; // Marcar que estamos haciendo login
             
+            const submitBtn = document.getElementById('submitBtn');
+            const btnText = document.getElementById('btnText');
+            const btnLoading = document.getElementById('btnLoading');
+            const errorMessage = document.getElementById('errorMessage');
+            
+            // Mostrar estado de carga
+            submitBtn.disabled = true;
+            btnText.classList.add('hidden');
+            btnLoading.classList.remove('hidden');
+            errorMessage.classList.add('hidden');
+            
             const email = document.getElementById('email').value.trim();
             const password = document.getElementById('password').value;
             
@@ -252,20 +267,31 @@
                         window.location.replace('index.html');
                     }
                 } else {
-                    alert('Usuario no encontrado en la base de datos');
+                    errorMessage.textContent = 'Usuario no encontrado en la base de datos.';
+                    errorMessage.classList.remove('hidden');
                     await window.firebaseAuth.signOut();
                     isLoggingIn = false;
+                    submitBtn.disabled = false;
+                    btnText.classList.remove('hidden');
+                    btnLoading.classList.add('hidden');
                 }
             } catch (error) {
                 console.error('Error de autenticación:', error);
                 isLoggingIn = false;
+                submitBtn.disabled = false;
+                btnText.classList.remove('hidden');
+                btnLoading.classList.add('hidden');
+                
                 if (error.code === 'auth/invalid-credential' || error.code === 'auth/wrong-password' || error.code === 'auth/user-not-found') {
-                    alert('Credenciales no válidas');
+                    errorMessage.textContent = 'Email o contraseña incorrectos. Verifica tus credenciales.';
                 } else if (error.code === 'auth/too-many-requests') {
-                    alert('Demasiados intentos fallidos. Intenta más tarde.');
+                    errorMessage.textContent = 'Demasiados intentos fallidos. Intenta más tarde.';
+                } else if (error.code === 'auth/network-request-failed') {
+                    errorMessage.textContent = 'Error de red. Verifica tu conexión a internet.';
                 } else {
-                    alert('Error de autenticación: ' + error.message);
+                    errorMessage.textContent = 'Error de autenticación: ' + error.message;
                 }
+                errorMessage.classList.remove('hidden');
             }
         });
     </script>

@@ -129,9 +129,55 @@
             justify-content: center;
             box-shadow: 0 10px 25px rgba(34, 197, 94, 0.35);
         }
+
+        .app-loading-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.55);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            backdrop-filter: blur(3px);
+        }
+
+        .app-loading-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            border-radius: 12px;
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 12px 30px rgba(2, 6, 23, 0.2);
+        }
+
+        .app-spinner {
+            width: 18px;
+            height: 18px;
+            border: 2px solid rgba(37, 99, 235, 0.25);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: appSpin 0.8s linear infinite;
+        }
+
+        .app-loading-hidden {
+            display: none;
+        }
+
+        @keyframes appSpin {
+            to { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body class="min-h-screen bg-gray-50 flex items-center justify-center">
+    <div id="appLoading" class="app-loading-overlay">
+        <div class="app-loading-card">
+            <div class="app-spinner"></div>
+            <div class="app-loading-text">Cargando...</div>
+        </div>
+    </div>
     <div class="w-full max-w-md bg-white p-8 rounded-lg shadow login-card">
         <div class="flex flex-col items-center mb-5">
             <div class="login-brand mb-3">$</div>
@@ -180,6 +226,20 @@
 
         initDarkMode();
 
+        function showAppLoading(message) {
+            const overlay = document.getElementById('appLoading');
+            if (!overlay) return;
+            const text = overlay.querySelector('.app-loading-text');
+            if (text && message) text.textContent = message;
+            overlay.classList.remove('app-loading-hidden');
+        }
+
+        function hideAppLoading() {
+            const overlay = document.getElementById('appLoading');
+            if (!overlay) return;
+            overlay.classList.add('app-loading-hidden');
+        }
+
         function normalizeUsers(rawUsers) {
             if (Array.isArray(rawUsers)) return rawUsers.filter(Boolean);
             if (rawUsers && typeof rawUsers === 'object') return Object.values(rawUsers);
@@ -220,11 +280,15 @@
 
         // Inicializar usuario admin por defecto en Firebase Auth y Database
         async function initAuthFlow() {
+            showAppLoading('Verificando sesion...');
             const ready = await waitForFirebaseReady();
             if (!ready) {
+                hideAppLoading();
                 alert('Firebase no se pudo inicializar. Recarga la página.');
                 return;
             }
+
+            hideAppLoading();
 
             let isLoggingIn = false;
 
@@ -244,6 +308,8 @@
             document.getElementById('loginForm').addEventListener('submit', async function(e){
                 e.preventDefault();
                 isLoggingIn = true;
+
+                showAppLoading('Iniciando sesion...');
 
                 const submitBtn = document.getElementById('submitBtn');
                 const btnText = document.getElementById('btnText');
@@ -272,6 +338,7 @@
                         errorMessage.classList.remove('hidden');
                         await window.firebaseAuth.signOut();
                         isLoggingIn = false;
+                        hideAppLoading();
                         submitBtn.disabled = false;
                         btnText.classList.remove('hidden');
                         btnLoading.classList.add('hidden');
@@ -279,6 +346,7 @@
                 } catch (error) {
                     console.error('Error de autenticación:', error);
                     isLoggingIn = false;
+                    hideAppLoading();
                     submitBtn.disabled = false;
                     btnText.classList.remove('hidden');
                     btnLoading.classList.add('hidden');

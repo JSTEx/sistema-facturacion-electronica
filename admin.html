@@ -269,9 +269,55 @@
         @media (max-width: 768px) {
             .dark-mode-toggle { display: none; }
         }
+
+        .app-loading-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.55);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            backdrop-filter: blur(3px);
+        }
+
+        .app-loading-card {
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            border-radius: 12px;
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 12px 30px rgba(2, 6, 23, 0.2);
+        }
+
+        .app-spinner {
+            width: 18px;
+            height: 18px;
+            border: 2px solid rgba(37, 99, 235, 0.25);
+            border-top-color: #22c55e;
+            border-radius: 50%;
+            animation: appSpin 0.8s linear infinite;
+        }
+
+        .app-loading-hidden {
+            display: none;
+        }
+
+        @keyframes appSpin {
+            to { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body class="bg-white text-gray-900 min-h-screen flex flex-col">
+    <div id="appLoading" class="app-loading-overlay">
+        <div class="app-loading-card">
+            <div class="app-spinner"></div>
+            <div class="app-loading-text">Cargando...</div>
+        </div>
+    </div>
     <!-- Navbar similar to index.html -->
     <nav class="border-b border-gray-200 px-6 py-4 flex justify-between items-center bg-white sticky top-0 z-50" style="border-color: var(--border-color); background-color: var(--nav-bg);">
         <div class="flex items-center gap-6">
@@ -385,6 +431,20 @@
             }
         }
 
+        function showAppLoading(message) {
+            const overlay = document.getElementById('appLoading');
+            if (!overlay) return;
+            const text = overlay.querySelector('.app-loading-text');
+            if (text && message) text.textContent = message;
+            overlay.classList.remove('app-loading-hidden');
+        }
+
+        function hideAppLoading() {
+            const overlay = document.getElementById('appLoading');
+            if (!overlay) return;
+            overlay.classList.add('app-loading-hidden');
+        }
+
         function normalizeUsers(rawUsers) {
             if (Array.isArray(rawUsers)) return rawUsers.filter(Boolean);
             if (rawUsers && typeof rawUsers === 'object') return Object.values(rawUsers);
@@ -402,12 +462,13 @@
         }
 
         // Verificar autenticación con Firebase Auth y que sea admin
-        // OCULTAR TODO HASTA QUE SE VERIFIQUE
-        document.body.style.display = 'none';
+        // Mostrar loader hasta verificar sesion
+        showAppLoading('Verificando sesion...');
 
         (async function enforceAdminAuthGuard() {
             const ready = await waitForFirebaseReady();
             if (!ready) {
+                hideAppLoading();
                 window.location.replace('login.html');
                 return;
             }
@@ -423,12 +484,13 @@
 
                 if (!userData || userData.role !== 'admin') {
                     await window.firebaseAuth.signOut();
+                    hideAppLoading();
                     window.location.replace('login.html');
                     return;
                 }
 
                 localStorage.setItem('currentUser', JSON.stringify({ email: userData.email, role: userData.role }));
-                document.body.style.display = '';
+                hideAppLoading();
             });
         })();
 

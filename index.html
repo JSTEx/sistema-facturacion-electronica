@@ -978,11 +978,11 @@
 
             try {
                 invoices = await loadInvoicesWithRetry();
-                render();
+                updateInvoiceList();
             } catch (error) {
                 console.error('No se pudieron cargar facturas al iniciar:', error);
                 invoices = [];
-                render();
+                updateInvoiceList();
             }
 
             const subscribe = () => {
@@ -991,7 +991,7 @@
                     invoicesRef,
                     (snapshot) => {
                         invoices = normalizeInvoices(snapshot.val());
-                        render();
+                        updateInvoiceList();
                     },
                     (error) => {
                         console.error('Error en listener de facturas:', error);

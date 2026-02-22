@@ -943,6 +943,18 @@
             }
         }
 
+        async function migrateInvoicesIfArray(rawInvoices) {
+            if (!Array.isArray(rawInvoices)) return rawInvoices;
+            const migrated = {};
+            rawInvoices.filter(Boolean).forEach((inv) => {
+                if (inv && inv.id) {
+                    migrated[String(inv.id)] = inv;
+                }
+            });
+            await setFirebaseData('invoices', migrated);
+            return migrated;
+        }
+
         async function readInvoicesStrict() {
             const invoicesRef = window.firebaseRef(window.firebaseDB, 'invoices');
             const snapshot = await window.firebaseGet(invoicesRef);
@@ -952,7 +964,10 @@
         async function loadInvoicesWithRetry(maxAttempts = 6) {
             for (let attempt = 1; attempt <= maxAttempts; attempt++) {
                 try {
-                    const raw = await readInvoicesStrict();
+                    let raw = await readInvoicesStrict();
+                    if (Array.isArray(raw)) {
+                        raw = await migrateInvoicesIfArray(raw);
+                    }
                     return normalizeInvoices(raw);
                 } catch (error) {
                     console.error(`Error cargando facturas (intento ${attempt}/${maxAttempts}):`, error);

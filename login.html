@@ -7,6 +7,9 @@
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%2322c55e' width='100' height='100' rx='20'/><text y='70' font-size='60' fill='white' text-anchor='middle' x='50' font-weight='bold'>$</text></svg>">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="css/app.css">
+    <script>
+        document.documentElement.classList.add('dark-mode');
+    </script>
     <script src="js/app-utils.js"></script>
     <script src="js/ui-utils.js"></script>
     
@@ -90,7 +93,7 @@
             iconColor: '#dc2626'
         };
 
-        initDarkMode({ respectSystem: true });
+        document.documentElement.classList.add('dark-mode');
 
         // Inicializar usuario admin por defecto en Firebase Auth y Database
         async function initAuthFlow() {

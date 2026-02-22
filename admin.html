@@ -509,7 +509,7 @@
 
         // Set current user email in navbar
         document.addEventListener('DOMContentLoaded', async function(){
-            initDarkMode({ respectSystem: false });
+            initDarkMode({ respectSystem: true });
             const cur = JSON.parse(localStorage.getItem('currentUser')||'null');
             const el = document.getElementById('currentUserEmail'); if (el && cur) el.textContent = cur.email;
             await render();

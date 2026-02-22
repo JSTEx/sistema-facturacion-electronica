@@ -943,26 +943,64 @@
             }
         }
 
+        async function readInvoicesStrict() {
+            const invoicesRef = window.firebaseRef(window.firebaseDB, 'invoices');
+            const snapshot = await window.firebaseGet(invoicesRef);
+            return snapshot.exists() ? snapshot.val() : [];
+        }
+
+        async function loadInvoicesWithRetry(maxAttempts = 6) {
+            for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+                try {
+                    const raw = await readInvoicesStrict();
+                    return normalizeInvoices(raw);
+                } catch (error) {
+                    console.error(`Error cargando facturas (intento ${attempt}/${maxAttempts}):`, error);
+                    if (attempt === maxAttempts) throw error;
+                    await new Promise(resolve => setTimeout(resolve, 250 * attempt));
+                }
+            }
+            return [];
+        }
+
         let invoices = [];
         let currentFilter = 'all';
         let editingId = null;
         let currentPage = 1;
         const invoicesPerPage = 30;
         let invoicesInitialized = false;
+        let stopInvoicesRealtime = null;
 
         // Cargar facturas solo después de validar autenticación Firebase
         async function initInvoicesRealtime() {
             if (invoicesInitialized) return;
             invoicesInitialized = true;
 
-            invoices = await loadInvoices();
-            render();
-
-            const invoicesRef = window.firebaseRef(window.firebaseDB, 'invoices');
-            window.firebaseOnValue(invoicesRef, (snapshot) => {
-                invoices = normalizeInvoices(snapshot.val());
+            try {
+                invoices = await loadInvoicesWithRetry();
                 render();
-            });
+            } catch (error) {
+                console.error('No se pudieron cargar facturas al iniciar:', error);
+                invoices = [];
+                render();
+            }
+
+            const subscribe = () => {
+                const invoicesRef = window.firebaseRef(window.firebaseDB, 'invoices');
+                stopInvoicesRealtime = window.firebaseOnValue(
+                    invoicesRef,
+                    (snapshot) => {
+                        invoices = normalizeInvoices(snapshot.val());
+                        render();
+                    },
+                    (error) => {
+                        console.error('Error en listener de facturas:', error);
+                        setTimeout(subscribe, 500);
+                    }
+                );
+            };
+
+            subscribe();
         }
 
         function showInvoiceForm() {

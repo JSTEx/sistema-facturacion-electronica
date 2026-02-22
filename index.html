@@ -1142,7 +1142,7 @@
             const pageWidth = doc.internal.pageSize.getWidth();
             const left = 48;
             const right = pageWidth - 48;
-            const statusChip = getStatusPdfChipData(inv.status);
+            const statusClass = getStatusClass(inv.status);
 
             doc.setFont('helvetica', 'bold');
             doc.setFontSize(28);
@@ -1181,40 +1181,20 @@
                 return [String(item.cant ?? ''), String(item.desc ?? ''), price, rowTotal];
             });
 
-            let tableEndY = y + 120;
-            if (typeof doc.autoTable === 'function') {
-                doc.autoTable({
-                    startY: y + 20,
-                    head: [['Cant.', 'Descripción', 'Precio', 'Total']],
-                    body: bodyRows,
-                    margin: { left, right: 48 },
-                    styles: { font: 'helvetica', fontSize: 11, cellPadding: 6 },
-                    headStyles: { fillColor: [243, 244, 246], textColor: [17, 24, 39] },
-                    columnStyles: {
-                        2: { halign: 'right' },
-                        3: { halign: 'right' }
-                    }
-                });
-                tableEndY = doc.lastAutoTable ? doc.lastAutoTable.finalY : tableEndY;
-            } else {
-                const rowHeight = 18;
-                let rowY = y + 24;
-                doc.setFont('helvetica', 'bold');
-                doc.setFontSize(11);
-                doc.text('Cant.', left, rowY);
-                doc.text('Descripción', left + 72, rowY);
-                doc.text('Precio', right - 130, rowY, { align: 'right' });
-                doc.text('Total', right, rowY, { align: 'right' });
-                doc.setFont('helvetica', 'normal');
-                bodyRows.forEach((row) => {
-                    rowY += rowHeight;
-                    doc.text(String(row[0] || ''), left, rowY);
-                    doc.text(String(row[1] || ''), left + 72, rowY);
-                    doc.text(String(row[2] || ''), right - 130, rowY, { align: 'right' });
-                    doc.text(String(row[3] || ''), right, rowY, { align: 'right' });
-                });
-                tableEndY = rowY + 10;
-            }
+            doc.autoTable({
+                startY: y + 20,
+                head: [['Cant.', 'Descripción', 'Precio', 'Total']],
+                body: bodyRows,
+                margin: { left, right: 48 },
+                styles: { font: 'helvetica', fontSize: 11, cellPadding: 6 },
+                headStyles: { fillColor: [243, 244, 246], textColor: [17, 24, 39] },
+                columnStyles: {
+                    2: { halign: 'right' },
+                    3: { halign: 'right' }
+                }
+            });
+
+            const tableEndY = doc.lastAutoTable ? doc.lastAutoTable.finalY : y + 120;
             const totalLabel = 'TOTAL';
             const totalValue = canViewAmount ? `$${Number(inv.amount || 0).toFixed(2)}` : 'Oculto';
 

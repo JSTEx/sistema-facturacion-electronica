@@ -12,7 +12,7 @@
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js';
         import { getDatabase, ref, set, get, child, onValue } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js';
-        import { getAuth, createUserWithEmailAndPassword, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
+        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, deleteUser, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
         
         const firebaseConfig = {
             apiKey: "AIzaSyB3spppto5IEYRAxFOe0jdBGAnMvJRn8K8",
@@ -40,6 +40,8 @@
         window.firebaseOnValue = onValue;
         window.firebaseAuthStateChanged = onAuthStateChanged;
         window.firebaseCreateUser = createUserWithEmailAndPassword;
+        window.firebaseSignIn = signInWithEmailAndPassword;
+        window.firebaseDeleteUser = deleteUser;
         window.firebaseProvisionAuth = userProvisionAuth;
     </script>
     
@@ -643,20 +645,77 @@
                 }
                 Swal.fire({
                     title: 'Eliminar usuario?',
-                    html: `<p>Eliminar <strong>${target.email}</strong> no se puede deshacer.</p><p style="color: #9ca3af; font-size: 0.875rem; margin-top: 0.5rem;">Nota: Este usuario se eliminará de la base de datos pero permanecerá en Firebase Authentication. Para eliminarlo completamente, usa la consola de Firebase.</p>`,
+                    html: `
+                        <p>Eliminar <strong>${target.email}</strong> no se puede deshacer.</p>
+                        <p style="color: #9ca3af; font-size: 0.875rem; margin-top: 0.5rem;">Para eliminarlo completamente, también se borrará de Firebase Authentication.</p>
+                        <div style="margin-top: 0.75rem; text-align: left;">
+                            <label for="deleteUserPassword" style="display:block; font-size:0.85rem; margin-bottom:0.35rem; color:#cbd5e1;">Contraseña actual del usuario</label>
+                            <input id="deleteUserPassword" type="password" class="swal2-input" style="margin:0; width:100%;" placeholder="Ingresa la contraseña del usuario">
+                            <label style="display:flex; align-items:center; gap:0.5rem; margin-top:0.75rem; font-size:0.85rem; color:#fca5a5;">
+                                <input id="forceDeleteDbOnly" type="checkbox">
+                                Forzar eliminación solo en base de datos (no borrar en Firebase Authentication)
+                            </label>
+                        </div>
+                    `,
                     icon: 'warning',
                     showCancelButton: true,
                     confirmButtonColor: '#dc2626',
                     cancelButtonColor: '#16a34a',
                     confirmButtonText: 'Sí, eliminar',
-                    cancelButtonText: 'No, cancelar'
+                    cancelButtonText: 'No, cancelar',
+                    preConfirm: () => {
+                        const forceDbOnly = !!document.getElementById('forceDeleteDbOnly')?.checked;
+                        const password = (document.getElementById('deleteUserPassword')?.value || '').trim();
+                        if (!forceDbOnly && !password) {
+                            Swal.showValidationMessage('Debes ingresar la contraseña actual del usuario para eliminarlo de Firebase Authentication.');
+                            return false;
+                        }
+                        return { password, forceDbOnly };
+                    }
                 }).then(async (res) => {
                     if (res.isConfirmed) {
-                        users.splice(idx,1);
-                        await saveUsers(users);
-                        await logAction('delete', target.email);
-                        Swal.fire({icon:'success', title:'Eliminado', timer:900, showConfirmButton:false});
-                        await render();
+                        const forceDbOnly = !!res.value?.forceDbOnly;
+
+                        if (forceDbOnly) {
+                            users.splice(idx,1);
+                            await saveUsers(users);
+                            await logAction('delete-db-only', target.email);
+                            Swal.fire({icon:'success', title:'Eliminado solo en BD', text:'Usuario eliminado de la base de datos. Permanecerá en Firebase Authentication.', timer:1500, showConfirmButton:false});
+                            await render();
+                            return;
+                        }
+
+                        try {
+                            const targetPassword = res.value.password;
+                            const authCredential = await window.firebaseSignIn(window.firebaseProvisionAuth, target.email, targetPassword);
+                            await window.firebaseDeleteUser(authCredential.user);
+                            await window.firebaseProvisionAuth.signOut();
+
+                            users.splice(idx,1);
+                            await saveUsers(users);
+                            await logAction('delete', target.email);
+                            Swal.fire({icon:'success', title:'Eliminado', text:'Usuario eliminado de Firebase Authentication y de la base de datos.', timer:1400, showConfirmButton:false});
+                            await render();
+                        } catch (error) {
+                            console.error('Error eliminando usuario en Firebase Auth:', error);
+                            try { await window.firebaseProvisionAuth.signOut(); } catch (_) {}
+
+                            let message = 'No se pudo eliminar el usuario en Firebase Authentication.';
+                            if (error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
+                                message = 'La contraseña ingresada no es correcta.';
+                            } else if (error.code === 'auth/user-not-found') {
+                                message = 'El usuario no existe en Firebase Authentication.';
+                            } else if (error.code === 'auth/too-many-requests') {
+                                message = 'Demasiados intentos. Intenta de nuevo más tarde.';
+                            }
+
+                            Swal.fire({
+                                icon:'error',
+                                title:'No se eliminó',
+                                text: `${message} La cuenta no fue borrada de la base de datos para mantener consistencia.`,
+                                confirmButtonColor:'#dc2626'
+                            });
+                        }
                     }
                 });
             }));
@@ -695,11 +754,11 @@
             try {
                 // Crear usuario en Firebase Authentication usando auth secundario
                 // para no alterar la sesión actual del administrador.
-                await window.firebaseCreateUser(window.firebaseProvisionAuth, email, pass);
+                const userCredential = await window.firebaseCreateUser(window.firebaseProvisionAuth, email, pass);
                 await window.firebaseProvisionAuth.signOut();
                 
                 // Guardar usuario en la base de datos (sin contraseña, Firebase Auth la maneja)
-                users.push({ email, role });
+                users.push({ email, role, uid: userCredential.user.uid });
                 await saveUsers(users);
                 this.reset();
                 await logAction('create', email);

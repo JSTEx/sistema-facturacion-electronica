@@ -7,6 +7,8 @@
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%2322c55e' width='100' height='100' rx='20'/><text y='70' font-size='60' fill='white' text-anchor='middle' x='50' font-weight='bold'>$</text></svg>">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.2/dist/jspdf.plugin.autotable.min.js"></script>
     
     <!-- Firebase SDK -->
     <script type="module">
@@ -1945,6 +1947,191 @@
             return { text: 'Pendiente', background: '#fef3c7', color: '#92400e' };
         }
 
+        function downloadInvoicePdf(inv, canViewAmount) {
+            if (!window.jspdf || !window.jspdf.jsPDF) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'PDF no disponible',
+                    text: 'No se pudo cargar la librería de PDF.',
+                    confirmButtonColor: '#1a1a1a'
+                });
+                return;
+            }
+
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF({ unit: 'pt', format: 'a4' });
+            const pageWidth = doc.internal.pageSize.getWidth();
+            const left = 48;
+            const right = pageWidth - 48;
+            const statusChip = getStatusPdfChipData(inv.status);
+
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(28);
+            doc.text(`Factura #${inv.number}`, pageWidth / 2, 56, { align: 'center' });
+
+            let y = 92;
+            doc.setFontSize(12);
+            doc.setFont('helvetica', 'bold');
+            doc.text('Cliente:', left, y);
+            doc.setFont('helvetica', 'normal');
+            doc.text(String(inv.client || ''), left + 52, y);
+
+            y += 20;
+            doc.setFont('helvetica', 'bold');
+            doc.text('Dirección:', left, y);
+            doc.setFont('helvetica', 'normal');
+            doc.text(canViewAmount ? String(inv.address || 'N/A') : 'Oculta', left + 62, y);
+
+            y += 20;
+            doc.setFont('helvetica', 'bold');
+            doc.text('Fecha:', left, y);
+            doc.setFont('helvetica', 'normal');
+            doc.text(String(inv.date || ''), left + 42, y);
+
+            y += 20;
+            doc.setFont('helvetica', 'bold');
+            doc.text('Estado:', left, y);
+            doc.setTextColor(statusChip.color);
+            doc.setFont('helvetica', 'bold');
+            doc.text(statusChip.text, left + 50, y);
+            doc.setTextColor('#111111');
+
+            const bodyRows = (inv.items || []).map(item => {
+                const price = canViewAmount ? `$${Number(item.precio || 0).toFixed(2)}` : 'Oculto';
+                const rowTotal = canViewAmount ? `$${Number(item.total || 0).toFixed(2)}` : 'Oculto';
+                return [String(item.cant ?? ''), String(item.desc ?? ''), price, rowTotal];
+            });
+
+            doc.autoTable({
+                startY: y + 20,
+                head: [['Cant.', 'Descripción', 'Precio', 'Total']],
+                body: bodyRows,
+                margin: { left, right: 48 },
+                styles: { font: 'helvetica', fontSize: 11, cellPadding: 6 },
+                headStyles: { fillColor: [243, 244, 246], textColor: [17, 24, 39] },
+                columnStyles: {
+                    2: { halign: 'right' },
+                    3: { halign: 'right' }
+                }
+            });
+
+            const tableEndY = doc.lastAutoTable ? doc.lastAutoTable.finalY : y + 120;
+            const totalLabel = 'TOTAL';
+            const totalValue = canViewAmount ? `$${Number(inv.amount || 0).toFixed(2)}` : 'Oculto';
+
+            doc.setDrawColor(209, 213, 219);
+            doc.roundedRect(right - 210, tableEndY + 16, 210, 42, 8, 8, 'S');
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(10);
+            doc.setTextColor(107, 114, 128);
+            doc.text(totalLabel, right - 190, tableEndY + 40);
+            doc.setTextColor(17, 24, 39);
+            doc.setFontSize(24);
+            doc.text(totalValue, right - 20, tableEndY + 42, { align: 'right' });
+
+            doc.save(`Factura-${inv.number}.pdf`);
+        }
+
+        function previewInvoicePdf(inv, canViewAmount) {
+            const previewWindow = window.open('', '_blank');
+            if (!previewWindow) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Ventana bloqueada',
+                    text: 'Permite ventanas emergentes para previsualizar el PDF.',
+                    confirmButtonColor: '#1a1a1a'
+                });
+                return;
+            }
+
+            const statusChip = getStatusPdfChipData(inv.status);
+            const addressText = canViewAmount ? (inv.address || 'N/A') : 'Oculta';
+            const totalText = canViewAmount ? `$${Number(inv.amount || 0).toFixed(2)}` : 'Oculto';
+
+            const itemsRows = (inv.items || []).map(item => {
+                const price = canViewAmount ? `$${Number(item.precio || 0).toFixed(2)}` : 'Oculto';
+                const rowTotal = canViewAmount ? `$${Number(item.total || 0).toFixed(2)}` : 'Oculto';
+                return `
+                    <tr>
+                        <td>${item.cant}</td>
+                        <td>${item.desc}</td>
+                        <td style="text-align:right;">${price}</td>
+                        <td style="text-align:right;">${rowTotal}</td>
+                    </tr>
+                `;
+            }).join('');
+
+            const html = `
+                <!DOCTYPE html>
+                <html lang="es">
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <title>Factura #${inv.number}</title>
+                    <style>
+                        body { font-family: Arial, sans-serif; margin: 24px; color: #111827; }
+                        .actions { display: flex; justify-content: flex-end; gap: 8px; margin-bottom: 14px; }
+                        .action-btn { border: 1px solid #d1d5db; background: #ffffff; color: #111827; padding: 8px 12px; border-radius: 8px; font-weight: 600; cursor: pointer; }
+                        .action-btn:hover { background: #f3f4f6; }
+                        .header { text-align: center; margin-bottom: 20px; }
+                        .header h1 { margin: 0; font-size: 34px; }
+                        .meta { margin-bottom: 14px; line-height: 1.35; font-size: 14px; }
+                        .chip { display: inline-block; padding: 4px 10px; border-radius: 999px; font-size: 12px; font-weight: 700; }
+                        .table-wrap { margin-top: 10px; border-top: 1px solid #d1d5db; padding-top: 10px; }
+                        table { width: 100%; border-collapse: collapse; }
+                        th, td { padding: 8px 6px; border-bottom: 1px solid #e5e7eb; text-align: left; font-size: 14px; }
+                        th { font-weight: 700; }
+                        .total { margin-top: 14px; text-align: right; }
+                        .total-box { display: inline-flex; align-items: center; gap: 10px; border: 1px solid #d1d5db; border-radius: 10px; padding: 8px 12px; }
+                        .total-label { font-size: 12px; color: #6b7280; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; }
+                        .total-value { font-size: 36px; font-weight: 800; line-height: 1; }
+                        @media print { .actions { display: none; } }
+                    </style>
+                </head>
+                <body>
+                    <div class="actions">
+                        <button class="action-btn" onclick="window.print()">Imprimir</button>
+                        <button class="action-btn" onclick="window.close()">Cerrar</button>
+                    </div>
+                    <div class="header">
+                        <h1>Factura #${inv.number}</h1>
+                    </div>
+                    <div class="meta">
+                        <div><strong>Cliente:</strong> ${inv.client}</div>
+                        <div><strong>Dirección:</strong> ${addressText}</div>
+                        <div><strong>Fecha:</strong> ${inv.date}</div>
+                        <div><strong>Estado:</strong> <span class="chip" style="background:${statusChip.background}; color:${statusChip.color};">${statusChip.text}</span></div>
+                    </div>
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th style="width:90px;">Cant.</th>
+                                    <th>Descripción</th>
+                                    <th style="width:120px; text-align:right;">Precio</th>
+                                    <th style="width:120px; text-align:right;">Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${itemsRows}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="total">
+                        <div class="total-box">
+                            <span class="total-label">Total</span>
+                            <span class="total-value">${totalText}</span>
+                        </div>
+                    </div>
+                </body>
+                </html>
+            `;
+
+            previewWindow.document.open();
+            previewWindow.document.write(html);
+            previewWindow.document.close();
+        }
+
         function viewInvoice(id) {
             const inv = invoices.find(i => i.id === id);
             if (!inv) return;
@@ -1982,8 +2169,21 @@
                         </div>
                     </div>
                 `,
+                showDenyButton: true,
+                denyButtonText: 'Previsualizar PDF',
+                denyButtonColor: '#2563eb',
+                showCancelButton: true,
+                cancelButtonText: 'Descargar PDF',
+                cancelButtonColor: '#059669',
                 confirmButtonText: 'Cerrar',
                 confirmButtonColor: '#1a1a1a'
+            }).then((result) => {
+                if (result.isDenied) {
+                    previewInvoicePdf(inv, canViewAmount);
+                }
+                if (result.dismiss === Swal.DismissReason.cancel) {
+                    downloadInvoicePdf(inv, canViewAmount);
+                }
             });
         }
 

@@ -1223,7 +1223,8 @@
                 return;
             }
 
-            const statusChip = getStatusPdfChipData(inv.status);
+            const statusClass = getStatusClass(inv.status);
+            const statusText = getStatusText(inv.status);
             const addressText = canViewAmount ? (inv.address || 'N/A') : 'Oculta';
             const totalText = canViewAmount ? `$${Number(inv.amount || 0).toFixed(2)}` : 'Oculto';
 
@@ -1240,7 +1241,7 @@
                 `;
             }).join('');
 
-            const baseHref = window.location.href.replace(/[^/]*$/, '');
+            const baseHref = new URL('./', window.location.href).href;
             const html = `
                 <!DOCTYPE html>
                 <html lang="es">
@@ -1263,7 +1264,7 @@
                         <div><strong>Cliente:</strong> ${inv.client}</div>
                         <div><strong>Dirección:</strong> ${addressText}</div>
                         <div><strong>Fecha:</strong> ${inv.date}</div>
-                        <div><strong>Estado:</strong> <span class="pdf-chip ${statusClass}">${getStatusText(inv.status)}</span></div>
+                        <div><strong>Estado:</strong> <span class="pdf-chip ${statusClass}">${statusText}</span></div>
                     </div>
                     <div class="pdf-table-wrap">
                         <table class="pdf-table">
@@ -1290,9 +1291,15 @@
                 </html>
             `;
 
-            previewWindow.document.open();
-            previewWindow.document.write(html);
-            previewWindow.document.close();
+            try {
+                const encodedHtml = `data:text/html;charset=utf-8,${encodeURIComponent(html)}`;
+                previewWindow.location.replace(encodedHtml);
+            } catch (error) {
+                previewWindow.document.open();
+                previewWindow.document.write(html);
+                previewWindow.document.close();
+                console.error('Error mostrando previsualizacion:', error);
+            }
         }
 
         function viewInvoice(id) {

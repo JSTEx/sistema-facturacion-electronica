@@ -192,7 +192,7 @@
                             <tbody id="itemsTableBody">
                                 <tr class="border-b border-gray-100">
                                     <td class="py-2 px-2" data-label="Cant.">
-                                        <input type="number" min="1" value="1" class="item-cant w-full px-2 py-1.5 border border-gray-200 rounded text-center text-sm focus:outline-none focus:border-gray-900" oninput="calculateTotals()">
+                                        <input type="number" min="0.01" step="0.01" value="1" class="item-cant w-full px-2 py-1.5 border border-gray-200 rounded text-center text-sm focus:outline-none focus:border-gray-900" oninput="calculateTotals()">
                                     </td>
                                     <td class="py-2 px-2" data-label="Descripcion">
                                         <textarea class="item-desc item-desc-area w-full px-2 py-1.5 border border-gray-200 rounded text-sm focus:outline-none focus:border-gray-900" placeholder="Descripción del item" rows="2"></textarea>
@@ -572,7 +572,7 @@
                         row.className = 'border-b border-gray-100';
                         row.innerHTML = `
                             <td class="py-2 px-2" data-label="Cant.">
-                                <input type="number" min="1" value="${item.cant || 1}" class="item-cant w-full px-2 py-1.5 border border-gray-200 rounded text-center text-sm focus:outline-none focus:border-gray-900" oninput="calculateTotals()">
+                                <input type="number" min="0.01" step="0.01" value="${item.cant || 1}" class="item-cant w-full px-2 py-1.5 border border-gray-200 rounded text-center text-sm focus:outline-none focus:border-gray-900" oninput="calculateTotals()">
                             </td>
                             <td class="py-2 px-2" data-label="Descripcion">
                                 <textarea class="item-desc item-desc-area w-full px-2 py-1.5 border border-gray-200 rounded text-sm focus:outline-none focus:border-gray-900" placeholder="Descripción del item" rows="2">${item.desc || ''}</textarea>
@@ -703,7 +703,7 @@
             document.getElementById('itemsTableBody').innerHTML = `
                 <tr class="border-b border-gray-100">
                     <td class="py-2 px-2" data-label="Cant.">
-                        <input type="number" min="1" value="1" class="item-cant w-full px-2 py-1.5 border border-gray-200 rounded text-center text-sm focus:outline-none focus:border-gray-900" oninput="calculateTotals()">
+                        <input type="number" min="0.01" step="0.01" value="1" class="item-cant w-full px-2 py-1.5 border border-gray-200 rounded text-center text-sm focus:outline-none focus:border-gray-900" oninput="calculateTotals()">
                     </td>
                     <td class="py-2 px-2" data-label="Descripcion">
                         <textarea class="item-desc item-desc-area w-full px-2 py-1.5 border border-gray-200 rounded text-sm focus:outline-none focus:border-gray-900" placeholder="Descripción del item" rows="2"></textarea>
@@ -732,7 +732,7 @@
             newRow.className = 'border-b border-gray-100';
             newRow.innerHTML = `
                 <td class="py-2 px-2" data-label="Cant.">
-                    <input type="number" min="1" value="1" class="item-cant w-full px-2 py-1.5 border border-gray-200 rounded text-center text-sm focus:outline-none focus:border-gray-900" oninput="calculateTotals()">
+                    <input type="number" min="0.01" step="0.01" value="1" class="item-cant w-full px-2 py-1.5 border border-gray-200 rounded text-center text-sm focus:outline-none focus:border-gray-900" oninput="calculateTotals()">
                 </td>
                 <td class="py-2 px-2" data-label="Descripcion">
                     <textarea class="item-desc item-desc-area w-full px-2 py-1.5 border border-gray-200 rounded text-sm focus:outline-none focus:border-gray-900" placeholder="Descripción del item" rows="2"></textarea>

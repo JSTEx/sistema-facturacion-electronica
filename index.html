@@ -617,6 +617,49 @@
                 flex-wrap: wrap;
                 gap: 8px;
             }
+
+            #invoiceFormView table {
+                min-width: 520px;
+            }
+
+            #invoiceFormView thead {
+                display: none;
+            }
+
+            #invoiceFormView tbody tr {
+                display: grid;
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 10px;
+                padding: 12px 8px;
+                border-bottom: 1px solid var(--border-color);
+            }
+
+            #invoiceFormView tbody td {
+                padding: 0;
+            }
+
+            #invoiceFormView tbody td:nth-child(2) {
+                grid-column: 1 / -1;
+            }
+
+            #invoiceFormView tbody td:nth-child(4) {
+                text-align: left;
+            }
+
+            #invoiceFormView tbody td:nth-child(5) {
+                grid-column: 1 / -1;
+                text-align: right;
+            }
+
+            #invoiceFormView .removeItemBtn {
+                width: 36px;
+                height: 36px;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                border: 1px solid var(--border-color);
+                border-radius: 8px;
+            }
         }
 
         @media (max-width: 360px) {
@@ -772,7 +815,7 @@
                     </div>
 
                     <!-- Tabla de Items -->
-                    <div class="mb-6 border border-gray-200 rounded-lg overflow-hidden" style="border-color: var(--border-color);">
+                    <div class="mb-6 border border-gray-200 rounded-lg overflow-x-auto" style="border-color: var(--border-color);">
                         <table class="w-full text-sm">
                             <thead class="bg-gray-50 border-b border-gray-200" style="background-color: var(--bg-primary); border-color: var(--border-color);">
                                 <tr>

@@ -6,7 +6,10 @@
     <title>Facturación</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%2322c55e' width='100' height='100' rx='20'/><text y='70' font-size='60' fill='white' text-anchor='middle' x='50' font-weight='bold'>$</text></svg>">
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="css/app.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="js/app-utils.js"></script>
+    <script src="js/ui-utils.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.2/dist/jspdf.plugin.autotable.min.js"></script>
     
@@ -41,781 +44,9 @@
         window.firebaseAuthStateChanged = onAuthStateChanged;
     </script>
     
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-        
-        :root {
-            --bg-primary: #ffffff;
-            --bg-secondary: #f9fafb;
-            --text-primary: #1a1a1a;
-            --text-secondary: #6b7280;
-            --border-color: #e5e7eb;
-            --input-bg: #ffffff;
-            --input-border: #d1d5db;
-            --nav-bg: #ffffff;
-            --card-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-        }
-
-        html.dark-mode {
-            --bg-primary: #0f1419;
-            --bg-secondary: #1a1f2e;
-            --text-primary: #e5e7eb;
-            --text-secondary: #cbd5e1;
-            --border-color: #334155;
-            --input-bg: #1e293b;
-            --input-border: #475569;
-            --nav-bg: #0f1419;
-            --card-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.3), 0 2px 4px -2px rgb(0 0 0 / 0.3);
-        }
-        
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: var(--bg-primary);
-            color: var(--text-primary);
-            transition: background-color 0.3s ease, color 0.3s ease;
-        }
-        
-        .invoice-card {
-            transition: all 0.2s ease;
-        }
-        
-        .invoice-card:hover {
-            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-        }
-        
-        .status-badge {
-            font-size: 11px;
-            font-weight: 600;
-            padding: 2px 8px;
-            border-radius: 4px;
-            text-transform: capitalize;
-        }
-
-        .owner-edit-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            font-size: 11px;
-            font-weight: 600;
-            padding: 3px 8px;
-            border-radius: 9999px;
-            background-color: #dcfce7;
-            color: #166534;
-        }
-
-        html.dark-mode .owner-edit-badge {
-            background-color: #064e3b;
-            color: #86efac;
-        }
-
-        .creator-info-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            font-size: 11px;
-            font-weight: 600;
-            padding: 3px 8px;
-            border-radius: 9999px;
-            background-color: #dbeafe;
-            color: #1e40af;
-        }
-
-        html.dark-mode .creator-info-badge {
-            background-color: #1e3a8a;
-            color: #bfdbfe;
-        }
-
-        .not-owner-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            font-size: 11px;
-            font-weight: 600;
-            padding: 3px 8px;
-            border-radius: 9999px;
-            background-color: #fee2e2;
-            color: #991b1b;
-        }
-
-        html.dark-mode .not-owner-badge {
-            background-color: #7f1d1d;
-            color: #fca5a5;
-        }
-        
-        .status-paid {
-            background-color: #d1fae5;
-            color: #065f46;
-        }
-        
-        .status-pending {
-            background-color: #fef3c7;
-            color: #92400e;
-        }
-        
-        .status-late, .status-vencida {
-            background-color: #fee2e2;
-            color: #991b1b;
-        }
-
-        .status-dispatch {
-            background-color: #dbeafe;
-            color: #1e40af;
-        }
-
-        .status-abono {
-            background-color: #cffafe;
-            color: #155e75;
-        }
-
-        .status-saldo {
-            background-color: #ede9fe;
-            color: #5b21b6;
-        }
-
-        #invoiceFormView input[readonly] {
-            background-color: var(--bg-primary);
-            color: var(--text-secondary);
-            border-style: dashed;
-            cursor: not-allowed;
-        }
-
-        #invoiceFormView input[readonly]:focus {
-            border-color: var(--border-color);
-            box-shadow: none;
-        }
-
-        .remove-label {
-            display: none;
-        }
-
-        .item-desc-area {
-            resize: vertical;
-            min-height: 38px;
-            max-height: 140px;
-            line-height: 1.25;
-            overflow-y: hidden;
-        }
-
-        html.dark-mode .status-paid {
-            background-color: #14532d;
-            color: #bbf7d0;
-        }
-
-        html.dark-mode .status-pending {
-            background-color: #78350f;
-            color: #fcd34d;
-        }
-
-        html.dark-mode .status-late,
-        html.dark-mode .status-vencida {
-            background-color: #7f1d1d;
-            color: #fca5a5;
-        }
-
-        html.dark-mode .status-dispatch {
-            background-color: #1e3a8a;
-            color: #bfdbfe;
-        }
-
-        html.dark-mode .status-abono {
-            background-color: #083344;
-            color: #a5f3fc;
-        }
-
-        html.dark-mode .status-saldo {
-            background-color: #4c1d95;
-            color: #ddd6fe;
-        }
-
-        /* Dark Mode Toggle Button (inline in navbar) */
-            .dark-mode-toggle {
-                display: inline-flex;
-                align-items: center;
-                justify-content: center;
-                width: 40px;
-                height: 36px;
-                background: rgba(0, 0, 0, 0.06);
-                border: 1.5px solid rgba(0, 0, 0, 0.12);
-                border-radius: 8px;
-                cursor: pointer;
-                transition: background-color 0.2s ease, transform 0.12s ease, border-color 0.2s ease;
-                margin-right: 6px;
-                padding: 4px;
-            }
-
-            html.dark-mode .dark-mode-toggle {
-                background: rgba(255,255,255,0.03);
-                border-color: rgba(255,255,255,0.03);
-            }
-
-            .dark-mode-toggle:hover {
-                background: rgba(0,0,0,0.1);
-                border-color: rgba(0, 0, 0, 0.2);
-                transform: translateY(-1px);
-            }
-
-            html.dark-mode .dark-mode-toggle:hover {
-                background: rgba(255,255,255,0.08);
-                border-color: rgba(255,255,255,0.1);
-            }
-
-            .dark-mode-toggle:active { transform: translateY(0); }
-
-            .toggle-icon { width: 20px; height: 20px; position: relative; display:inline-block; }
-
-            .icon-sun, .icon-moon { position: absolute; width: 20px; height: 20px; transition: all 0.28s ease; }
-
-            .icon-sun { color: #f59e0e; }
-            .icon-moon { color: #6366f1; opacity: 0; transform: scale(0.8) rotate(-20deg); }
-
-            html.dark-mode .icon-sun { opacity: 0; transform: scale(0.8) rotate(20deg); }
-            html.dark-mode .icon-moon { opacity: 1; transform: scale(1) rotate(0deg); }
-
-        /* Estilo para el botón Nueva Factura en modo oscuro */
-        #btnNewInvoice {
-            background-color: #22c55e !important;
-            color: white !important;
-        }
-
-        #btnNewInvoice:hover {
-            background-color: #16a34a !important;
-        }
-
-        html.dark-mode #btnNewInvoice {
-            background-color: #22c55e !important;
-            box-shadow: 0 0 12px rgba(34, 197, 94, 0.4);
-        }
-
-        html.dark-mode #btnNewInvoice:hover {
-            background-color: #16a34a !important;
-            box-shadow: 0 0 16px rgba(34, 197, 94, 0.6);
-        }
-
-        /* Estilos para los botones de formulario */
-        #submitBtn {
-            background-color: #1f2937 !important;
-            transition: all 0.3s ease;
-        }
-
-        #submitBtn:hover {
-            background-color: #111827 !important;
-        }
-
-        html.dark-mode #submitBtn {
-            background-color: #22c55e !important;
-            color: white !important;
-            box-shadow: 0 0 12px rgba(34, 197, 94, 0.4);
-        }
-
-        html.dark-mode #submitBtn:hover {
-            background-color: #16a34a !important;
-            box-shadow: 0 0 16px rgba(34, 197, 94, 0.6);
-        }
-
-        /* Botón Cancelar */
-        .invoiceForm button[type="button"] {
-            color: #6b7280;
-            background-color: transparent;
-            border: 1px solid transparent;
-            transition: all 0.3s ease;
-        }
-
-        .invoiceForm button[type="button"]:hover {
-            color: #1f2937;
-            background-color: #f3f4f6;
-        }
-
-        html.dark-mode .invoiceForm button[type="button"] {
-            color: #d1d5db;
-            background-color: #374151;
-        }
-
-        html.dark-mode .invoiceForm button[type="button"]:hover {
-            color: #f3f4f6;
-            background-color: #4b5563;
-            box-shadow: 0 0 8px rgba(209, 213, 219, 0.2);
-        }
-
-        #cancelBtn {
-            color: var(--text-primary);
-            background-color: var(--bg-primary);
-            border: 1px solid var(--border-color);
-        }
-
-        #cancelBtn:hover {
-            color: var(--text-primary);
-            background-color: var(--bg-secondary);
-            border-color: var(--input-border);
-        }
-
-        /* Estilos para el contenedor del formulario en modo oscuro */
-        #invoiceFormView > div {
-            background-color: var(--bg-secondary);
-            border-color: var(--border-color);
-        }
-
-        html.dark-mode #invoiceFormView h2 {
-            color: var(--text-primary);
-            border-color: var(--border-color);
-        }
-
-        html.dark-mode #invoiceFormView input,
-        html.dark-mode #invoiceFormView select,
-        html.dark-mode #invoiceFormView textarea {
-            background-color: var(--input-bg);
-            border-color: var(--input-border);
-            color: var(--text-primary);
-        }
-
-        html.dark-mode #invoiceFormView input::placeholder,
-        html.dark-mode #invoiceFormView textarea::placeholder {
-            color: var(--text-secondary);
-        }
-
-        /* Labels en modo oscuro */
-        html.dark-mode label {
-            color: var(--text-primary);
-        }
-
-        /* Tablas en el formulario */
-        html.dark-mode #invoiceFormView table {
-            background-color: var(--bg-secondary);
-            color: var(--text-primary);
-        }
-
-        html.dark-mode #invoiceFormView table th,
-        html.dark-mode #invoiceFormView table td {
-            border-color: var(--border-color);
-            color: var(--text-primary);
-        }
-
-        html.dark-mode #invoiceFormView table thead {
-            background-color: var(--bg-primary) !important;
-            border-bottom-color: var(--border-color) !important;
-        }
-
-        html.dark-mode #invoiceFormView table thead th {
-            color: var(--text-primary) !important;
-        }
-
-        /* Botón Agregar Item */
-        #addItemBtn {
-            font-weight: 600;
-            background-color: #f0f9ff !important;
-            color: #0369a1 !important;
-            border-color: #bae6fd !important;
-            transition: all 0.3s ease;
-        }
-
-        #addItemBtn:hover {
-            background-color: #e0f2fe !important;
-            color: #0284c7 !important;
-            border-color: #7dd3fc !important;
-        }
-
-        html.dark-mode #addItemBtn {
-            background-color: #164e63 !important;
-            color: #06b6d4 !important;
-            border: 2px solid #22d3ee !important;
-            font-weight: 600;
-            box-shadow: 0 0 10px rgba(34, 211, 238, 0.3);
-        }
-
-        html.dark-mode #addItemBtn:hover {
-            background-color: #0e7490 !important;
-            color: #ffffff !important;
-            box-shadow: 0 0 16px rgba(34, 211, 238, 0.5);
-            border-color: #06b6d4 !important;
-        }
-
-        /* Botones de eliminar item */
-        .removeItemBtn {
-            padding: 6px 8px;
-            border-radius: 6px;
-            background-color: transparent;
-            border: 1px solid transparent;
-            color: #9ca3af;
-            transition: all 0.3s ease;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .removeItemBtn:hover {
-            background-color: #fee2e2;
-            color: #dc2626;
-            border-color: #fecaca;
-        }
-
-        html.dark-mode .removeItemBtn {
-            color: #9ca3af;
-            background-color: transparent;
-            border: 1px solid transparent;
-        }
-
-        html.dark-mode .removeItemBtn:hover {
-            background-color: #7f1d1d;
-            color: #fca5a5;
-            border-color: #dc2626;
-            box-shadow: 0 0 8px rgba(220, 38, 38, 0.3);
-        }
-
-        .icon-sun {
-            opacity: 1;
-            transform: scale(1) rotate(0deg);
-        }
-
-        .icon-moon {
-            opacity: 0;
-            transform: scale(0.5) rotate(180deg);
-        }
-
-        /* Dark mode updates for existing elements */
-        html.dark-mode body {
-            background-color: var(--bg-primary);
-            color: var(--text-primary);
-        }
-
-        html.dark-mode nav {
-            background-color: var(--nav-bg);
-            border-color: var(--border-color);
-            color: var(--text-primary);
-        }
-
-        html.dark-mode h1,
-        html.dark-mode h2,
-        html.dark-mode h3,
-        html.dark-mode h4,
-        html.dark-mode h5,
-        html.dark-mode h6 {
-            color: var(--text-primary);
-        }
-
-        html.dark-mode p,
-        html.dark-mode span,
-        html.dark-mode label,
-        html.dark-mode button {
-            color: var(--text-primary);
-        }
-
-        html.dark-mode .text-gray-900 {
-            color: var(--text-primary) !important;
-        }
-
-        html.dark-mode .text-gray-500 {
-            color: var(--text-secondary) !important;
-        }
-
-        html.dark-mode .invoice-card {
-            background-color: var(--bg-secondary);
-            border-color: var(--border-color);
-            color: var(--text-primary);
-        }
-
-        html.dark-mode input,
-        html.dark-mode select,
-        html.dark-mode textarea {
-            background-color: var(--input-bg);
-            border-color: var(--input-border);
-            color: var(--text-primary);
-        }
-
-        html.dark-mode input::placeholder,
-        html.dark-mode textarea::placeholder {
-            color: var(--text-secondary);
-        }
-
-        html.dark-mode input:focus,
-        html.dark-mode select:focus,
-        html.dark-mode textarea:focus {
-            border-color: #6366f1;
-            background-color: var(--input-bg);
-            color: var(--text-primary);
-        }
-
-        html.dark-mode button {
-            color: var(--text-primary);
-        }
-
-        html.dark-mode .bg-white {
-            background-color: var(--bg-secondary) !important;
-        }
-
-        /* Dark Mode for SweetAlert2 */
-        html.dark-mode .swal2-popup {
-            background-color: var(--bg-secondary) !important;
-            color: var(--text-primary) !important;
-        }
-
-        html.dark-mode .swal2-title {
-            color: var(--text-primary) !important;
-        }
-
-        html.dark-mode .swal2-html-container {
-            color: var(--text-primary) !important;
-        }
-
-        html.dark-mode .swal2-input,
-        html.dark-mode .swal2-textarea {
-            background-color: var(--input-bg) !important;
-            border-color: var(--input-border) !important;
-            color: var(--text-primary) !important;
-        }
-
-        html.dark-mode .swal2-input::placeholder,
-        html.dark-mode .swal2-textarea::placeholder {
-            color: var(--text-secondary) !important;
-        }
-
-        html.dark-mode table {
-            color: var(--text-primary) !important;
-        }
-
-        html.dark-mode table tr {
-            border-color: var(--border-color) !important;
-        }
-
-        html.dark-mode strong {
-            color: var(--text-primary) !important;
-        }
-
-        .nav-link-btn {
-            color: var(--text-secondary);
-        }
-
-        .nav-link-btn:hover {
-            color: var(--text-primary);
-        }
-
-        .app-loading-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(15, 23, 42, 0.55);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 9999;
-            backdrop-filter: blur(3px);
-        }
-
-        .app-loading-card {
-            background: var(--bg-primary);
-            border: 1px solid var(--border-color);
-            color: var(--text-primary);
-            border-radius: 12px;
-            padding: 16px 20px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            box-shadow: 0 12px 30px rgba(2, 6, 23, 0.2);
-        }
-
-        .app-spinner {
-            width: 18px;
-            height: 18px;
-            border: 2px solid rgba(37, 99, 235, 0.25);
-            border-top-color: #22c55e;
-            border-radius: 50%;
-            animation: appSpin 0.8s linear infinite;
-        }
-
-        .app-loading-hidden {
-            display: none;
-        }
-
-        @keyframes appSpin {
-            to { transform: rotate(360deg); }
-        }
-
-        @media (max-width: 1024px) {
-            nav {
-                flex-wrap: wrap;
-                gap: 12px;
-            }
-
-            nav > div {
-                width: 100%;
-                justify-content: space-between;
-                flex-wrap: wrap;
-                gap: 12px;
-            }
-
-            main {
-                padding-left: 16px;
-                padding-right: 16px;
-            }
-
-            #invoiceFormView {
-                padding-left: 0;
-                padding-right: 0;
-            }
-
-            #invoiceFormView .grid {
-                grid-template-columns: repeat(2, minmax(0, 1fr));
-            }
-        }
-
-        @media (max-width: 640px) {
-            nav {
-                padding-left: 16px;
-                padding-right: 16px;
-            }
-
-            #btnNewInvoice {
-                width: 100%;
-                justify-content: center;
-            }
-
-            #invoiceListView .flex.justify-between {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 8px;
-            }
-
-            #invoiceFormView .grid {
-                grid-template-columns: 1fr;
-            }
-
-            #invoiceFormView .bg-white {
-                padding: 20px;
-            }
-
-            #paginationContainer {
-                flex-wrap: wrap;
-                gap: 8px;
-            }
-
-            #invoiceFormView table {
-                width: 100%;
-                border-collapse: collapse;
-            }
-
-            #invoiceFormView thead {
-                display: none;
-            }
-
-            #invoiceFormView tbody {
-                display: block;
-            }
-
-            #invoiceFormView tbody tr {
-                display: block;
-                padding: 12px;
-                margin-bottom: 8px;
-                border: 1px solid var(--border-color);
-                border-radius: 4px;
-                background-color: var(--bg-secondary);
-            }
-
-            #invoiceFormView tbody td {
-                display: block;
-                padding: 8px 0;
-                border: none;
-                text-align: left;
-            }
-
-            #invoiceFormView tbody td::before {
-                display: block;
-                font-size: 11px;
-                font-weight: 600;
-                text-transform: uppercase;
-                letter-spacing: 0.04em;
-                color: var(--text-secondary);
-                margin-bottom: 4px;
-                content: attr(data-label);
-            }
-
-            #invoiceFormView tbody td.remove-cell {
-                display: flex;
-                flex-direction: row;
-                align-items: center;
-                justify-content: flex-start;
-                padding-top: 12px;
-                padding-bottom: 0;
-                border-top: 1px solid var(--border-color);
-                margin-top: 8px;
-            }
-
-            #invoiceFormView tbody td.remove-cell::before {
-                content: "";
-                display: none;
-                margin-bottom: 0;
-            }
-
-            #invoiceFormView .removeItemBtn {
-                width: 100%;
-                height: 36px;
-                padding: 0 10px;
-                display: inline-flex;
-                align-items: center;
-                justify-content: center;
-                border: 1px solid var(--border-color);
-                border-radius: 4px;
-                background-color: var(--bg-primary);
-                color: var(--text-primary);
-                cursor: pointer;
-                font-size: 13px;
-                transition: all 0.2s;
-            }
-
-            #invoiceFormView .removeItemBtn:hover {
-                background-color: var(--bg-hover);
-            }
-
-            #invoiceFormView .remove-label {
-                display: inline;
-                font-size: 13px;
-                margin-left: 6px;
-            }
-
-            #invoiceFormView .item-desc-area {
-                min-height: 60px;
-            }
-
-            #invoiceFormView tbody td input,
-            #invoiceFormView tbody td textarea {
-                width: 100%;
-            }
-        }
-
-        @media (max-width: 360px) {
-            nav {
-                padding-left: 12px;
-                padding-right: 12px;
-            }
-
-            #invoiceListView .text-2xl {
-                font-size: 1.25rem;
-            }
-
-            #invoiceFormView .bg-white {
-                padding: 16px;
-            }
-
-            #invoiceFormView input,
-            #invoiceFormView select {
-                font-size: 0.85rem;
-                padding-left: 10px;
-                padding-right: 10px;
-            }
-
-            #invoiceFormView tbody tr {
-                padding: 10px;
-                margin-bottom: 6px;
-            }
-
-            #invoiceFormView tbody td {
-                padding: 6px 0;
-            }
-
-            .invoice-card {
-                padding: 14px;
-            }
-        }
-    </style>
+    <!-- Styles moved to css/app.css -->
 </head>
-<body class="bg-white text-gray-900 min-h-screen flex flex-col">
+<body class="page-index bg-white text-gray-900 min-h-screen flex flex-col">
     <div id="appLoading" class="app-loading-overlay">
         <div class="app-loading-card">
             <div class="app-spinner"></div>
@@ -826,10 +57,10 @@
     
 
     <!-- Navbar -->
-    <nav class="border-b border-gray-200 px-6 py-4 flex justify-between items-center bg-white sticky top-0 z-50" style="border-color: var(--border-color); background-color: var(--nav-bg);">
+    <nav class="app-nav border-b border-gray-200 px-6 py-4 flex justify-between items-center bg-white sticky top-0 z-50">
         <div class="flex items-center gap-4">
-            <span class="text-lg font-semibold" style="color: var(--text-primary);">Facturación Electrónica</span>
-            <button id="btnNewInvoice" onclick="showInvoiceForm()" class="bg-gray-800 hover:bg-gray-800 text-white px-4 py-2 rounded-md text-sm font-medium flex items-center gap-2 transition-colors" style="background-color: #22c55e;">            
+            <span class="nav-title text-lg font-semibold">Facturación Electrónica</span>
+            <button id="btnNewInvoice" onclick="showInvoiceForm()" class="bg-gray-800 hover:bg-gray-800 text-white px-4 py-2 rounded-md text-sm font-medium flex items-center gap-2 transition-colors">            
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                 Nueva Factura
             </button>
@@ -842,7 +73,7 @@
                     <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="20" height="20"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
                 </div>
             </button>
-            <span id="currentUserEmail" class="text-sm" style="color: var(--text-secondary);"></span>
+            <span id="currentUserEmail" class="text-sm"></span>
             <button onclick="logout()" class="text-sm flex items-center gap-2 transition-colors nav-link-btn">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
                 Salir
@@ -899,8 +130,8 @@
 
         <!-- Formulario de Factura Provisional (Oculto por defecto) -->
         <div id="invoiceFormView" class="hidden max-w-3xl mx-auto">
-            <div class="bg-white border border-gray-200 rounded-xl p-8 shadow-sm" style="background-color: var(--bg-secondary); border-color: var(--border-color);">
-                <h2 class="invoiceFormTitle text-xl font-bold text-center uppercase tracking-wide mb-8 text-gray-900 border-b border-gray-100 pb-4" style="color: var(--text-primary); border-color: var(--border-color);">Crear Factura Provisional</h2>
+            <div class="invoice-form-card bg-white border border-gray-200 rounded-xl p-8 shadow-sm">
+                <h2 class="invoice-form-title invoiceFormTitle text-xl font-bold text-center uppercase tracking-wide mb-8 text-gray-900 border-b border-gray-100 pb-4">Crear Factura Provisional</h2>
                 
                 <form id="invoiceForm" class="invoiceForm" onsubmit="handleSubmit(event)">
                     <!-- Fecha y Número -->
@@ -934,8 +165,8 @@
                             <input type="text" id="direccion" class="w-full px-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:border-gray-900 transition-colors">
                         </div>
                         <div>
-                            <label class="block text-xs font-bold text-orange-500 uppercase mb-1.5 tracking-wider" style="color: #f97316; letter-spacing: 0.05em;">Estado</label>
-                            <select id="estado" class="w-full px-3 py-2 border-2 rounded-md text-sm focus:outline-none bg-white cursor-pointer font-semibold" style="border-color: #f97316; color: var(--text-primary); background-color: var(--input-bg);">
+                            <label class="status-label block text-xs font-bold text-orange-500 uppercase mb-1.5 tracking-wider">Estado</label>
+                            <select id="estado" class="status-select w-full px-3 py-2 border-2 rounded-md text-sm focus:outline-none bg-white cursor-pointer font-semibold">
                                 <option value="dispatch">Despacho</option>
                                 <option value="abono">Abono</option>
                                 <option value="saldo_actual">Saldo Actual</option>
@@ -947,14 +178,14 @@
                     </div>
 
                     <!-- Tabla de Items -->
-                    <div class="mb-6 border border-gray-200 rounded-lg overflow-x-auto" style="border-color: var(--border-color);">
+                    <div class="items-table-wrapper mb-6 border border-gray-200 rounded-lg overflow-x-auto">
                         <table class="w-full text-sm">
-                            <thead class="bg-gray-50 border-b border-gray-200" style="background-color: var(--bg-primary); border-color: var(--border-color);">
+                            <thead class="items-table-head bg-gray-50 border-b border-gray-200">
                                 <tr>
-                                    <th class="text-left py-3 px-4 font-semibold text-gray-700 uppercase text-xs w-20" style="color: var(--text-primary);">Cant.</th>
-                                    <th class="text-left py-3 px-4 font-semibold text-gray-700 uppercase text-xs" style="color: var(--text-primary);">Descripción</th>
-                                    <th class="text-left py-3 px-4 font-semibold text-gray-700 uppercase text-xs w-32" style="color: var(--text-primary);">Precio</th>
-                                    <th class="text-right py-3 px-4 font-semibold text-gray-700 uppercase text-xs w-32" style="color: var(--text-primary);">Valor</th>
+                                    <th class="text-left py-3 px-4 font-semibold text-gray-700 uppercase text-xs w-20">Cant.</th>
+                                    <th class="text-left py-3 px-4 font-semibold text-gray-700 uppercase text-xs">Descripción</th>
+                                    <th class="text-left py-3 px-4 font-semibold text-gray-700 uppercase text-xs w-32">Precio</th>
+                                    <th class="text-right py-3 px-4 font-semibold text-gray-700 uppercase text-xs w-32">Valor</th>
                                     <th class="w-10"></th>
                                 </tr>
                             </thead>
@@ -970,7 +201,7 @@
                                         <input type="number" min="0" step="0.01" class="item-precio w-full px-2 py-1.5 border border-gray-200 rounded text-sm focus:outline-none focus:border-gray-900" placeholder="0.00" oninput="calculateTotals()">
                                     </td>
                                     <td class="py-2 px-2 text-right" data-label="Valor">
-                                        <span class="item-valor text-gray-900 font-medium" style="color: var(--text-primary);">0</span>
+                                        <span class="item-valor text-gray-900 font-medium">0</span>
                                     </td>
                                     <td class="py-2 px-2 text-center remove-cell" data-label="Eliminar">
                                         <button type="button" class="removeItemBtn" onclick="removeItem(this)">
@@ -981,24 +212,24 @@
                                 </tr>
                             </tbody>
                         </table>
-                        <button type="button" id="addItemBtn" onclick="addItem()" class="w-full py-2 text-sm text-gray-500 hover:text-gray-900 hover:bg-gray-50 transition-colors border-t border-gray-200 flex items-center justify-center gap-2" style="border-color: var(--border-color); color: var(--text-secondary); background-color: var(--bg-secondary);">
+                        <button type="button" id="addItemBtn" onclick="addItem()" class="add-item-btn w-full py-2 text-sm text-gray-500 hover:text-gray-900 hover:bg-gray-50 transition-colors border-t border-gray-200 flex items-center justify-center gap-2">
                             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                             Agregar Item
                         </button>
                     </div>
 
                     <!-- Total -->
-                    <div class="flex justify-end mb-8 border-t border-gray-200 pt-4" style="border-color: var(--border-color);">
+                    <div class="invoice-total-row flex justify-end mb-8 border-t border-gray-200 pt-4">
                         <div class="text-right">
-                            <span class="text-sm font-semibold text-gray-700 uppercase mr-2" style="color: var(--text-secondary);">Total</span>
-                            <span class="text-lg font-bold text-gray-900" style="color: var(--text-primary);">$ <span id="totalAmount">0.00</span></span>
+                            <span class="invoice-total-label text-sm font-semibold text-gray-700 uppercase mr-2">Total</span>
+                            <span class="invoice-total-amount text-lg font-bold text-gray-900">$ <span id="totalAmount">0.00</span></span>
                         </div>
                     </div>
 
                     <!-- Footer -->
-                    <div class="grid grid-cols-2 gap-8 mb-8 text-xs text-gray-500 uppercase tracking-wide" style="color: var(--text-secondary);">
+                    <div class="invoice-footer grid grid-cols-2 gap-8 mb-8 text-xs text-gray-500 uppercase tracking-wide">
                         <div>No se admiten devoluciones</div>
-                        <div class="text-right">Recibido por <span class="inline-block border-b border-gray-400 w-32 ml-2" style="border-color: var(--border-color);"></span></div>
+                        <div class="text-right">Recibido por <span class="invoice-footer-signature inline-block border-b border-gray-400 w-32 ml-2"></span></div>
                     </div>
 
                     <!-- Botones -->
@@ -1017,62 +248,16 @@
     </main>
 
     <script>
-        // Firebase Helper Functions (necesarias para verificación de autenticación)
-        async function getFirebaseData(path) {
-            try {
-                const dbRef = window.firebaseRef(window.firebaseDB);
-                const snapshot = await window.firebaseGet(window.firebaseChild(dbRef, path));
-                return snapshot.exists() ? snapshot.val() : null;
-            } catch (error) {
-                console.error('Error reading from Firebase:', error);
-                return null;
-            }
-        }
-
-        async function setFirebaseData(path, data) {
-            try {
-                await window.firebaseSet(window.firebaseRef(window.firebaseDB, path), data);
-                return true;
-            } catch (error) {
-                console.error('Error writing to Firebase:', error);
-                return false;
-            }
-        }
-
-        function normalizeUsers(rawUsers) {
-            if (Array.isArray(rawUsers)) return rawUsers.filter(Boolean);
-            if (rawUsers && typeof rawUsers === 'object') return Object.values(rawUsers);
-            return [];
-        }
+        window.toastTheme = {
+            background: '#ecfdf5',
+            color: '#065f46',
+            iconColor: '#16a34a'
+        };
 
         function normalizeInvoices(rawInvoices) {
             if (Array.isArray(rawInvoices)) return rawInvoices.filter(Boolean);
             if (rawInvoices && typeof rawInvoices === 'object') return Object.values(rawInvoices);
             return [];
-        }
-
-        function showAppLoading(message) {
-            const overlay = document.getElementById('appLoading');
-            if (!overlay) return;
-            const text = overlay.querySelector('.app-loading-text');
-            if (text && message) text.textContent = message;
-            overlay.classList.remove('app-loading-hidden');
-        }
-
-        function hideAppLoading() {
-            const overlay = document.getElementById('appLoading');
-            if (!overlay) return;
-            overlay.classList.add('app-loading-hidden');
-        }
-
-        async function waitForFirebaseReady(maxAttempts = 100) {
-            for (let attempt = 0; attempt < maxAttempts; attempt++) {
-                if (window.firebaseAuth && window.firebaseAuthStateChanged && window.firebaseDB) {
-                    return true;
-                }
-                await new Promise(resolve => setTimeout(resolve, 30));
-            }
-            return false;
         }
 
         // Verificar autenticación obligatoria con Firebase Auth
@@ -1222,28 +407,6 @@
             }
         })();
 
-        // Firebase Helper Functions
-        async function getFirebaseData(path) {
-            try {
-                const dbRef = window.firebaseRef(window.firebaseDB);
-                const snapshot = await window.firebaseGet(window.firebaseChild(dbRef, path));
-                return snapshot.exists() ? snapshot.val() : null;
-            } catch (error) {
-                console.error('Error reading from Firebase:', error);
-                return null;
-            }
-        }
-
-        async function setFirebaseData(path, data) {
-            try {
-                await window.firebaseSet(window.firebaseRef(window.firebaseDB, path), data);
-                return true;
-            } catch (error) {
-                console.error('Error writing to Firebase:', error);
-                return false;
-            }
-        }
-
         // Funciones de carga y guardado
         async function loadInvoices() {
             const data = await getFirebaseData('invoices');
@@ -1328,6 +491,117 @@
         const invoicesPerPage = 30;
         let invoicesInitialized = false;
         let stopInvoicesRealtime = null;
+        const INVOICE_DRAFT_KEY = 'invoiceDraftV1';
+        let draftSaveTimer = null;
+
+        function buildInvoiceDraft() {
+            const rows = Array.from(document.querySelectorAll('#itemsTableBody tr'));
+            return {
+                dia: document.getElementById('dia').value,
+                mes: document.getElementById('mes').value,
+                anio: document.getElementById('anio').value,
+                numero: document.getElementById('numero').value,
+                cliente: document.getElementById('cliente').value || '',
+                direccion: document.getElementById('direccion').value || '',
+                estado: document.getElementById('estado').value || 'pending',
+                items: rows.map((row) => ({
+                    cant: row.querySelector('.item-cant')?.value || '1',
+                    desc: row.querySelector('.item-desc')?.value || '',
+                    precio: row.querySelector('.item-precio')?.value || ''
+                }))
+            };
+        }
+
+        function hasMeaningfulDraftData(draft) {
+            if (!draft) return false;
+            const hasClientData = !!String(draft.cliente || '').trim() || !!String(draft.direccion || '').trim();
+            const hasItemsData = Array.isArray(draft.items) && draft.items.some((item) => {
+                const desc = String(item.desc || '').trim();
+                const precio = String(item.precio || '').trim();
+                return desc.length > 0 || (precio.length > 0 && precio !== '0' && precio !== '0.00');
+            });
+            return hasClientData || hasItemsData;
+        }
+
+        function saveDraftNow() {
+            if (editingId) return;
+            const formView = document.getElementById('invoiceFormView');
+            if (!formView || formView.classList.contains('hidden')) return;
+
+            const draft = buildInvoiceDraft();
+            if (hasMeaningfulDraftData(draft)) {
+                localStorage.setItem(INVOICE_DRAFT_KEY, JSON.stringify(draft));
+            } else {
+                localStorage.removeItem(INVOICE_DRAFT_KEY);
+            }
+        }
+
+        function scheduleDraftSave() {
+            if (editingId) return;
+            clearTimeout(draftSaveTimer);
+            draftSaveTimer = setTimeout(saveDraftNow, 300);
+        }
+
+        function clearInvoiceDraft() {
+            localStorage.removeItem(INVOICE_DRAFT_KEY);
+            clearTimeout(draftSaveTimer);
+        }
+
+        function restoreDraftIfExists() {
+            if (editingId) return;
+            const rawDraft = localStorage.getItem(INVOICE_DRAFT_KEY);
+            if (!rawDraft) return;
+
+            try {
+                const draft = JSON.parse(rawDraft);
+                if (!hasMeaningfulDraftData(draft)) return;
+
+                document.getElementById('dia').value = draft.dia || document.getElementById('dia').value;
+                document.getElementById('mes').value = draft.mes || document.getElementById('mes').value;
+                document.getElementById('anio').value = draft.anio || document.getElementById('anio').value;
+                document.getElementById('numero').value = draft.numero || document.getElementById('numero').value;
+                document.getElementById('cliente').value = draft.cliente || '';
+                document.getElementById('direccion').value = draft.direccion || '';
+                document.getElementById('estado').value = draft.estado || 'pending';
+
+                if (Array.isArray(draft.items) && draft.items.length > 0) {
+                    const tbody = document.getElementById('itemsTableBody');
+                    tbody.innerHTML = '';
+                    draft.items.forEach((item, idx) => {
+                        const row = document.createElement('tr');
+                        row.className = 'border-b border-gray-100';
+                        row.innerHTML = `
+                            <td class="py-2 px-2" data-label="Cant.">
+                                <input type="number" min="1" value="${item.cant || 1}" class="item-cant w-full px-2 py-1.5 border border-gray-200 rounded text-center text-sm focus:outline-none focus:border-gray-900" oninput="calculateTotals()">
+                            </td>
+                            <td class="py-2 px-2" data-label="Descripcion">
+                                <textarea class="item-desc item-desc-area w-full px-2 py-1.5 border border-gray-200 rounded text-sm focus:outline-none focus:border-gray-900" placeholder="Descripción del item" rows="2">${item.desc || ''}</textarea>
+                            </td>
+                            <td class="py-2 px-2" data-label="Precio">
+                                <input type="number" min="0" step="0.01" value="${item.precio || ''}" class="item-precio w-full px-2 py-1.5 border border-gray-200 rounded text-sm focus:outline-none focus:border-gray-900" placeholder="0.00" oninput="calculateTotals()">
+                            </td>
+                            <td class="py-2 px-2 text-right" data-label="Valor">
+                                <span class="item-valor text-gray-900 font-medium">0.00</span>
+                            </td>
+                            <td class="py-2 px-2 text-center remove-cell" data-label="Eliminar">
+                                <button type="button" class="removeItemBtn" onclick="removeItem(this)">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                                    <span class="remove-label">Eliminar item</span>
+                                </button>
+                            </td>
+                        `;
+                        tbody.appendChild(row);
+                    });
+                }
+
+                syncAllItemDescHeights();
+                calculateTotals();
+                showToast('Borrador restaurado', 'info', 1600);
+            } catch (error) {
+                console.warn('No se pudo restaurar el borrador:', error);
+                localStorage.removeItem(INVOICE_DRAFT_KEY);
+            }
+        }
 
         // Cargar facturas solo después de validar autenticación Firebase
         async function initInvoicesRealtime() {
@@ -1387,6 +661,7 @@
             document.getElementById('estado').value = 'pending';
             resetItemsTable();
             calculateTotals();
+            restoreDraftIfExists();
         }
 
         function generateInvoiceNumber() {
@@ -1421,6 +696,7 @@
             editingId = null;
             resetItemsTable();
             calculateTotals();
+            clearInvoiceDraft();
         }
 
         function resetItemsTable() {
@@ -1476,6 +752,7 @@
             `;
             tbody.appendChild(newRow);
             syncAllItemDescHeights();
+            scheduleDraftSave();
         }
 
         function removeItem(btn) {
@@ -1484,6 +761,7 @@
             if (rows.length > 1) {
                 btn.closest('tr').remove();
                 calculateTotals();
+                scheduleDraftSave();
             } else {
                 Swal.fire({
                     icon: 'warning',
@@ -1519,6 +797,7 @@
             });
             
             document.getElementById('totalAmount').textContent = total.toFixed(2);
+            scheduleDraftSave();
         }
 
         async function handleSubmit(e) {
@@ -1666,17 +945,9 @@
                     try {
                         await saveInvoiceRecord(updatedInvoices[invoiceIndex]);
                         invoices = updatedInvoices;
-                        Swal.fire({
-                            icon: 'success',
-                            title: '¡Factura actualizada!',
-                            text: `Factura #${document.getElementById('numero').value} actualizada exitosamente`,
-                            confirmButtonColor: '#1a1a1a',
-                            timer: 2000,
-                            showConfirmButton: false
-                        }).then(() => {
-                            resetForm();
-                            updateInvoiceList();
-                        });
+                        resetForm();
+                        updateInvoiceList();
+                        showToast(`Factura #${document.getElementById('numero').value} actualizada`, 'success', 1800);
                     } catch (error) {
                         console.error('Error guardando factura:', error);
                         Swal.fire({
@@ -1705,18 +976,9 @@
                 try {
                     await saveInvoiceRecord(newInvoice);
                     invoices = updatedInvoices;
-
-                    Swal.fire({
-                        icon: 'success',
-                        title: '¡Factura creada!',
-                        text: `Factura #${newInvoice.number} creada exitosamente`,
-                        confirmButtonColor: '#1a1a1a',
-                        timer: 2000,
-                        showConfirmButton: false
-                    }).then(() => {
-                        resetForm();
-                        updateInvoiceList();
-                    });
+                    resetForm();
+                    updateInvoiceList();
+                    showToast(`Factura #${newInvoice.number} creada`, 'success', 1800);
                 } catch (error) {
                     console.error('Error creando factura:', error);
                     Swal.fire({
@@ -1729,32 +991,14 @@
             }
         }
 
-        function formatDate(dateString) {
-            const date = new Date(dateString);
-            if (isNaN(date.getTime())) return 'Fecha inválida';
-            
-            const today = new Date();
-            const diffTime = date - today;
-            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-            
-            if (diffDays < 0) return `Vencida hace ${Math.abs(diffDays)} días`;
-            if (diffDays === 0) return 'Vence hoy';
-            return `Vence en ${diffDays} días`;
-        }
-
         function updateInvoiceList() {
             const listContainer = document.getElementById('invoiceList');
             const emptyState = document.getElementById('emptyState');
             const totalCount = document.getElementById('totalCount');
             const paginationContainer = document.getElementById('paginationContainer');
             
-            let filtered = invoices;
-            if (currentFilter !== 'all') {
-                filtered = invoices.filter(inv => inv.status === currentFilter);
-            }
-            
-            // Ordenar por ID descendente (más recientes primero)
-            filtered = filtered.sort((a, b) => b.id - a.id);
+            let filtered = filterInvoicesByStatus(invoices, currentFilter);
+            filtered = sortInvoicesDescById(filtered);
             
             totalCount.textContent = `${filtered.length} total`;
             
@@ -1781,15 +1025,10 @@
             emptyState.classList.add('hidden');
             listContainer.classList.remove('hidden');
             
-            // Calcular paginación
-            const totalPages = Math.ceil(filtered.length / invoicesPerPage);
-            if (currentPage > totalPages) {
-                currentPage = totalPages;
-            }
-            
-            const startIndex = (currentPage - 1) * invoicesPerPage;
-            const endIndex = startIndex + invoicesPerPage;
-            const paginatedInvoices = filtered.slice(startIndex, endIndex);
+            const paginationData = paginateList(filtered, currentPage, invoicesPerPage);
+            const totalPages = paginationData.totalPages;
+            currentPage = paginationData.currentPage;
+            const paginatedInvoices = paginationData.pageItems;
             
             // Mostrar u ocultar paginación
             if (totalPages > 1) {
@@ -1799,53 +1038,47 @@
                 paginationContainer.classList.add('hidden');
             }
             const canDelete = currentUser && currentUser.role === 'admin';
-            
-            listContainer.innerHTML = paginatedInvoices.map(inv => {
-                const statusClass = getStatusClass(inv.status);
-                const statusText = getStatusText(inv.status);
-                const canViewAmount = canSeeInvoiceAmount(inv);
-                const amountText = canViewAmount ? `$${inv.amount.toFixed(2)}` : 'Monto oculto';
-                
-                return `
-                <div class="invoice-card bg-white border border-gray-200 rounded-lg p-5 relative">
-                    <div class="flex justify-end gap-3 mb-2">
-                        <button onclick="viewInvoice(${inv.id})" class="text-gray-400 hover:text-gray-600 transition-colors" title="Ver">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
-                        </button>
-                        ${canEditInvoice(inv) ? `
-                        <button onclick="editInvoice(${inv.id})" class="text-gray-400 hover:text-blue-600 transition-colors" title="Editar">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
-                        </button>
-                        ` : ''}
-                        ${canDelete ? `
-                        <button onclick="deleteInvoice(${inv.id})" class="text-gray-400 hover:text-red-600 transition-colors" title="Eliminar">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
-                        </button>
-                        ` : ''}
-                    </div>
-                    
-                    <div class="mb-4">
-                        <h3 class="text-lg font-semibold text-gray-900 leading-tight">${inv.client}</h3>
-                        <p class="text-sm text-gray-500 mt-0.5">Factura #${inv.number}</p>
-                        ${getInvoiceOwnershipBadge(inv)}
-                    </div>
-                    
-                    <div class="flex justify-between items-end">
-                        <span class="text-2xl font-bold text-gray-900">${amountText}</span>
-                        <div class="flex items-center gap-6"></div>
-                    </div>
-                    <span class="status-badge ${statusClass} absolute bottom-3 right-3">${statusText}</span>
-                </div>
-                `;
-            }).join('');
+            listContainer.innerHTML = paginatedInvoices.map(inv => renderInvoiceCard(inv, canDelete, true)).join('');
         }
 
-        async function logout(){
-            const darkModeSetting = localStorage.getItem('darkMode'); // Guardar configuración
-            await window.firebaseAuth.signOut();
-            localStorage.clear(); // Limpiar todo
-            if (darkModeSetting) localStorage.setItem('darkMode', darkModeSetting); // Restaurar
-            window.location.href = 'login.html';
+        function renderInvoiceCard(inv, canDelete, withTitle = false) {
+            const statusClass = getStatusClass(inv.status);
+            const statusText = getStatusText(inv.status);
+            const canViewAmount = canSeeInvoiceAmount(inv);
+            const amountText = canViewAmount ? `$${inv.amount.toFixed(2)}` : 'Monto oculto';
+            const viewTitle = withTitle ? ' title="Ver"' : '';
+            const editTitle = withTitle ? ' title="Editar"' : '';
+            const deleteTitle = withTitle ? ' title="Eliminar"' : '';
+
+            return `
+            <div class="invoice-card bg-white border border-gray-200 rounded-lg p-5 relative">
+                <div class="flex justify-end gap-3 mb-2">
+                    <button onclick="viewInvoice(${inv.id})" class="text-gray-400 hover:text-gray-600 transition-colors"${viewTitle}>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                    </button>
+                    ${canEditInvoice(inv) ? `
+                    <button onclick="editInvoice(${inv.id})" class="text-gray-400 hover:text-blue-600 transition-colors"${editTitle}>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                    </button>
+                    ` : ''}
+                    ${canDelete ? `
+                    <button onclick="deleteInvoice(${inv.id})" class="text-gray-400 hover:text-red-600 transition-colors"${deleteTitle}>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                    </button>
+                    ` : ''}
+                </div>
+                <div class="mb-4">
+                    <h3 class="text-lg font-semibold text-gray-900 leading-tight">${inv.client}</h3>
+                    <p class="text-sm text-gray-500 mt-0.5">Factura #${inv.number}</p>
+                    ${getInvoiceOwnershipBadge(inv)}
+                </div>
+                <div class="flex justify-between items-end">
+                    <span class="text-2xl font-bold text-gray-900">${amountText}</span>
+                    <div class="flex items-center gap-6"></div>
+                </div>
+                <span class="status-badge ${statusClass} absolute bottom-3 right-3">${statusText}</span>
+            </div>
+            `;
         }
 
         function renderPaginationButtons(totalPages) {
@@ -1877,11 +1110,8 @@
         function nextPage() {
             const listContainer = document.getElementById('invoiceList');
             if (!listContainer.classList.contains('hidden')) {
-                let filtered = invoices;
-                if (currentFilter !== 'all') {
-                    filtered = invoices.filter(inv => inv.status === currentFilter);
-                }
-                const totalPages = Math.ceil(filtered.length / invoicesPerPage);
+                const filtered = filterInvoicesByStatus(invoices, currentFilter);
+                const totalPages = paginateList(filtered, currentPage, invoicesPerPage).totalPages;
                 if (currentPage < totalPages) {
                     currentPage++;
                     updateInvoiceList();
@@ -1894,57 +1124,6 @@
                 currentPage--;
                 updateInvoiceList();
             }
-        }
-
-        function getStatusClass(status) {
-            const normalized = String(status || '').toLowerCase();
-            if (normalized === 'dispatch' || normalized === 'despacho') return 'status-dispatch';
-            if (normalized === 'abono') return 'status-abono';
-            if (normalized === 'saldo_actual' || normalized === 'saldo actual' || normalized === 'sado actual') return 'status-saldo';
-            if (normalized === 'paid' || normalized === 'pagada' || normalized === 'pagadas') return 'status-paid';
-            if (normalized === 'late' || normalized === 'vencida' || normalized === 'vencidas') return 'status-late';
-            return 'status-pending';
-        }
-
-        function getStatusText(status) {
-            const statusMap = {
-                'dispatch': 'Despacho',
-                'despacho': 'Despacho',
-                'abono': 'Abono',
-                'saldo_actual': 'Saldo Actual',
-                'saldo actual': 'Saldo Actual',
-                'sado actual': 'Saldo Actual',
-                'paid': 'Pagada',
-                'pagada': 'Pagada',
-                'pagadas': 'Pagada',
-                'pending': 'Pendiente',
-                'pendiente': 'Pendiente',
-                'pendientes': 'Pendiente',
-                'late': 'Vencida',
-                'vencida': 'Vencida',
-                'vencidas': 'Vencida'
-            };
-            return statusMap[String(status || '').toLowerCase()] || status;
-        }
-
-        function getStatusPdfChipData(status) {
-            const normalized = String(status || '').toLowerCase();
-            if (normalized === 'dispatch' || normalized === 'despacho') {
-                return { text: 'Despacho', background: '#dbeafe', color: '#1e40af' };
-            }
-            if (normalized === 'abono') {
-                return { text: 'Abono', background: '#dcfce7', color: '#166534' };
-            }
-            if (normalized === 'saldo_actual' || normalized === 'saldo actual' || normalized === 'sado actual') {
-                return { text: 'Saldo Actual', background: '#ede9fe', color: '#5b21b6' };
-            }
-            if (normalized === 'paid' || normalized === 'pagada' || normalized === 'pagadas') {
-                return { text: 'Pagada', background: '#d1fae5', color: '#065f46' };
-            }
-            if (normalized === 'late' || normalized === 'vencida' || normalized === 'vencidas') {
-                return { text: 'Vencida', background: '#fee2e2', color: '#991b1b' };
-            }
-            return { text: 'Pendiente', background: '#fef3c7', color: '#92400e' };
         }
 
         function downloadInvoicePdf(inv, canViewAmount) {
@@ -1963,7 +1142,7 @@
             const pageWidth = doc.internal.pageSize.getWidth();
             const left = 48;
             const right = pageWidth - 48;
-            const statusChip = getStatusPdfChipData(inv.status);
+            const statusClass = getStatusClass(inv.status);
 
             doc.setFont('helvetica', 'bold');
             doc.setFontSize(28);
@@ -2055,8 +1234,8 @@
                     <tr>
                         <td>${item.cant}</td>
                         <td>${item.desc}</td>
-                        <td style="text-align:right;">${price}</td>
-                        <td style="text-align:right;">${rowTotal}</td>
+                        <td class="pdf-cell-right">${price}</td>
+                        <td class="pdf-cell-right">${rowTotal}</td>
                     </tr>
                 `;
             }).join('');
@@ -2068,48 +1247,30 @@
                     <meta charset="UTF-8">
                     <meta name="viewport" content="width=device-width, initial-scale=1.0">
                     <title>Factura #${inv.number}</title>
-                    <style>
-                        body { font-family: Arial, sans-serif; margin: 24px; color: #111827; }
-                        .actions { display: flex; justify-content: flex-end; gap: 8px; margin-bottom: 14px; }
-                        .action-btn { border: 1px solid #d1d5db; background: #ffffff; color: #111827; padding: 8px 12px; border-radius: 8px; font-weight: 600; cursor: pointer; }
-                        .action-btn:hover { background: #f3f4f6; }
-                        .header { text-align: center; margin-bottom: 20px; }
-                        .header h1 { margin: 0; font-size: 34px; }
-                        .meta { margin-bottom: 14px; line-height: 1.35; font-size: 14px; }
-                        .chip { display: inline-block; padding: 4px 10px; border-radius: 999px; font-size: 12px; font-weight: 700; }
-                        .table-wrap { margin-top: 10px; border-top: 1px solid #d1d5db; padding-top: 10px; }
-                        table { width: 100%; border-collapse: collapse; }
-                        th, td { padding: 8px 6px; border-bottom: 1px solid #e5e7eb; text-align: left; font-size: 14px; }
-                        th { font-weight: 700; }
-                        .total { margin-top: 14px; text-align: right; }
-                        .total-box { display: inline-flex; align-items: center; gap: 10px; border: 1px solid #d1d5db; border-radius: 10px; padding: 8px 12px; }
-                        .total-label { font-size: 12px; color: #6b7280; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; }
-                        .total-value { font-size: 36px; font-weight: 800; line-height: 1; }
-                        @media print { .actions { display: none; } }
-                    </style>
+                    <link rel="stylesheet" href="css/app.css">
                 </head>
-                <body>
-                    <div class="actions">
-                        <button class="action-btn" onclick="window.print()">Imprimir</button>
-                        <button class="action-btn" onclick="window.close()">Cerrar</button>
+                <body class="pdf-preview">
+                    <div class="pdf-actions">
+                        <button class="pdf-action-btn" onclick="window.print()">Imprimir</button>
+                        <button class="pdf-action-btn" onclick="window.close()">Cerrar</button>
                     </div>
-                    <div class="header">
+                    <div class="pdf-header">
                         <h1>Factura #${inv.number}</h1>
                     </div>
-                    <div class="meta">
+                    <div class="pdf-meta">
                         <div><strong>Cliente:</strong> ${inv.client}</div>
                         <div><strong>Dirección:</strong> ${addressText}</div>
                         <div><strong>Fecha:</strong> ${inv.date}</div>
-                        <div><strong>Estado:</strong> <span class="chip" style="background:${statusChip.background}; color:${statusChip.color};">${statusChip.text}</span></div>
+                        <div><strong>Estado:</strong> <span class="pdf-chip ${statusClass}">${getStatusText(inv.status)}</span></div>
                     </div>
-                    <div class="table-wrap">
-                        <table>
+                    <div class="pdf-table-wrap">
+                        <table class="pdf-table">
                             <thead>
                                 <tr>
-                                    <th style="width:90px;">Cant.</th>
+                                    <th class="pdf-col-qty">Cant.</th>
                                     <th>Descripción</th>
-                                    <th style="width:120px; text-align:right;">Precio</th>
-                                    <th style="width:120px; text-align:right;">Total</th>
+                                    <th class="pdf-col-price pdf-cell-right">Precio</th>
+                                    <th class="pdf-col-total pdf-cell-right">Total</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -2117,10 +1278,10 @@
                             </tbody>
                         </table>
                     </div>
-                    <div class="total">
-                        <div class="total-box">
-                            <span class="total-label">Total</span>
-                            <span class="total-value">${totalText}</span>
+                    <div class="pdf-total">
+                        <div class="pdf-total-box">
+                            <span class="pdf-total-label">Total</span>
+                            <span class="pdf-total-value">${totalText}</span>
                         </div>
                     </div>
                 </body>
@@ -2148,23 +1309,23 @@
             
             itemsHtml += '</table>';
             const totalHtml = canViewAmount
-                ? `<div style="display: inline-flex; align-items: center; gap: 10px; padding: 8px 14px; border-radius: 10px; background-color: var(--bg-primary); border: 1px solid var(--border-color); box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);"><span style="font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-secondary);">Total</span><span style="font-size: 30px; line-height: 1; font-weight: 800; color: var(--text-primary);">$${inv.amount.toFixed(2)}</span></div>`
-                : '<div style="display: inline-flex; align-items: center; gap: 10px; padding: 8px 14px; border-radius: 10px; background-color: var(--bg-primary); border: 1px solid var(--border-color);"><span style="font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-secondary);">Total</span><span style="font-size: 24px; line-height: 1; font-weight: 800; color: var(--text-primary);">Oculto</span></div>';
+                ? `<div class="invoice-modal-total-box has-total"><span class="invoice-modal-total-label">Total</span><span class="invoice-modal-total-value">$${inv.amount.toFixed(2)}</span></div>`
+                : '<div class="invoice-modal-total-box"><span class="invoice-modal-total-label">Total</span><span class="invoice-modal-total-value is-hidden">Oculto</span></div>';
 
             Swal.fire({
                 title: `Factura #${inv.number}`,
                 html: `
-                    <div class="text-left" style="max-height: 400px; overflow-y: auto; color: var(--text-primary);">
-                        <div style="margin-bottom: 15px;">
+                    <div class="invoice-modal-content text-left">
+                        <div class="invoice-modal-meta">
                             <p><strong>Cliente:</strong> ${inv.client}</p>
                             <p><strong>Dirección:</strong> ${addressText}</p>
                             <p><strong>Fecha:</strong> ${inv.date}</p>
                             <p><strong>Estado:</strong> ${getStatusText(inv.status)}</p>
                         </div>
-                        <div style="margin-bottom: 15px; border-top: 1px solid var(--border-color); padding-top: 10px;">
+                        <div class="invoice-modal-items">
                             ${itemsHtml}
                         </div>
-                        <div style="text-align: right; border-top: 2px solid var(--border-color); padding-top: 14px;">
+                        <div class="invoice-modal-total">
                             ${totalHtml}
                         </div>
                     </div>
@@ -2277,19 +1438,32 @@
                 cancelButtonText: 'Cancelar'
             }).then(async (result) => {
                 if (result.isConfirmed) {
+                    const deletedInvoice = invoices.find(inv => inv.id === id);
+                    if (!deletedInvoice) return;
                     const updatedInvoices = invoices.filter(inv => inv.id !== id);
                     try {
                         await deleteInvoiceRecord(id);
                         invoices = updatedInvoices;
                         updateInvoiceList();
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Eliminada',
-                            text: 'La factura ha sido eliminada',
-                            confirmButtonColor: '#1a1a1a',
-                            timer: 1500,
-                            showConfirmButton: false
+
+                        const undoResult = await Swal.fire({
+                            toast: true,
+                            position: 'bottom-end',
+                            icon: 'warning',
+                            title: `Factura #${deletedInvoice.number} eliminada`,
+                            showConfirmButton: true,
+                            confirmButtonText: 'Deshacer',
+                            confirmButtonColor: '#2563eb',
+                            timer: 5000,
+                            timerProgressBar: true
                         });
+
+                        if (undoResult.isConfirmed) {
+                            await saveInvoiceRecord(deletedInvoice);
+                            invoices = [...invoices, deletedInvoice];
+                            updateInvoiceList();
+                            showToast(`Factura #${deletedInvoice.number} restaurada`, 'success', 1800);
+                        }
                     } catch (error) {
                         console.error('Error eliminando factura:', error);
                         Swal.fire({
@@ -2309,11 +1483,9 @@
             const emptyState = document.getElementById('emptyState');
             const paginationContainer = document.getElementById('paginationContainer');
             
-            let baseFiltered = currentFilter === 'all' ? invoices : invoices.filter(inv => inv.status === currentFilter);
-            let filtered = baseFiltered.filter(inv => 
-                inv.number.toLowerCase().includes(term) || 
-                inv.client.toLowerCase().includes(term)
-            );
+            const baseFiltered = filterInvoicesByStatus(invoices, currentFilter);
+            let filtered = searchInvoices(baseFiltered, term);
+            filtered = sortInvoicesDescById(filtered);
             
             if (term && filtered.length === 0) {
                 listContainer.classList.add('hidden');
@@ -2334,20 +1506,22 @@
             if (e.target && e.target.classList.contains('item-desc-area')) {
                 autoResizeItemDesc(e.target);
             }
+            scheduleDraftSave();
+        });
+
+        document.getElementById('invoiceForm').addEventListener('input', function () {
+            scheduleDraftSave();
         });
 
         function renderSearchResults(filtered) {
             const listContainer = document.getElementById('invoiceList');
             const paginationContainer = document.getElementById('paginationContainer');
             
-            // Ordenar por ID descendente (más recientes primero)
-            filtered = filtered.sort((a, b) => b.id - a.id);
-            
-            // Calcular paginación para búsqueda
-            const totalPages = Math.ceil(filtered.length / invoicesPerPage);
-            const startIndex = (currentPage - 1) * invoicesPerPage;
-            const endIndex = startIndex + invoicesPerPage;
-            const paginatedInvoices = filtered.slice(startIndex, endIndex);
+            filtered = sortInvoicesDescById(filtered);
+            const paginationData = paginateList(filtered, currentPage, invoicesPerPage);
+            const totalPages = paginationData.totalPages;
+            currentPage = paginationData.currentPage;
+            const paginatedInvoices = paginationData.pageItems;
             
             // Mostrar u ocultar paginación
             if (totalPages > 1) {
@@ -2357,43 +1531,7 @@
                 paginationContainer.classList.add('hidden');
             }
             const canDelete = currentUser && currentUser.role === 'admin';
-            
-            listContainer.innerHTML = paginatedInvoices.map(inv => {
-                const statusClass = getStatusClass(inv.status);
-                const statusText = getStatusText(inv.status);
-                const canViewAmount = canSeeInvoiceAmount(inv);
-                const amountText = canViewAmount ? `$${inv.amount.toFixed(2)}` : 'Monto oculto';
-                
-                return `
-                <div class="invoice-card bg-white border border-gray-200 rounded-lg p-5 relative">
-                    <div class="flex justify-end gap-3 mb-2">
-                        <button onclick="viewInvoice(${inv.id})" class="text-gray-400 hover:text-gray-600 transition-colors">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
-                        </button>
-                        ${canEditInvoice(inv) ? `
-                        <button onclick="editInvoice(${inv.id})" class="text-gray-400 hover:text-blue-600 transition-colors">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
-                        </button>
-                        ` : ''}
-                        ${canDelete ? `
-                        <button onclick="deleteInvoice(${inv.id})" class="text-gray-400 hover:text-red-600 transition-colors">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
-                        </button>
-                        ` : ''}
-                    </div>
-                    <div class="mb-4">
-                        <h3 class="text-lg font-semibold text-gray-900 leading-tight">${inv.client}</h3>
-                        <p class="text-sm text-gray-500 mt-0.5">Factura #${inv.number}</p>
-                        ${getInvoiceOwnershipBadge(inv)}
-                    </div>
-                    <div class="flex justify-between items-end">
-                        <span class="text-2xl font-bold text-gray-900">${amountText}</span>
-                        <div class="flex items-center gap-6"></div>
-                    </div>
-                    <span class="status-badge ${statusClass} absolute bottom-3 right-3">${statusText}</span>
-                </div>
-                `;
-            }).join('');
+            listContainer.innerHTML = paginatedInvoices.map(inv => renderInvoiceCard(inv, canDelete, false)).join('');
         }
 
         document.getElementById('filterSelect').addEventListener('change', function(e) {
@@ -2403,65 +1541,21 @@
             updateInvoiceList();
         });
 
-        async function logout() {
-            Swal.fire({
-                title: 'Cerrar sesión',
-                text: "¿Estás seguro de que deseas salir?",
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonColor: '#1a1a1a',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Sí, salir',
-                cancelButtonText: 'Cancelar'
-            }).then(async (result) => {
-                if (result.isConfirmed) {
-                    Swal.fire({
-                        icon: 'success',
-                        title: '¡Hasta pronto!',
-                        text: 'Sesión cerrada correctamente',
-                        confirmButtonColor: '#1a1a1a',
-                        timer: 1500,
-                        showConfirmButton: false
-                    });
-                    // Guardar configuración de modo oscuro antes de limpiar
-                    const darkModeSetting = localStorage.getItem('darkMode');
-                    // Cerrar sesión en Firebase Auth
-                    await window.firebaseAuth.signOut();
-                    localStorage.clear(); // Limpiar todo
-                    if (darkModeSetting) localStorage.setItem('darkMode', darkModeSetting); // Restaurar
-                    setTimeout(() => { window.location.href = 'login.html'; }, 600);
-                }
+        function logout() {
+            return confirmLogout({
+                confirmTitle: 'Cerrar sesion',
+                confirmText: 'Estas seguro de que deseas salir?',
+                confirmButtonText: 'Si, salir',
+                cancelButtonText: 'Cancelar',
+                confirmButtonColor: '#16a34a',
+                cancelButtonColor: '#dc2626',
+                successTitle: 'Hasta pronto',
+                successText: 'Sesion cerrada correctamente'
             });
         }
 
-        // Dark Mode Toggle
-        function initDarkMode() {
-            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-            const savedMode = localStorage.getItem('darkMode');
-            const isSavedDark = savedMode === '1' || savedMode === 'true';
-            
-            if (savedMode !== null) {
-                if (isSavedDark) {
-                    document.documentElement.classList.add('dark-mode');
-                } else {
-                    document.documentElement.classList.remove('dark-mode');
-                }
-            } else if (prefersDark) {
-                document.documentElement.classList.add('dark-mode');
-                localStorage.setItem('darkMode', '1');
-            } else {
-                localStorage.setItem('darkMode', '0');
-            }
-        }
-
-        function toggleDarkMode() {
-            const html = document.documentElement;
-            const isDarkMode = html.classList.toggle('dark-mode');
-            localStorage.setItem('darkMode', isDarkMode ? '1' : '0');
-        }
-
         // Inicializar Dark Mode al cargar la página
-        initDarkMode();
+        initDarkMode({ respectSystem: true });
 
         // Inicializar el select de filtro
         document.getElementById('filterSelect').value = 'all';

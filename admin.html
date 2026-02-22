@@ -6,7 +6,9 @@
     <title>Admin - Usuarios</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%2322c55e' width='100' height='100' rx='20'/><text y='70' font-size='60' fill='white' text-anchor='middle' x='50' font-weight='bold'>$</text></svg>">
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="css/app.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="js/app-utils.js"></script>
     
     <!-- Firebase SDK -->
     <script type="module">
@@ -45,353 +47,9 @@
         window.firebaseProvisionAuth = userProvisionAuth;
     </script>
     
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-        :root {
-            --bg-primary: #ffffff;
-            --bg-secondary: #f9fafb;
-            --text-primary: #1a1a1a;
-            --text-secondary: #6b7280;
-            --border-color: #e5e7eb;
-            --input-bg: #ffffff;
-            --input-border: #d1d5db;
-            --nav-bg: #ffffff;
-            --card-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-        }
-
-        html.dark-mode {
-            --bg-primary: #0f1419;
-            --bg-secondary: #1a1f2e;
-            --text-primary: #e5e7eb;
-            --text-secondary: #cbd5e1;
-            --border-color: #334155;
-            --input-bg: #1e293b;
-            --input-border: #475569;
-            --nav-bg: #0f1419;
-            --card-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.3), 0 2px 4px -2px rgb(0 0 0 / 0.3);
-        }
-
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: var(--bg-primary);
-            color: var(--text-primary);
-            transition: background-color 0.3s ease, color 0.3s ease;
-        }
-
-        nav.admin-nav { background-color: var(--nav-bg); border-bottom: 1px solid var(--border-color); }
-
-        /* Dark Mode Toggle Button (inline in navbar) */
-        .dark-mode-toggle {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 40px;
-            height: 36px;
-            background: rgba(0, 0, 0, 0.06);
-            border: 1.5px solid rgba(0, 0, 0, 0.12);
-            border-radius: 8px;
-            cursor: pointer;
-            transition: background-color 0.2s ease, transform 0.12s ease, border-color 0.2s ease;
-            margin-right: 6px;
-            padding: 4px;
-        }
-
-        html.dark-mode .dark-mode-toggle {
-            background: rgba(255,255,255,0.03);
-            border-color: rgba(255,255,255,0.03);
-        }
-
-        .dark-mode-toggle:hover {
-            background: rgba(0,0,0,0.1);
-            border-color: rgba(0, 0, 0, 0.2);
-            transform: translateY(-1px);
-        }
-
-        html.dark-mode .dark-mode-toggle:hover {
-            background: rgba(255,255,255,0.08);
-            border-color: rgba(255,255,255,0.1);
-        }
-
-        .dark-mode-toggle:active { transform: translateY(0); }
-
-        .toggle-icon { width: 20px; height: 20px; position: relative; display:inline-block; }
-
-        .icon-sun, .icon-moon { position: absolute; width: 20px; height: 20px; transition: all 0.28s ease; }
-
-        .icon-sun { color: #f59e0e; }
-        .icon-moon { color: #6366f1; opacity: 0; transform: scale(0.8) rotate(-20deg); }
-
-        html.dark-mode .icon-sun { opacity: 0; transform: scale(0.8) rotate(20deg); }
-        html.dark-mode .icon-moon { opacity: 1; transform: scale(1) rotate(0deg); }
-
-        /* status badges */
-        .status-badge { font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 6px; text-transform: capitalize; }
-        .status-paid { background-color: #dcfce7; color: #166534; }
-        .status-pending { background-color: #fef3c7; color: #92400e; }
-        .status-late { background-color: #fee2e2; color: #991b1b; }
-        html.dark-mode .status-paid { background-color: #064e3b; color: #86efac; }
-        html.dark-mode .status-pending { background-color: #78350f; color: #fcd34d; }
-        html.dark-mode .status-late { background-color: #7f1d1d; color: #fca5a5; }
-
-        /* form and table styles */
-        input, select, textarea { background-color: var(--input-bg); border: 1px solid var(--input-border); color: var(--text-primary); }
-        input::placeholder, textarea::placeholder { color: var(--text-secondary); }
-        select option { background-color: var(--bg-secondary); color: var(--text-primary); }
-        .bg-white { background-color: var(--bg-secondary) !important; }
-        .rounded-xl { border-radius: 12px; }
-        .shadow-sm { box-shadow: var(--card-shadow); }
-
-        .soft-btn {
-            background-color: var(--bg-primary);
-            color: var(--text-primary);
-            border: 1px solid var(--border-color);
-        }
-
-        .back-invoices-btn {
-            background-color: #22c55e;
-            color: #ffffff;
-            border: 1px solid #22c55e;
-            box-shadow: 0 2px 8px rgba(34, 197, 94, 0.22);
-        }
-
-        .back-invoices-btn:hover {
-            background-color: #16a34a;
-            border-color: #16a34a;
-            box-shadow: 0 4px 14px rgba(34, 197, 94, 0.35);
-        }
-
-        html.dark-mode .back-invoices-btn {
-            background-color: #22c55e;
-            color: #ffffff;
-            border-color: #22c55e;
-            box-shadow: 0 0 14px rgba(34, 197, 94, 0.4);
-        }
-
-        html.dark-mode .back-invoices-btn:hover {
-            background-color: #16a34a;
-            border-color: #16a34a;
-            box-shadow: 0 0 18px rgba(34, 197, 94, 0.55);
-        }
-
-        .users-table thead tr {
-            background-color: var(--bg-primary);
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        .users-table tbody tr {
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        .users-table tbody td {
-            color: var(--text-primary);
-        }
-
-        .muted-text { color: var(--text-secondary); }
-
-        .nav-link-btn {
-            color: var(--text-secondary);
-        }
-
-        .nav-link-btn:hover {
-            color: var(--text-primary);
-        }
-
-        /* SweetAlert2 dark adjustments */
-        html.dark-mode .swal2-popup { background-color: var(--bg-secondary) !important; color: var(--text-primary) !important; }
-        html.dark-mode .swal2-title, html.dark-mode .swal2-html-container { color: var(--text-primary) !important; }
-
-        .edit-user-popup {
-            border-radius: 14px !important;
-            padding: 1rem 1.2rem 1.2rem !important;
-            border: 1px solid var(--border-color) !important;
-            box-shadow: var(--card-shadow) !important;
-        }
-
-        .edit-user-title {
-            font-weight: 700 !important;
-            font-size: 1.75rem !important;
-            line-height: 1.2 !important;
-            margin-bottom: 0.25rem !important;
-            color: var(--text-primary) !important;
-        }
-
-        .edit-user-html {
-            text-align: left !important;
-            margin: 0.4rem 0 0 !important;
-        }
-
-        .edit-user-form {
-            display: grid;
-            gap: 12px;
-        }
-
-        .edit-user-label {
-            display: block;
-            font-size: 12px;
-            font-weight: 600;
-            margin-bottom: 6px;
-            color: var(--text-secondary);
-        }
-
-        .edit-user-field {
-            width: 100% !important;
-            margin: 0 !important;
-            height: 42px;
-            border-radius: 8px !important;
-            border: 1px solid var(--input-border) !important;
-            background-color: var(--input-bg) !important;
-            color: var(--text-primary) !important;
-            padding: 0 12px !important;
-            box-sizing: border-box !important;
-        }
-
-        .edit-user-field:focus {
-            border-color: #60a5fa !important;
-            box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.2) !important;
-            outline: none !important;
-        }
-
-        .edit-user-confirm {
-            background-color: #6366f1 !important;
-            color: #fff !important;
-            border-radius: 8px !important;
-            min-width: 96px;
-        }
-
-        .edit-user-cancel {
-            border-radius: 8px !important;
-            min-width: 96px;
-        }
-
-        .edit-user-actions {
-            gap: 10px !important;
-        }
-
-        /* responsive tweaks */
-        @media (max-width: 768px) {
-            .dark-mode-toggle { display: none; }
-        }
-
-        .app-loading-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(15, 23, 42, 0.55);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 9999;
-            backdrop-filter: blur(3px);
-        }
-
-        .app-loading-card {
-            background: var(--bg-primary);
-            border: 1px solid var(--border-color);
-            color: var(--text-primary);
-            border-radius: 12px;
-            padding: 16px 20px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            box-shadow: 0 12px 30px rgba(2, 6, 23, 0.2);
-        }
-
-        .app-spinner {
-            width: 18px;
-            height: 18px;
-            border: 2px solid rgba(37, 99, 235, 0.25);
-            border-top-color: #22c55e;
-            border-radius: 50%;
-            animation: appSpin 0.8s linear infinite;
-        }
-
-        .app-loading-hidden {
-            display: none;
-        }
-
-        @keyframes appSpin {
-            to { transform: rotate(360deg); }
-        }
-
-        @media (max-width: 1024px) {
-            nav {
-                flex-wrap: wrap;
-                gap: 12px;
-            }
-
-            nav > div {
-                width: 100%;
-                justify-content: space-between;
-                flex-wrap: wrap;
-                gap: 12px;
-            }
-
-            main {
-                padding-left: 16px;
-                padding-right: 16px;
-            }
-        }
-
-        @media (max-width: 640px) {
-            nav {
-                padding-left: 16px;
-                padding-right: 16px;
-            }
-
-            .back-invoices-btn {
-                width: 100%;
-                justify-content: center;
-            }
-
-            #userForm {
-                grid-template-columns: 1fr;
-            }
-
-            #userForm .col-span-12 {
-                grid-column: span 1 / span 1;
-            }
-
-            .soft-btn,
-            #exportBtn,
-            #importBtn {
-                width: 100%;
-                justify-content: center;
-            }
-
-            .flex.justify-between.items-center.mt-4 {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 10px;
-            }
-        }
-
-        @media (max-width: 360px) {
-            nav {
-                padding-left: 12px;
-                padding-right: 12px;
-            }
-
-            h1.text-2xl {
-                font-size: 1.25rem;
-            }
-
-            .users-table thead {
-                display: none;
-            }
-
-            .users-table tbody tr {
-                display: grid;
-                grid-template-columns: 1fr;
-                gap: 6px;
-                padding: 10px 0;
-            }
-
-            .users-table tbody td {
-                text-align: left !important;
-            }
-        }
-    </style>
+    <!-- Styles moved to css/app.css -->
 </head>
-<body class="bg-white text-gray-900 min-h-screen flex flex-col">
+<body class="page-admin bg-white text-gray-900 min-h-screen flex flex-col">
     <div id="appLoading" class="app-loading-overlay">
         <div class="app-loading-card">
             <div class="app-spinner"></div>
@@ -399,9 +57,9 @@
         </div>
     </div>
     <!-- Navbar similar to index.html -->
-    <nav class="border-b border-gray-200 px-6 py-4 flex justify-between items-center bg-white sticky top-0 z-50" style="border-color: var(--border-color); background-color: var(--nav-bg);">
+    <nav class="admin-nav border-b border-gray-200 px-6 py-4 flex justify-between items-center bg-white sticky top-0 z-50">
         <div class="flex items-center gap-6">
-            <span class="text-lg font-semibold" style="color: var(--text-primary);">Facturación Electrónica - Admin</span>
+            <span class="nav-title text-lg font-semibold">Facturación Electrónica - Admin</span>
             <button onclick="window.location.href='index.html'" class="px-3 py-2 rounded-md text-sm font-medium transition-colors back-invoices-btn">
                 Volver a Facturas
             </button>
@@ -413,7 +71,7 @@
                     <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="20" height="20"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
                 </div>
             </button>
-            <span id="currentUserEmail" class="text-sm" style="color: var(--text-secondary);"></span>
+            <span id="currentUserEmail" class="text-sm"></span>
             <button onclick="logout()" class="text-sm flex items-center gap-2 transition-colors nav-link-btn">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
                 Logout
@@ -421,16 +79,16 @@
         </div>
     </nav>
     <main class="flex-1 max-w-6xl w-full mx-auto px-6 py-8">
-        <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-6" style="background-color:var(--bg-secondary); border-color:var(--border-color);">
+        <div class="admin-panel-card bg-white rounded-xl border border-gray-200 shadow-sm p-6">
             <div class="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4 mb-7">
                 <div>
-                    <h1 class="text-2xl font-bold" style="color:var(--text-primary);">Panel de Administración</h1>
-                    <p class="text-sm text-gray-500" style="color:var(--text-secondary);">Gestiona usuarios, exporta/importa y revisa acciones del administrador.</p>
+                    <h1 class="admin-panel-title text-2xl font-bold">Panel de Administración</h1>
+                    <p class="admin-panel-subtitle text-sm text-gray-500">Gestiona usuarios, exporta/importa y revisa acciones del administrador.</p>
                 </div>
                 <div class="w-full lg:w-auto flex flex-col sm:flex-row sm:items-stretch gap-3">
-                    <div class="w-full sm:min-w-[320px] flex items-center border rounded-full overflow-hidden" style="border-color:var(--border-color); background-color:var(--bg-primary);">
-                        <input id="userSearch" type="text" placeholder="Buscar por email" class="flex-1 px-3 h-10 text-sm" style="border:0;outline:none;background:transparent; color:var(--text-primary);" />
-                        <select id="pageSize" class="px-3 h-10 text-sm border-l" style="border-left:1px solid var(--border-color); background:transparent; color:var(--text-primary);">
+                    <div class="admin-search-bar w-full sm:min-w-[320px] flex items-center border rounded-full overflow-hidden">
+                        <input id="userSearch" type="text" placeholder="Buscar por email" class="admin-search-input flex-1 px-3 h-10 text-sm" />
+                        <select id="pageSize" class="admin-page-size px-3 h-10 text-sm border-l">
                             <option value="5">5</option>
                             <option value="10" selected>10</option>
                             <option value="20">20</option>
@@ -444,21 +102,21 @@
 
             <form id="userForm" class="grid grid-cols-12 gap-3 items-end mb-7">
                 <div class="col-span-12 md:col-span-4">
-                    <label class="block text-xs font-semibold mb-1" style="color:var(--text-secondary);">Email</label>
-                    <input id="uemail" type="email" class="w-full px-3 py-2 border rounded" required style="background-color:var(--input-bg); border-color:var(--input-border); color:var(--text-primary);" />
+                    <label class="admin-form-label block text-xs font-semibold mb-1">Email</label>
+                    <input id="uemail" type="email" class="w-full px-3 py-2 border rounded" required />
                 </div>
                 <div class="col-span-12 md:col-span-4 relative">
-                    <label class="block text-xs font-semibold mb-1" style="color:var(--text-secondary);">Contraseña</label>
-                    <div style="position:relative; display:flex; align-items:center;">
-                        <input id="upass" type="password" class="w-full px-3 py-2 border rounded" required style="background-color:var(--input-bg); border-color:var(--input-border); color:var(--text-primary); padding-right:42px;" />
-                        <button type="button" style="position:absolute; right:12px; background:none; border:none; cursor:pointer; padding:4px 8px; display:flex; align-items:center; justify-content:center; color:var(--text-secondary); transition:color 0.2s ease;" onclick="togglePasswordVisibility('upass')" title="Mostrar/ocultar contraseña">
+                    <label class="admin-form-label block text-xs font-semibold mb-1">Contraseña</label>
+                    <div class="admin-password-wrap">
+                        <input id="upass" type="password" class="admin-password-input w-full px-3 py-2 border rounded" required />
+                        <button type="button" class="admin-password-toggle" onclick="togglePasswordVisibility('upass')" title="Mostrar/ocultar contraseña">
                             <svg id="upass-eye-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
                         </button>
                     </div>
                 </div>
                 <div class="col-span-12 sm:col-span-6 md:col-span-2">
-                    <label class="block text-xs font-semibold mb-1" style="color:var(--text-secondary);">Rol</label>
-                    <select id="urole" class="w-full h-10 px-3 border rounded" style="background-color:var(--input-bg); border-color:var(--input-border); color:var(--text-primary);">
+                    <label class="admin-form-label block text-xs font-semibold mb-1">Rol</label>
+                    <select id="urole" class="w-full h-10 px-3 border rounded">
                         <option value="user">Usuario</option>
                         <option value="admin">Administrador</option>
                     </select>
@@ -468,15 +126,15 @@
                 </div>
             </form>
 
-            <h2 class="text-lg font-semibold mt-4 mb-2" style="color:var(--text-primary);">Usuarios existentes</h2>
-            <div class="overflow-x-auto bg-white rounded border" style="border-color:var(--border-color);">
+            <h2 class="admin-section-title text-lg font-semibold mt-4 mb-2">Usuarios existentes</h2>
+            <div class="admin-table-wrapper overflow-x-auto bg-white rounded border">
                 <table class="min-w-full text-sm users-table">
                     <thead>
                         <tr>
-                            <th class="p-3 text-center" style="color:var(--text-secondary); width: 50px;">#</th>
-                            <th class="p-3 text-left" style="color:var(--text-secondary);">Email</th>
-                            <th class="p-3 text-center" style="color:var(--text-secondary);">Rol</th>
-                            <th class="p-3 text-center" style="color:var(--text-secondary);">Acciones</th>
+                            <th class="col-index p-3 text-center">#</th>
+                            <th class="p-3 text-left">Email</th>
+                            <th class="p-3 text-center">Rol</th>
+                            <th class="p-3 text-center">Acciones</th>
                         </tr>
                     </thead>
                     <tbody id="usersBody"></tbody>
@@ -488,63 +146,17 @@
                     <button id="prevPage" class="h-10 px-4 rounded soft-btn">Anterior</button>
                     <button id="nextPage" class="h-10 px-4 rounded soft-btn">Siguiente</button>
                 </div>
-                <div class="text-sm text-gray-600" style="color:var(--text-secondary);">Página <span id="currentPage">1</span></div>
+                <div class="admin-page-meta text-sm text-gray-600">Página <span id="currentPage">1</span></div>
             </div>
         </div>
     </main>
 
     <script>
-        // Firebase Helper Functions (necesarias para verificación de autenticación)
-        async function getFirebaseData(path) {
-            try {
-                const dbRef = window.firebaseRef(window.firebaseDB);
-                const snapshot = await window.firebaseGet(window.firebaseChild(dbRef, path));
-                return snapshot.exists() ? snapshot.val() : null;
-            } catch (error) {
-                console.error('Error reading from Firebase:', error);
-                return null;
-            }
-        }
-
-        async function setFirebaseData(path, data) {
-            try {
-                await window.firebaseSet(window.firebaseRef(window.firebaseDB, path), data);
-                return true;
-            } catch (error) {
-                console.error('Error writing to Firebase:', error);
-                return false;
-            }
-        }
-
-        function showAppLoading(message) {
-            const overlay = document.getElementById('appLoading');
-            if (!overlay) return;
-            const text = overlay.querySelector('.app-loading-text');
-            if (text && message) text.textContent = message;
-            overlay.classList.remove('app-loading-hidden');
-        }
-
-        function hideAppLoading() {
-            const overlay = document.getElementById('appLoading');
-            if (!overlay) return;
-            overlay.classList.add('app-loading-hidden');
-        }
-
-        function normalizeUsers(rawUsers) {
-            if (Array.isArray(rawUsers)) return rawUsers.filter(Boolean);
-            if (rawUsers && typeof rawUsers === 'object') return Object.values(rawUsers);
-            return [];
-        }
-
-        async function waitForFirebaseReady(maxAttempts = 100) {
-            for (let attempt = 0; attempt < maxAttempts; attempt++) {
-                if (window.firebaseAuth && window.firebaseAuthStateChanged && window.firebaseDB) {
-                    return true;
-                }
-                await new Promise(resolve => setTimeout(resolve, 30));
-            }
-            return false;
-        }
+        window.toastTheme = {
+            background: '#eff6ff',
+            color: '#1e3a8a',
+            iconColor: '#2563eb'
+        };
 
         // Verificar autenticación con Firebase Auth y que sea admin
         // Mostrar loader hasta verificar sesion
@@ -578,21 +190,6 @@
                 hideAppLoading();
             });
         })();
-
-        function togglePasswordVisibility(inputId) {
-            const input = document.getElementById(inputId);
-            const icon = document.getElementById(inputId + '-eye-icon');
-            if (!input || !icon) return;
-            
-            const isPassword = input.type === 'password';
-            input.type = isPassword ? 'text' : 'password';
-            
-            if (isPassword) {
-                icon.innerHTML = '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line>';
-            } else {
-                icon.innerHTML = '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle>';
-            }
-        }
 
         // Audit log
         async function logAction(action, target) {
@@ -639,9 +236,9 @@
                 const globalIndex = allUsers.indexOf(u);
                 const isCurrent = current && current.email && (u.email.toLowerCase() === current.email.toLowerCase());
                 const rowNumber = start + idx + 1;
-                const descriptionIndicator = u.description ? ` <span class="text-xs" style="color: #60a5fa;" title="${u.description}">📝</span>` : '';
+                const descriptionIndicator = u.description ? ` <span class="admin-description-indicator text-xs" title="${u.description}">📝</span>` : '';
                 const tr = document.createElement('tr');
-                tr.innerHTML = `<td class="p-2 text-center font-semibold" style="color: #60a5fa;">${rowNumber}</td><td class="p-2">${u.email}${descriptionIndicator}${isCurrent? ' <span class="text-xs muted-text">(Cuenta actual)</span>':''}</td><td class="p-2 text-center">${u.role}</td><td class="p-2 text-center">${isCurrent? '<span class="text-xs muted-text">-</span>' : `<button data-index="${globalIndex}" class="editBtn px-2 py-1 bg-blue-500 text-white rounded mr-2">Editar</button><button data-index="${globalIndex}" class="delBtn px-2 py-1 bg-red-500 text-white rounded">Eliminar</button>`}</td>`;
+                tr.innerHTML = `<td class="admin-row-number p-2 text-center font-semibold">${rowNumber}</td><td class="p-2">${u.email}${descriptionIndicator}${isCurrent? ' <span class="text-xs muted-text">(Cuenta actual)</span>':''}</td><td class="p-2 text-center">${u.role}</td><td class="p-2 text-center">${isCurrent? '<span class="text-xs muted-text">-</span>' : `<button data-index="${globalIndex}" class="editBtn px-2 py-1 bg-blue-500 text-white rounded mr-2">Editar</button><button data-index="${globalIndex}" class="delBtn px-2 py-1 bg-red-500 text-white rounded">Eliminar</button>`}</td>`;
                 tbody.appendChild(tr);
             });
 
@@ -668,11 +265,11 @@
                     title: 'Eliminar usuario?',
                     html: `
                         <p>Eliminar <strong>${target.email}</strong> no se puede deshacer.</p>
-                        <p style="color: #9ca3af; font-size: 0.875rem; margin-top: 0.5rem;">Para eliminarlo completamente, también se borrará de Firebase Authentication.</p>
-                        <div style="margin-top: 0.75rem; text-align: left;">
-                            <label for="deleteUserPassword" style="display:block; font-size:0.85rem; margin-bottom:0.35rem; color:#cbd5e1;">Contraseña actual del usuario</label>
-                            <input id="deleteUserPassword" type="password" class="swal2-input" style="margin:0; width:100%;" placeholder="Ingresa la contraseña del usuario">
-                            <label style="display:flex; align-items:center; gap:0.5rem; margin-top:0.75rem; font-size:0.85rem; color:#fca5a5;">
+                        <p class="admin-delete-note">Para eliminarlo completamente, también se borrará de Firebase Authentication.</p>
+                        <div class="admin-delete-fields">
+                            <label for="deleteUserPassword" class="admin-delete-label">Contraseña actual del usuario</label>
+                            <input id="deleteUserPassword" type="password" class="swal2-input admin-delete-input" placeholder="Ingresa la contraseña del usuario">
+                            <label class="admin-delete-warning">
                                 <input id="forceDeleteDbOnly" type="checkbox">
                                 Forzar eliminación solo en base de datos (no borrar en Firebase Authentication)
                             </label>
@@ -701,7 +298,7 @@
                             users.splice(idx,1);
                             await saveUsers(users);
                             await logAction('delete-db-only', target.email);
-                            Swal.fire({icon:'success', title:'Eliminado solo en BD', text:'Usuario eliminado de la base de datos. Permanecerá en Firebase Authentication.', timer:1500, showConfirmButton:false});
+                            showToast('Usuario eliminado solo en base de datos', 'success', 1700);
                             await render();
                             return;
                         }
@@ -715,7 +312,7 @@
                             users.splice(idx,1);
                             await saveUsers(users);
                             await logAction('delete', target.email);
-                            Swal.fire({icon:'success', title:'Eliminado', text:'Usuario eliminado de Firebase Authentication y de la base de datos.', timer:1400, showConfirmButton:false});
+                            showToast('Usuario eliminado de Firebase Auth y base de datos', 'success', 1700);
                             await render();
                         } catch (error) {
                             console.error('Error eliminando usuario en Firebase Auth:', error);
@@ -783,7 +380,7 @@
                 await saveUsers(users);
                 this.reset();
                 await logAction('create', email);
-                Swal.fire({icon:'success', title:'Usuario creado en Firebase Auth', showConfirmButton:false, timer:1200});
+                showToast('Usuario creado en Firebase Auth', 'success', 1400);
                 await render();
             } catch (error) {
                 console.error('Error creando usuario:', error);
@@ -805,15 +402,15 @@
             const { value: formValues } = await Swal.fire({
                 title: `Editar ${target.email}`,
                 html:
-                    `<div class="edit-user-form" style="text-align: left;">`+
-                    `<p style="color: #9ca3af; font-size: 0.85rem; margin-bottom: 1.25rem; line-height: 1.4;">Las contraseñas se gestionan mediante Firebase Authentication. Los usuarios pueden cambiarlas desde su perfil.</p>`+
-                    `<div style="margin-bottom: 1.25rem;">`+
-                    `<label style="display:block; font-size: 0.85rem; font-weight: 600; color: #e5e7eb; margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.5px;">Rol del usuario</label>`+
-                    `<select id="swal-role" style="width: 100%; padding: 0.625rem 0.75rem; background-color: #1e293b; color: #e5e7eb; border: 1px solid #475569; border-radius: 0.375rem; font-size: 0.875rem; font-family: 'Inter', sans-serif; transition: border-color 0.2s; cursor: pointer;"><option value="user">Usuario</option><option value="admin">Administrador</option></select>`+
+                    `<div class="edit-user-form">`+
+                    `<p class="edit-user-note">Las contraseñas se gestionan mediante Firebase Authentication. Los usuarios pueden cambiarlas desde su perfil.</p>`+
+                    `<div class="edit-user-group">`+
+                    `<label class="edit-user-field-label">Rol del usuario</label>`+
+                    `<select id="swal-role" class="edit-user-select"><option value="user">Usuario</option><option value="admin">Administrador</option></select>`+
                     `</div>`+
-                    `<div style="margin-bottom: 0.5rem;">`+
-                    `<label style="display:block; font-size: 0.85rem; font-weight: 600; color: #e5e7eb; margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.5px;">Descripción</label>`+
-                    `<textarea id="swal-description" style="width: 100%; padding: 0.625rem 0.75rem; background-color: #1e293b; color: #e5e7eb; border: 1px solid #475569; border-radius: 0.375rem; font-size: 0.875rem; font-family: 'Inter', sans-serif; resize: vertical; min-height: 90px; transition: border-color 0.2s; box-sizing: border-box;" placeholder="Agrega notas sobre este usuario (proyectos, empresa, contacto, etc.)"></textarea>`+
+                    `<div class="edit-user-group is-tight">`+
+                    `<label class="edit-user-field-label">Descripción</label>`+
+                    `<textarea id="swal-description" class="edit-user-textarea" placeholder="Agrega notas sobre este usuario (proyectos, empresa, contacto, etc.)"></textarea>`+
                     `</div>`+
                     `</div>`,
                 focusConfirm: false,
@@ -851,7 +448,7 @@
                 target.description = formValues.newDescription;
                 await saveUsers(users);
                 await logAction('edit', target.email);
-                Swal.fire({icon:'success', title:'Actualizado', timer:900, showConfirmButton:false});
+                showToast('Usuario actualizado', 'success', 1200);
                 await render();
             }
         }
@@ -881,7 +478,7 @@
                     const valid = imported.every(u => u.email && u.password && u.role);
                     if (!valid) throw new Error('Formato incorrecto');
                     await setFirebaseData('users', imported);
-                    Swal.fire({icon:'success', title:'Importado', timer:900, showConfirmButton:false});
+                    showToast('Usuarios importados', 'success', 1200);
                     await render();
                 }catch(err){
                     Swal.fire({icon:'error', title:'Error', text: err.message || 'Archivo inválido'});
@@ -896,35 +493,23 @@
         document.getElementById('prevPage').addEventListener('click', function(){ if (currentPage>1) { currentPage--; render(); } });
         document.getElementById('nextPage').addEventListener('click', function(){ currentPage++; render(); });
 
-        // Dark mode toggle persistence
-        function toggleDarkMode(){
-            const htmlEl = document.documentElement;
-            const isDark = htmlEl.classList.toggle('dark-mode');
-            localStorage.setItem('darkMode', isDark ? '1' : '0');
-        }
-
-        function initDarkMode(){
-            const dm = localStorage.getItem('darkMode');
-            const isDark = dm === '1' || dm === 'true';
-            if (isDark) {
-                document.documentElement.classList.add('dark-mode');
-            } else {
-                document.documentElement.classList.remove('dark-mode');
-            }
-        }
-
         // Logout helper
-        async function logout(){ 
-            const darkModeSetting = localStorage.getItem('darkMode'); // Guardar configuración
-            await window.firebaseAuth.signOut();
-            localStorage.clear(); // Limpiar todo
-            if (darkModeSetting) localStorage.setItem('darkMode', darkModeSetting); // Restaurar
-            window.location.href='login.html'; 
+        function logout(){
+            return confirmLogout({
+                confirmTitle: 'Salir del panel',
+                confirmText: 'Estas seguro de que deseas salir del panel de usuarios?',
+                confirmButtonText: 'Si, salir',
+                cancelButtonText: 'Cancelar',
+                confirmButtonColor: '#2563eb',
+                cancelButtonColor: '#dc2626',
+                successTitle: 'Hasta pronto',
+                successText: 'Sesion cerrada correctamente'
+            });
         }
 
         // Set current user email in navbar
         document.addEventListener('DOMContentLoaded', async function(){
-            initDarkMode();
+            initDarkMode({ respectSystem: false });
             const cur = JSON.parse(localStorage.getItem('currentUser')||'null');
             const el = document.getElementById('currentUserEmail'); if (el && cur) el.textContent = cur.email;
             await render();
@@ -936,6 +521,7 @@
             });
         });
     </script>
+    <script src="js/ui-utils.js"></script>
     <script src="js/anti-inspection.js"></script>
 </body>
 </html>

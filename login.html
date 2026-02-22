@@ -6,6 +6,8 @@
     <title>Login - Facturación</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%2322c55e' width='100' height='100' rx='20'/><text y='70' font-size='60' fill='white' text-anchor='middle' x='50' font-weight='bold'>$</text></svg>">
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="css/app.css">
+    <script src="js/app-utils.js"></script>
     
     <!-- Firebase SDK -->
     <script type="module">
@@ -38,246 +40,9 @@
         window.firebaseAuthStateChanged = onAuthStateChanged;
     </script>
     
-    <style>
-        :root {
-            --bg-primary: #f9fafb;
-            --card-bg: #ffffff;
-            --text-primary: #111827;
-            --text-secondary: #6b7280;
-            --border-color: #e5e7eb;
-            --input-bg: #ffffff;
-            --accent: #2563eb;
-            --accent-hover: #1d4ed8;
-        }
-
-        html.dark-mode {
-            --bg-primary: #0f172a;
-            --card-bg: #1e293b;
-            --text-primary: #f1f5f9;
-            --text-secondary: #cbd5e1;
-            --border-color: #334155;
-            --input-bg: #0b1220;
-            --accent: #3b82f6;
-            --accent-hover: #2563eb;
-        }
-
-        body {
-            background-color: var(--bg-primary) !important;
-            color: var(--text-primary);
-            transition: background-color 0.25s ease, color 0.25s ease;
-            background: linear-gradient(-45deg, #0f172a, #1e293b, #0f172a, #1e293b);
-            background-size: 400% 400%;
-            animation: gradientShift 15s ease infinite;
-            filter: brightness(1.05);
-            position: relative;
-        }
-
-        @keyframes gradientShift {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-
-        body::before {
-            content: '';
-            position: fixed;
-            inset: 0;
-            background: 
-                radial-gradient(800px 600px at 20% 10%, rgba(37, 99, 235, 0.15), transparent 50%),
-                radial-gradient(600px 700px at 80% 90%, rgba(14, 165, 233, 0.12), transparent 50%),
-                radial-gradient(900px 500px at 50% 50%, rgba(59, 130, 246, 0.08), transparent 60%);
-            animation: orbsFloat 20s ease-in-out infinite;
-            pointer-events: none;
-            z-index: 0;
-        }
-
-        @keyframes orbsFloat {
-            0%, 100% { 
-                background-position: 0% 0%, 100% 0%, 50% 0%;
-                filter: blur(40px);
-            }
-            50% { 
-                background-position: 100% 100%, 0% 100%, 50% 100%;
-                filter: blur(50px);
-            }
-        }
-
-        html.dark-mode body {
-            background: linear-gradient(-45deg, #0f172a, #1e293b, #0f172a, #1e293b);
-            background-size: 400% 400%;
-            animation: gradientShift 15s ease infinite;
-        }
-
-        .login-card {
-            background-color: var(--card-bg) !important;
-            border: 1px solid var(--border-color);
-            color: var(--text-primary);
-            border-radius: 14px;
-            box-shadow: 0 18px 45px rgba(2, 6, 23, 0.12);
-            backdrop-filter: blur(2px);
-        }
-
-        .login-muted {
-            color: var(--text-secondary) !important;
-        }
-
-        .login-input {
-            background-color: var(--input-bg) !important;
-            border: 1px solid var(--border-color) !important;
-            color: var(--text-primary) !important;
-            height: 42px;
-            padding: 0 12px;
-            transition: border-color 0.2s ease, box-shadow 0.2s ease;
-        }
-
-        .login-input:focus {
-            outline: none;
-            border-color: var(--accent) !important;
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
-        }
-
-        .login-label {
-            color: var(--text-primary) !important;
-        }
-
-        .login-submit {
-            height: 42px;
-            width: 100%;
-            font-weight: 600;
-            background-color: var(--accent);
-            transition: background-color 0.2s ease, transform 0.12s ease;
-        }
-
-        .login-submit:hover {
-            background-color: var(--accent-hover);
-            transform: translateY(-1px);
-        }
-
-        .login-submit:active {
-            transform: translateY(0);
-        }
-
-        .password-toggle-wrapper {
-            position: relative;
-            display: flex;
-            align-items: center;
-        }
-
-        .password-toggle-btn {
-            position: absolute;
-            right: 12px;
-            background: none;
-            border: none;
-            cursor: pointer;
-            padding: 4px 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--text-secondary);
-            transition: color 0.2s ease;
-        }
-
-        .password-toggle-btn:hover {
-            color: var(--accent);
-        }
-
-        .password-input-with-toggle {
-            padding-right: 42px !important;
-        }
-
-        .login-brand {
-            width: 42px;
-            height: 42px;
-            border-radius: 10px;
-            background: linear-gradient(135deg, #22c55e, #16a34a);
-            color: #fff;
-            font-weight: 800;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 10px 25px rgba(34, 197, 94, 0.35);
-        }
-
-        .app-loading-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(15, 23, 42, 0.55);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 9999;
-            backdrop-filter: blur(3px);
-        }
-
-        .app-loading-card {
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            color: var(--text-primary);
-            border-radius: 12px;
-            padding: 16px 20px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            box-shadow: 0 12px 30px rgba(2, 6, 23, 0.2);
-        }
-
-        .app-spinner {
-            width: 18px;
-            height: 18px;
-            border: 2px solid rgba(37, 99, 235, 0.25);
-            border-top-color: var(--accent);
-            border-radius: 50%;
-            animation: appSpin 0.8s linear infinite;
-        }
-
-        .app-loading-hidden {
-            display: none;
-        }
-
-        main {
-            position: relative;
-            z-index: 10;
-        }
-
-        @keyframes appSpin {
-            to { transform: rotate(360deg); }
-        }
-
-        @media (max-width: 640px) {
-            body {
-                padding: 16px;
-            }
-
-            .login-card {
-                width: 100%;
-                padding: 24px;
-            }
-
-            .login-card h1 {
-                font-size: 2rem;
-            }
-
-            .login-muted {
-                font-size: 0.85rem;
-            }
-        }
-
-        @media (max-width: 360px) {
-            .login-card {
-                padding: 18px;
-            }
-
-            .login-card h1 {
-                font-size: 1.75rem;
-            }
-
-            .login-input {
-                height: 40px;
-            }
-        }
-    </style>
+    <!-- Styles moved to css/app.css -->
 </head>
-<body class="min-h-screen bg-gray-50 flex items-center justify-center">
+<body class="page-login min-h-screen bg-gray-50 flex items-center justify-center">
     <div id="appLoading" class="app-loading-overlay">
         <div class="app-loading-card">
             <div class="app-spinner"></div>
@@ -318,101 +83,23 @@
     </main>
 
     <script>
-        function togglePasswordVisibility(inputId) {
-            const input = document.getElementById(inputId);
-            const icon = document.getElementById(inputId + '-eye-icon');
-            if (!input || !icon) return;
-            
-            const isPassword = input.type === 'password';
-            input.type = isPassword ? 'text' : 'password';
-            
-            if (isPassword) {
-                icon.innerHTML = '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line>';
-            } else {
-                icon.innerHTML = '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle>';
-            }
-        }
+        window.toastTheme = {
+            background: '#fef2f2',
+            color: '#991b1b',
+            iconColor: '#dc2626'
+        };
 
-        function initDarkMode() {
-            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-            const savedMode = localStorage.getItem('darkMode');
-            const isSavedDark = savedMode === '1' || savedMode === 'true';
-
-            if (savedMode !== null) {
-                if (isSavedDark) {
-                    document.documentElement.classList.add('dark-mode');
-                } else {
-                    document.documentElement.classList.remove('dark-mode');
-                }
-            } else if (prefersDark) {
-                document.documentElement.classList.add('dark-mode');
-                localStorage.setItem('darkMode', '1');
-            } else {
-                localStorage.setItem('darkMode', '0');
-            }
-        }
-
-        initDarkMode();
-
-        function showAppLoading(message) {
-            const overlay = document.getElementById('appLoading');
-            if (!overlay) return;
-            const text = overlay.querySelector('.app-loading-text');
-            if (text && message) text.textContent = message;
-            overlay.classList.remove('app-loading-hidden');
-        }
-
-        function hideAppLoading() {
-            const overlay = document.getElementById('appLoading');
-            if (!overlay) return;
-            overlay.classList.add('app-loading-hidden');
-        }
-
-        function normalizeUsers(rawUsers) {
-            if (Array.isArray(rawUsers)) return rawUsers.filter(Boolean);
-            if (rawUsers && typeof rawUsers === 'object') return Object.values(rawUsers);
-            return [];
-        }
-
-        async function waitForFirebaseReady(maxAttempts = 100) {
-            for (let attempt = 0; attempt < maxAttempts; attempt++) {
-                if (window.firebaseAuth && window.firebaseAuthStateChanged && window.firebaseSignIn && window.firebaseDB) {
-                    return true;
-                }
-                await new Promise(resolve => setTimeout(resolve, 30));
-            }
-            return false;
-        }
-
-        // Firebase Helper Functions
-        async function getFirebaseData(path) {
-            try {
-                const dbRef = window.firebaseRef(window.firebaseDB);
-                const snapshot = await window.firebaseGet(window.firebaseChild(dbRef, path));
-                return snapshot.exists() ? snapshot.val() : null;
-            } catch (error) {
-                console.error('Error reading from Firebase:', error);
-                return null;
-            }
-        }
-
-        async function setFirebaseData(path, data) {
-            try {
-                await window.firebaseSet(window.firebaseRef(window.firebaseDB, path), data);
-                return true;
-            } catch (error) {
-                console.error('Error writing to Firebase:', error);
-                return false;
-            }
-        }
+        initDarkMode({ respectSystem: true });
 
         // Inicializar usuario admin por defecto en Firebase Auth y Database
         async function initAuthFlow() {
             showAppLoading('Verificando sesion...');
-            const ready = await waitForFirebaseReady();
+            const ready = await waitForFirebaseReady({
+                required: ['firebaseAuth', 'firebaseAuthStateChanged', 'firebaseSignIn', 'firebaseDB']
+            });
             if (!ready) {
                 hideAppLoading();
-                alert('Firebase no se pudo inicializar. Recarga la página.');
+                showToast('Firebase no se pudo inicializar. Recarga la pagina.', 'error', 2800);
                 return;
             }
 
@@ -460,9 +147,13 @@
 
                     if (userData) {
                         localStorage.setItem('currentUser', JSON.stringify({ email: userData.email, role: userData.role }));
-                        window.location.replace(userData.role === 'admin' ? 'admin.html' : 'index.html');
+                        showToast('Inicio de sesion exitoso.', 'success', 1400);
+                        setTimeout(() => {
+                            window.location.replace(userData.role === 'admin' ? 'admin.html' : 'index.html');
+                        }, 350);
                     } else {
                         errorMessage.textContent = 'Usuario autenticado, pero sin rol asignado en la base de datos.';
+                        showToast('Usuario autenticado, pero sin rol asignado.', 'error', 2600);
                         errorMessage.classList.remove('hidden');
                         await window.firebaseAuth.signOut();
                         isLoggingIn = false;
@@ -481,12 +172,16 @@
 
                     if (error.code === 'auth/invalid-credential' || error.code === 'auth/wrong-password' || error.code === 'auth/user-not-found') {
                         errorMessage.textContent = 'Email o contraseña incorrectos. Verifica tus credenciales.';
+                        showToast('Email o contrasena incorrectos.', 'error', 2400);
                     } else if (error.code === 'auth/too-many-requests') {
                         errorMessage.textContent = 'Demasiados intentos fallidos. Intenta más tarde.';
+                        showToast('Demasiados intentos fallidos. Intenta mas tarde.', 'error', 2600);
                     } else if (error.code === 'auth/network-request-failed') {
                         errorMessage.textContent = 'Error de red. Verifica tu conexión a internet.';
+                        showToast('Error de red. Verifica tu conexion a internet.', 'error', 2600);
                     } else {
                         errorMessage.textContent = 'Error de autenticación: ' + error.message;
+                        showToast('Error de autenticacion. Intenta de nuevo.', 'error', 2600);
                     }
                     errorMessage.classList.remove('hidden');
                 }

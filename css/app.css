@@ -110,46 +110,90 @@ body.page-index .invoice-footer-signature {
 
 body.pdf-preview {
     font-family: 'Inter', sans-serif;
-    margin: 24px;
+    margin: 0;
+    padding: 24px;
     color: #111827;
-    background-color: #ffffff;
+    background-color: #f3f4f6;
+}
+
+body.pdf-preview .pdf-shell {
+    max-width: 980px;
+    margin: 0 auto;
 }
 
 body.pdf-preview .pdf-actions {
     display: flex;
     justify-content: flex-end;
     gap: 8px;
-    margin-bottom: 14px;
+    margin-bottom: 12px;
 }
 
 body.pdf-preview .pdf-action-btn {
     border: 1px solid #d1d5db;
     background: #ffffff;
     color: #111827;
-    padding: 8px 12px;
+    padding: 9px 14px;
     border-radius: 8px;
-    font-weight: 600;
+    font-weight: 700;
+    font-size: 13px;
     cursor: pointer;
+    transition: all 0.2s ease;
 }
 
 body.pdf-preview .pdf-action-btn:hover {
     background: #f3f4f6;
+    transform: translateY(-1px);
+}
+
+body.pdf-preview .pdf-action-print {
+    background: #22c55e;
+    color: #ffffff;
+    border-color: #22c55e;
+}
+
+body.pdf-preview .pdf-action-print:hover {
+    background: #16a34a;
+    border-color: #16a34a;
+}
+
+body.pdf-preview .pdf-action-close {
+    background: #111827;
+    color: #ffffff;
+    border-color: #111827;
+}
+
+body.pdf-preview .pdf-action-close:hover {
+    background: #0f172a;
+    border-color: #0f172a;
+}
+
+body.pdf-preview .pdf-card {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 14px;
+    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+    padding: 22px 24px;
 }
 
 body.pdf-preview .pdf-header {
     text-align: center;
-    margin-bottom: 20px;
+    margin-bottom: 18px;
 }
 
 body.pdf-preview .pdf-header h1 {
     margin: 0;
-    font-size: 34px;
+    font-size: 38px;
+    letter-spacing: 0.01em;
 }
 
 body.pdf-preview .pdf-meta {
-    margin-bottom: 14px;
-    line-height: 1.35;
-    font-size: 14px;
+    margin-bottom: 16px;
+    line-height: 1.45;
+    font-size: 16px;
+}
+
+body.pdf-preview .pdf-meta strong {
+    color: #111827;
 }
 
 body.pdf-preview .pdf-chip {
@@ -163,7 +207,7 @@ body.pdf-preview .pdf-chip {
 body.pdf-preview .pdf-table-wrap {
     margin-top: 10px;
     border-top: 1px solid #d1d5db;
-    padding-top: 10px;
+    padding-top: 12px;
 }
 
 body.pdf-preview .pdf-table {
@@ -173,14 +217,15 @@ body.pdf-preview .pdf-table {
 
 body.pdf-preview .pdf-table th,
 body.pdf-preview .pdf-table td {
-    padding: 8px 6px;
+    padding: 10px 8px;
     border-bottom: 1px solid #e5e7eb;
     text-align: left;
-    font-size: 14px;
+    font-size: 18px;
 }
 
 body.pdf-preview .pdf-table th {
     font-weight: 700;
+    color: #111827;
 }
 
 body.pdf-preview .pdf-cell-right {
@@ -192,7 +237,7 @@ body.pdf-preview .pdf-col-price { width: 120px; }
 body.pdf-preview .pdf-col-total { width: 120px; }
 
 body.pdf-preview .pdf-total {
-    margin-top: 14px;
+    margin-top: 16px;
     text-align: right;
 }
 
@@ -202,7 +247,9 @@ body.pdf-preview .pdf-total-box {
     gap: 10px;
     border: 1px solid #d1d5db;
     border-radius: 10px;
-    padding: 8px 12px;
+    padding: 9px 14px;
+    background-color: #f9fafb;
+    box-shadow: 0 2px 10px rgba(2, 6, 23, 0.08);
 }
 
 body.pdf-preview .pdf-total-label {
@@ -214,7 +261,7 @@ body.pdf-preview .pdf-total-label {
 }
 
 body.pdf-preview .pdf-total-value {
-    font-size: 36px;
+    font-size: 48px;
     font-weight: 800;
     line-height: 1;
 }
@@ -227,7 +274,51 @@ body.pdf-preview .status-late { background-color: #fee2e2; color: #991b1b; }
 body.pdf-preview .status-pending { background-color: #fef3c7; color: #92400e; }
 
 @media print {
+    body.pdf-preview {
+        padding: 0;
+        background: #ffffff;
+    }
+
+    body.pdf-preview .pdf-shell {
+        max-width: none;
+    }
+
     body.pdf-preview .pdf-actions { display: none; }
+
+    body.pdf-preview .pdf-card {
+        border: none;
+        box-shadow: none;
+        border-radius: 0;
+        padding: 0;
+    }
+}
+
+@media (max-width: 768px) {
+    body.pdf-preview {
+        padding: 12px;
+    }
+
+    body.pdf-preview .pdf-card {
+        padding: 16px;
+    }
+
+    body.pdf-preview .pdf-header h1 {
+        font-size: 30px;
+    }
+
+    body.pdf-preview .pdf-meta {
+        font-size: 14px;
+    }
+
+    body.pdf-preview .pdf-table th,
+    body.pdf-preview .pdf-table td {
+        font-size: 14px;
+        padding: 8px 6px;
+    }
+
+    body.pdf-preview .pdf-total-value {
+        font-size: 36px;
+    }
 }
 
 body.page-index .invoice-modal-content {

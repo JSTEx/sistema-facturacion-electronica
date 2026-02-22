@@ -927,6 +927,20 @@
             }
         }
 
+        async function saveInvoiceRecord(invoice) {
+            const ok = await setFirebaseData(`invoices/${String(invoice.id)}`, invoice);
+            if (!ok) {
+                throw new Error('No se pudo guardar la factura en Firebase');
+            }
+        }
+
+        async function deleteInvoiceRecord(id) {
+            const ok = await setFirebaseData(`invoices/${String(id)}`, null);
+            if (!ok) {
+                throw new Error('No se pudo eliminar la factura en Firebase');
+            }
+        }
+
         let invoices = [];
         let currentFilter = 'all';
         let editingId = null;
@@ -1240,7 +1254,7 @@
                         createdByEmail: invoices[invoiceIndex].createdByEmail || (currentUser ? currentUser.email : null)
                     };
                     try {
-                        await saveInvoices(updatedInvoices);
+                        await saveInvoiceRecord(updatedInvoices[invoiceIndex]);
                         invoices = updatedInvoices;
                         Swal.fire({
                             icon: 'success',
@@ -1279,7 +1293,7 @@
                 const updatedInvoices = [...invoices, newInvoice];
 
                 try {
-                    await saveInvoices(updatedInvoices);
+                    await saveInvoiceRecord(newInvoice);
                     invoices = updatedInvoices;
 
                     Swal.fire({
@@ -1867,7 +1881,7 @@
                 if (result.isConfirmed) {
                     const updatedInvoices = invoices.filter(inv => inv.id !== id);
                     try {
-                        await saveInvoices(updatedInvoices);
+                        await deleteInvoiceRecord(id);
                         invoices = updatedInvoices;
                         updateInvoiceList();
                         Swal.fire({

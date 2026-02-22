@@ -334,6 +334,18 @@
             box-shadow: 0 0 8px rgba(209, 213, 219, 0.2);
         }
 
+        #cancelBtn {
+            color: var(--text-primary);
+            background-color: var(--bg-primary);
+            border: 1px solid var(--border-color);
+        }
+
+        #cancelBtn:hover {
+            color: var(--text-primary);
+            background-color: var(--bg-secondary);
+            border-color: var(--input-border);
+        }
+
         /* Estilos para el contenedor del formulario en modo oscuro */
         #invoiceFormView > div {
             background-color: var(--bg-secondary);
@@ -989,7 +1001,7 @@
 
                     <!-- Botones -->
                     <div class="flex justify-end gap-3">
-                        <button type="button" onclick="cancelInvoice()" class="px-6 py-2.5 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-lg transition-colors">
+                        <button id="cancelBtn" type="button" onclick="cancelInvoice()" class="px-6 py-2.5 text-sm font-medium rounded-lg transition-colors">
                             Cancelar
                         </button>
                         <button type="submit" id="submitBtn" class="px-6 py-2.5 bg-gray-900 hover:bg-gray-800 text-white text-sm font-medium rounded-lg transition-colors">

@@ -381,55 +381,52 @@
             }
         }
 
+        function normalizeUsers(rawUsers) {
+            if (Array.isArray(rawUsers)) return rawUsers.filter(Boolean);
+            if (rawUsers && typeof rawUsers === 'object') return Object.values(rawUsers);
+            return [];
+        }
+
+        async function waitForFirebaseReady(maxAttempts = 100) {
+            for (let attempt = 0; attempt < maxAttempts; attempt++) {
+                if (window.firebaseAuth && window.firebaseAuthStateChanged && window.firebaseDB) {
+                    return true;
+                }
+                await new Promise(resolve => setTimeout(resolve, 30));
+            }
+            return false;
+        }
+
         // Verificar autenticación con Firebase Auth y que sea admin
         // OCULTAR TODO HASTA QUE SE VERIFIQUE
         document.body.style.display = 'none';
-        let authCheckComplete = false;
-        
-        window.firebaseAuthStateChanged(window.firebaseAuth, async (user) => {
-            if (!user) {
-                // No hay usuario autenticado en Firebase
+
+        (async function enforceAdminAuthGuard() {
+            const ready = await waitForFirebaseReady();
+            if (!ready) {
                 window.location.replace('login.html');
                 return;
             }
-            
-            // Verificar que el usuario sea admin en la base de datos
-            const users = await getFirebaseData('users') || [];
-            const userData = users.find(u => u.email.toLowerCase() === user.email.toLowerCase());
-            
-            if (!userData || userData.role !== 'admin') {
-                // Usuario no es admin, redirigir al login
-                await window.firebaseAuth.signOut();
-                window.location.replace('login.html');
-                return;
-            }
-            
-            // Usuario admin válido, mostrar la página
-            authCheckComplete = true;
-            document.body.style.display = '';
-        });
 
-        // Firebase Helper Functions
-        async function getFirebaseData(path) {
-            try {
-                const dbRef = window.firebaseRef(window.firebaseDB);
-                const snapshot = await window.firebaseGet(window.firebaseChild(dbRef, path));
-                return snapshot.exists() ? snapshot.val() : null;
-            } catch (error) {
-                console.error('Error reading from Firebase:', error);
-                return null;
-            }
-        }
+            window.firebaseAuthStateChanged(window.firebaseAuth, async (user) => {
+                if (!user) {
+                    window.location.replace('login.html');
+                    return;
+                }
 
-        async function setFirebaseData(path, data) {
-            try {
-                await window.firebaseSet(window.firebaseRef(window.firebaseDB, path), data);
-                return true;
-            } catch (error) {
-                console.error('Error writing to Firebase:', error);
-                return false;
-            }
-        }
+                const users = normalizeUsers(await getFirebaseData('users'));
+                const userData = users.find(u => u.email && u.email.toLowerCase() === user.email.toLowerCase());
+
+                if (!userData || userData.role !== 'admin') {
+                    await window.firebaseAuth.signOut();
+                    window.location.replace('login.html');
+                    return;
+                }
+
+                localStorage.setItem('currentUser', JSON.stringify({ email: userData.email, role: userData.role }));
+                document.body.style.display = '';
+            });
+        })();
 
         // Audit log
         async function logAction(action, target) {
@@ -440,7 +437,7 @@
         }
 
         async function loadUsers(){
-            return await getFirebaseData('users') || [];
+            return normalizeUsers(await getFirebaseData('users'));
         }
 
         async function saveUsers(list){

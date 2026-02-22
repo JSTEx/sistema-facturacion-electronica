@@ -135,7 +135,7 @@
         <div class="flex flex-col items-center mb-5">
             <div class="login-brand mb-3">$</div>
             <h1 class="text-4xl font-bold mb-2 text-center">Iniciar sesión</h1>
-            <p class="text-sm text-center text-gray-500 login-muted">Usa el administrador o ingresa tu usuario <strong>admin@admin.com / admin123</strong></p>
+            <p class="text-sm text-center text-gray-500 login-muted">Usa el administrador o ingresa tu usuario <strong>admin@facturacion.com / Factura2026!Admin</strong></p>
         </div>
 
         <form id="loginForm" class="space-y-4">
@@ -179,6 +179,22 @@
 
         initDarkMode();
 
+        function normalizeUsers(rawUsers) {
+            if (Array.isArray(rawUsers)) return rawUsers.filter(Boolean);
+            if (rawUsers && typeof rawUsers === 'object') return Object.values(rawUsers);
+            return [];
+        }
+
+        async function waitForFirebaseReady(maxAttempts = 100) {
+            for (let attempt = 0; attempt < maxAttempts; attempt++) {
+                if (window.firebaseAuth && window.firebaseAuthStateChanged && window.firebaseSignIn && window.firebaseDB) {
+                    return true;
+                }
+                await new Promise(resolve => setTimeout(resolve, 30));
+            }
+            return false;
+        }
+
         // Firebase Helper Functions
         async function getFirebaseData(path) {
             try {
@@ -203,7 +219,7 @@
 
         // Inicializar usuario admin por defecto en Firebase Auth y Database
         async function ensureDefaultAdmin() {
-            const users = await getFirebaseData('users') || [];
+            const users = normalizeUsers(await getFirebaseData('users'));
             if (!users.find(u => u.role === 'admin')) {
                 // El usuario admin se creará manualmente desde admin.html
                 // o puedes crearlo directamente en Firebase Console
@@ -211,89 +227,87 @@
             }
         }
 
-        ensureDefaultAdmin();
-
-        // Verificar si ya hay usuario autenticado en Firebase
-        let isLoggingIn = false;
-        
-        window.firebaseAuthStateChanged(window.firebaseAuth, async (user) => {
-            // No interferir si estamos en proceso de login
-            if (isLoggingIn) return;
-            
-            if (user && window.location.pathname.includes('login.html')) {
-                // Usuario ya autenticado, obtener su role de la base de datos
-                const users = await getFirebaseData('users') || [];
-                const userData = users.find(u => u.email.toLowerCase() === user.email.toLowerCase());
-                if (userData) {
-                    localStorage.setItem('currentUser', JSON.stringify({ email: userData.email, role: userData.role }));
-                    window.location.replace(userData.role === 'admin' ? 'admin.html' : 'index.html');
-                }
+        async function initAuthFlow() {
+            const ready = await waitForFirebaseReady();
+            if (!ready) {
+                alert('Firebase no se pudo inicializar. Recarga la página.');
+                return;
             }
-        });
 
-        document.getElementById('loginForm').addEventListener('submit', async function(e){
-            e.preventDefault();
-            isLoggingIn = true; // Marcar que estamos haciendo login
-            
-            const submitBtn = document.getElementById('submitBtn');
-            const btnText = document.getElementById('btnText');
-            const btnLoading = document.getElementById('btnLoading');
-            const errorMessage = document.getElementById('errorMessage');
-            
-            // Mostrar estado de carga
-            submitBtn.disabled = true;
-            btnText.classList.add('hidden');
-            btnLoading.classList.remove('hidden');
-            errorMessage.classList.add('hidden');
-            
-            const email = document.getElementById('email').value.trim();
-            const password = document.getElementById('password').value;
-            
-            try {
-                // Autenticar con Firebase Authentication
-                const userCredential = await window.firebaseSignIn(window.firebaseAuth, email, password);
-                const user = userCredential.user;
-                
-                // Obtener el role del usuario desde la base de datos
-                const users = await getFirebaseData('users') || [];
-                const userData = users.find(u => u.email.toLowerCase() === email.toLowerCase());
-                
-                if (userData) {
-                    localStorage.setItem('currentUser', JSON.stringify({ email: userData.email, role: userData.role }));
-                    // Redirigir según el role (usar replace para evitar volver con el botón atrás)
-                    if (userData.role === 'admin') {
-                        window.location.replace('admin.html');
-                    } else {
-                        window.location.replace('index.html');
+            await ensureDefaultAdmin();
+
+            let isLoggingIn = false;
+
+            window.firebaseAuthStateChanged(window.firebaseAuth, async (user) => {
+                if (isLoggingIn) return;
+
+                if (user) {
+                    const users = normalizeUsers(await getFirebaseData('users'));
+                    const userData = users.find(u => u.email && u.email.toLowerCase() === user.email.toLowerCase());
+                    if (userData) {
+                        localStorage.setItem('currentUser', JSON.stringify({ email: userData.email, role: userData.role }));
+                        window.location.replace(userData.role === 'admin' ? 'admin.html' : 'index.html');
                     }
-                } else {
-                    errorMessage.textContent = 'Usuario no encontrado en la base de datos.';
-                    errorMessage.classList.remove('hidden');
-                    await window.firebaseAuth.signOut();
+                }
+            });
+
+            document.getElementById('loginForm').addEventListener('submit', async function(e){
+                e.preventDefault();
+                isLoggingIn = true;
+
+                const submitBtn = document.getElementById('submitBtn');
+                const btnText = document.getElementById('btnText');
+                const btnLoading = document.getElementById('btnLoading');
+                const errorMessage = document.getElementById('errorMessage');
+
+                submitBtn.disabled = true;
+                btnText.classList.add('hidden');
+                btnLoading.classList.remove('hidden');
+                errorMessage.classList.add('hidden');
+
+                const email = document.getElementById('email').value.trim();
+                const password = document.getElementById('password').value;
+
+                try {
+                    await window.firebaseSignIn(window.firebaseAuth, email, password);
+
+                    const users = normalizeUsers(await getFirebaseData('users'));
+                    const userData = users.find(u => u.email && u.email.toLowerCase() === email.toLowerCase());
+
+                    if (userData) {
+                        localStorage.setItem('currentUser', JSON.stringify({ email: userData.email, role: userData.role }));
+                        window.location.replace(userData.role === 'admin' ? 'admin.html' : 'index.html');
+                    } else {
+                        errorMessage.textContent = 'Usuario autenticado, pero sin rol asignado en la base de datos.';
+                        errorMessage.classList.remove('hidden');
+                        await window.firebaseAuth.signOut();
+                        isLoggingIn = false;
+                        submitBtn.disabled = false;
+                        btnText.classList.remove('hidden');
+                        btnLoading.classList.add('hidden');
+                    }
+                } catch (error) {
+                    console.error('Error de autenticación:', error);
                     isLoggingIn = false;
                     submitBtn.disabled = false;
                     btnText.classList.remove('hidden');
                     btnLoading.classList.add('hidden');
+
+                    if (error.code === 'auth/invalid-credential' || error.code === 'auth/wrong-password' || error.code === 'auth/user-not-found') {
+                        errorMessage.textContent = 'Email o contraseña incorrectos. Verifica tus credenciales.';
+                    } else if (error.code === 'auth/too-many-requests') {
+                        errorMessage.textContent = 'Demasiados intentos fallidos. Intenta más tarde.';
+                    } else if (error.code === 'auth/network-request-failed') {
+                        errorMessage.textContent = 'Error de red. Verifica tu conexión a internet.';
+                    } else {
+                        errorMessage.textContent = 'Error de autenticación: ' + error.message;
+                    }
+                    errorMessage.classList.remove('hidden');
                 }
-            } catch (error) {
-                console.error('Error de autenticación:', error);
-                isLoggingIn = false;
-                submitBtn.disabled = false;
-                btnText.classList.remove('hidden');
-                btnLoading.classList.add('hidden');
-                
-                if (error.code === 'auth/invalid-credential' || error.code === 'auth/wrong-password' || error.code === 'auth/user-not-found') {
-                    errorMessage.textContent = 'Email o contraseña incorrectos. Verifica tus credenciales.';
-                } else if (error.code === 'auth/too-many-requests') {
-                    errorMessage.textContent = 'Demasiados intentos fallidos. Intenta más tarde.';
-                } else if (error.code === 'auth/network-request-failed') {
-                    errorMessage.textContent = 'Error de red. Verifica tu conexión a internet.';
-                } else {
-                    errorMessage.textContent = 'Error de autenticación: ' + error.message;
-                }
-                errorMessage.classList.remove('hidden');
-            }
-        });
+            });
+        }
+
+        initAuthFlow();
     </script>
 </body>
 </html>

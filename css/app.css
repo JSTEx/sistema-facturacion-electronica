@@ -830,6 +830,15 @@ body.page-index .item-desc-area {
     overflow-y: hidden;
 }
 
+body.page-index #itemsTableBody tr.item-error {
+    background-color: #fee2e2;
+    box-shadow: inset 0 0 0 2px #dc2626;
+}
+
+body.page-index #itemsTableBody tr.item-error td {
+    border-color: #dc2626;
+}
+
 html.dark-mode body.page-index .status-paid {
     background-color: #14532d;
     color: #bbf7d0;

@@ -864,6 +864,9 @@
             let hasItems = false;
             let validItems = true;
             
+            // Limpiar resaltados anteriores
+            rows.forEach(row => row.classList.remove('item-error'));
+            
             rows.forEach(row => {
                 const desc = row.querySelector('.item-desc').value.trim();
                 const precio = parseFloat(row.querySelector('.item-precio').value) || 0;
@@ -872,6 +875,8 @@
                     hasItems = true;
                 } else if (desc || precio > 0) {
                     validItems = false;
+                    // Resaltar la fila con error
+                    row.classList.add('item-error');
                 }
             });
             

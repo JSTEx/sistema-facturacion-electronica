@@ -386,8 +386,8 @@ body.pdf-preview .pdf-copies {
 }
 
 body.pdf-preview .pdf-copy-slot {
-    min-height: 285px;
     display: flex;
+    height: fit-content;
 }
 
 body.pdf-preview .pdf-copy-slot:nth-child(3) {
@@ -526,7 +526,29 @@ body.pdf-preview .status-pending { background-color: #fef3c7; color: #92400e; bo
 
 @page {
     size: Letter portrait;
-    margin: 10mm;
+    margin: 8mm;
+}
+
+@media print {
+    html {
+        margin: 0;
+        padding: 0;
+    }
+
+    body.pdf-preview {
+        margin: 0;
+        padding: 0;
+    }
+
+    body.pdf-preview .pdf-shell {
+        margin: 0;
+        padding: 0;
+    }
+
+    body.pdf-preview .pdf-fit-area {
+        margin: 0;
+        padding: 0;
+    }
 }
 
 @media print {
@@ -555,7 +577,9 @@ body.pdf-preview .status-pending { background-color: #fef3c7; color: #92400e; bo
     body.pdf-preview .pdf-copies {
         display: grid;
         grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 8px;
+        gap: 6px;
+        orphans: 3;
+        widows: 3;
     }
 
     body.pdf-preview .pdf-copy-slot {

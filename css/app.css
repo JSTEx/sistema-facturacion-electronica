@@ -563,7 +563,7 @@ body.pdf-preview .status-pending { background-color: #fef3c7; color: #92400e; bo
     body.pdf-preview .pdf-copies {
         display: grid;
         grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 12px;
+        gap: 0;
         overflow: hidden;
         page-break-after: avoid;
     }
@@ -575,21 +575,18 @@ body.pdf-preview .status-pending { background-color: #fef3c7; color: #92400e; bo
 
     body.pdf-preview .pdf-copy-slot:nth-child(1) {
         border-bottom: 1px dashed #000;
-        padding-bottom: 12px;
-        margin-bottom: 0;
+        border-right: 1px dashed #000;
+        padding: 8px;
     }
 
     body.pdf-preview .pdf-copy-slot:nth-child(2) {
         border-bottom: 1px dashed #000;
-        padding-bottom: 12px;
-        margin-bottom: 0;
+        padding: 8px;
     }
 
     body.pdf-preview .pdf-copy-slot:nth-child(3) {
         grid-column: 1 / 2;
-        border-right: 1px dashed #000;
-        padding-right: 12px;
-        margin-right: 0;
+        padding: 8px;
     }
 
     body.pdf-preview .pdf-cut-line {

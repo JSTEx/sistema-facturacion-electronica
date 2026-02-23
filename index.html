@@ -596,7 +596,7 @@
 
                 syncAllItemDescHeights();
                 calculateTotals();
-                showToast('Borrador restaurado', 'info', 1600);
+                showToast('Borrador restaurado', 'info', 1600, 'top-center');
             } catch (error) {
                 console.warn('No se pudo restaurar el borrador:', error);
                 localStorage.removeItem(INVOICE_DRAFT_KEY);
@@ -955,7 +955,7 @@
                         invoices = updatedInvoices;
                         resetForm();
                         updateInvoiceList();
-                        showToast(`Factura #${document.getElementById('numero').value} actualizada`, 'success', 1800);
+                        showToast(`Factura #${document.getElementById('numero').value} actualizada`, 'success', 1800, 'top-center');
                     } catch (error) {
                         console.error('Error guardando factura:', error);
                         Swal.fire({
@@ -986,7 +986,7 @@
                     invoices = updatedInvoices;
                     resetForm();
                     updateInvoiceList();
-                    showToast(`Factura #${newInvoice.number} creada`, 'success', 1800);
+                    showToast(`Factura #${newInvoice.number} creada`, 'success', 1800, 'top-center');
                 } catch (error) {
                     console.error('Error creando factura:', error);
                     Swal.fire({
@@ -1620,7 +1620,7 @@
                             await saveInvoiceRecord(deletedInvoice);
                             invoices = [...invoices, deletedInvoice];
                             updateInvoiceList();
-                            showToast(`Factura #${deletedInvoice.number} restaurada`, 'success', 1800);
+                            showToast(`Factura #${deletedInvoice.number} restaurada`, 'success', 1800, 'top-center');
                         }
                     } catch (error) {
                         console.error('Error eliminando factura:', error);

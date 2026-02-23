@@ -386,6 +386,21 @@ body.pdf-preview .pdf-copies {
 body.pdf-preview .pdf-copy-slot {
     display: flex;
     height: fit-content;
+    border: 2px dashed #cc0000;
+    padding: 4px;
+    position: relative;
+}
+
+body.pdf-preview .pdf-copy-slot::before {
+    content: "✂ CORTAR";
+    position: absolute;
+    top: 2px;
+    left: 4px;
+    font-size: 9px;
+    color: #cc0000;
+    background: white;
+    padding: 0 2px;
+    display: none;
 }
 
 body.pdf-preview .pdf-copy-slot:nth-child(3) {
@@ -569,6 +584,12 @@ body.pdf-preview .status-pending { background-color: #fef3c7; color: #92400e; bo
 
     body.pdf-preview .pdf-copy-slot {
         page-break-inside: auto;
+        border: none;
+        padding: 0;
+    }
+
+    body.pdf-preview .pdf-copy-slot::before {
+        display: none;
     }
 
     body.pdf-preview .pdf-copy-slot:nth-child(3) {

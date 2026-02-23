@@ -1230,6 +1230,46 @@
                 `;
             }).join('');
 
+            const invoiceCardHtml = `
+                    <div class="pdf-copy">
+                        <div class="pdf-card">
+                            <div class="pdf-header">
+                                <h1>Factura #${inv.number}</h1>
+                            </div>
+                            <div class="pdf-meta">
+                                <div><strong>Cliente:</strong> ${inv.client}</div>
+                                <div><strong>Dirección:</strong> ${addressText}</div>
+                                <div><strong>Fecha:</strong> ${inv.date}</div>
+                                <div class="pdf-status-row"><strong class="pdf-status-label">Estado:</strong> <span class="pdf-chip ${statusClass}">${statusText}</span></div>
+                            </div>
+                            <div class="pdf-table-wrap">
+                                <table class="pdf-table">
+                                    <thead>
+                                        <tr>
+                                            <th class="pdf-col-qty">Cant.</th>
+                                            <th>Descripción</th>
+                                            <th class="pdf-col-price pdf-cell-right">Precio</th>
+                                            <th class="pdf-col-total pdf-cell-right">Total</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        ${itemsRows}
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="pdf-total">
+                                <div class="pdf-total-box">
+                                    <span class="pdf-total-label">Total</span>
+                                    <span class="pdf-total-value">${totalText}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+            `;
+
+            const copiesHtml = [invoiceCardHtml, invoiceCardHtml, invoiceCardHtml]
+                .join('<div class="pdf-cut-line" aria-hidden="true"></div>');
+
             const baseHref = new URL('./', window.location.href).href;
             const html = `
                 <!DOCTYPE html>
@@ -1247,37 +1287,8 @@
                         <button class="pdf-action-btn pdf-action-print" onclick="window.print()">Imprimir</button>
                         <button class="pdf-action-btn pdf-action-close" onclick="window.close()">Cerrar</button>
                     </div>
-                    <div class="pdf-card">
-                        <div class="pdf-header">
-                            <h1>Factura #${inv.number}</h1>
-                        </div>
-                        <div class="pdf-meta">
-                            <div><strong>Cliente:</strong> ${inv.client}</div>
-                            <div><strong>Dirección:</strong> ${addressText}</div>
-                            <div><strong>Fecha:</strong> ${inv.date}</div>
-                            <div class="pdf-status-row"><strong class="pdf-status-label">Estado:</strong> <span class="pdf-chip ${statusClass}">${statusText}</span></div>
-                        </div>
-                        <div class="pdf-table-wrap">
-                            <table class="pdf-table">
-                                <thead>
-                                    <tr>
-                                        <th class="pdf-col-qty">Cant.</th>
-                                        <th>Descripción</th>
-                                        <th class="pdf-col-price pdf-cell-right">Precio</th>
-                                        <th class="pdf-col-total pdf-cell-right">Total</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    ${itemsRows}
-                                </tbody>
-                            </table>
-                        </div>
-                        <div class="pdf-total">
-                            <div class="pdf-total-box">
-                                <span class="pdf-total-label">Total</span>
-                                <span class="pdf-total-value">${totalText}</span>
-                            </div>
-                        </div>
+                    <div class="pdf-copies">
+                        ${copiesHtml}
                     </div>
                     </div>
                 </body>

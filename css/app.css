@@ -312,6 +312,7 @@ body.pdf-preview .status-late { background-color: #fee2e2; color: #991b1b; borde
 body.pdf-preview .status-pending { background-color: #fef3c7; color: #92400e; border-color: #fcd34d; }
 
 @page {
+    size: A4 portrait;
     margin: 10mm;
 }
 
@@ -345,6 +346,11 @@ body.pdf-preview .status-pending { background-color: #fef3c7; color: #92400e; bo
     body.pdf-preview .pdf-cut-line {
         border-top: 1px dashed #374151;
         margin: 0;
+    }
+
+    body.pdf-preview .pdf-copy {
+        break-inside: auto;
+        page-break-inside: auto;
     }
 }
 

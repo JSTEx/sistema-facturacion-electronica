@@ -1295,7 +1295,8 @@
                     </div>
                     <script>
                         (function () {
-                            const MIN_SCALE = 0.2;
+                            const MIN_SCALE = 0.1;
+                            const PRINT_SAFE_FACTOR = 0.9;
 
                             function getPrintableA4HeightPx() {
                                 const probe = document.createElement('div');
@@ -1318,7 +1319,7 @@
                                 if (!copies) return;
 
                                 document.documentElement.style.setProperty('--pdf-scale', '1');
-                                const availableHeight = getPrintableA4HeightPx();
+                                const availableHeight = Math.max(120, getPrintableA4HeightPx() * PRINT_SAFE_FACTOR);
 
                                 const rawHeight = Math.max(1, copies.scrollHeight);
                                 const scale = Math.max(MIN_SCALE, Math.min(1, availableHeight / rawHeight));
@@ -1335,6 +1336,15 @@
                             window.addEventListener('resize', autoFitInvoices);
                             window.addEventListener('beforeprint', autoFitInvoices);
                             window.addEventListener('afterprint', autoFitInvoices);
+                            if (window.matchMedia) {
+                                const mediaQuery = window.matchMedia('print');
+                                const onPrintChange = () => autoFitInvoices();
+                                if (typeof mediaQuery.addEventListener === 'function') {
+                                    mediaQuery.addEventListener('change', onPrintChange);
+                                } else if (typeof mediaQuery.addListener === 'function') {
+                                    mediaQuery.addListener(onPrintChange);
+                                }
+                            }
                             if (document.fonts && document.fonts.ready) {
                                 document.fonts.ready.then(autoFitInvoices).catch(() => {});
                             }

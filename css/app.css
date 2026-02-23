@@ -387,7 +387,6 @@ body.pdf-preview .pdf-copies {
 body.pdf-preview .pdf-copy-slot {
     display: flex;
     height: fit-content;
-    border: none;
 }
 
 body.pdf-preview .pdf-copy-slot:nth-child(3) {
@@ -564,30 +563,64 @@ body.pdf-preview .status-pending { background-color: #fef3c7; color: #92400e; bo
     body.pdf-preview .pdf-copies {
         display: grid;
         grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 0;
+        gap: 6px;
         overflow: hidden;
         page-break-after: avoid;
     }
 
+    body.pdf-preview .pdf-copies {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        grid-template-rows: auto auto auto;
+        gap: 0;
+        overflow: hidden;
+        position: relative;
+    }
+
+    body.pdf-preview .pdf-copies::before {
+        content: "";
+        position: absolute;
+        top: 50%;
+        transform: translateY(calc(-50% - 4px));
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: repeating-linear-gradient(
+            90deg,
+            #000 0px,
+            #000 4px,
+            transparent 4px,
+            transparent 8px
+        );
+        z-index: 100;
+        pointer-events: none;
+    }
+
+    body.pdf-preview .pdf-copies::after {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 2px;
+        height: 55%;
+        background: repeating-linear-gradient(
+            180deg,
+            #000 0px,
+            #000 4px,
+            transparent 4px,
+            transparent 8px
+        );
+        z-index: 100;
+        pointer-events: none;
+    }
+
     body.pdf-preview .pdf-copy-slot {
         page-break-inside: auto;
-        border: 2px dashed #000;
-    }
-
-    body.pdf-preview .pdf-copy-slot:nth-child(1) {
-        border-right: none;
-        border-bottom: 2px dashed #000;
-    }
-
-    body.pdf-preview .pdf-copy-slot:nth-child(2) {
-        border-left: none;
-        border-bottom: 2px dashed #000;
     }
 
     body.pdf-preview .pdf-copy-slot:nth-child(3) {
         grid-column: 1 / 2;
-        border-top: none;
-        border-right: 2px dashed #000;
     }
 
     body.pdf-preview .pdf-cut-line {

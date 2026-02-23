@@ -187,7 +187,7 @@ body.pdf-preview .pdf-copies {
 
 body.pdf-preview .pdf-fit-area {
     width: 100%;
-    overflow: visible;
+    overflow: hidden;
 }
 
 body.pdf-preview .pdf-copy {
@@ -355,25 +355,25 @@ body.pdf-preview .status-pending { background-color: #fef3c7; color: #92400e; bo
     }
 
     body.pdf-preview .pdf-card {
-        padding: 10px 14px;
+        padding: 16px;
     }
 
     body.pdf-preview .pdf-header h1 {
-        font-size: 22px;
+        font-size: 30px;
     }
 
     body.pdf-preview .pdf-meta {
-        font-size: 12px;
+        font-size: 14px;
     }
 
     body.pdf-preview .pdf-table th,
     body.pdf-preview .pdf-table td {
-        font-size: 11px;
-        padding: 4px 6px;
+        font-size: 14px;
+        padding: 8px 6px;
     }
 
     body.pdf-preview .pdf-total-value {
-        font-size: 20px;
+        font-size: 36px;
     }
 }
 

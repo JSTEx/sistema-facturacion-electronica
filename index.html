@@ -1297,39 +1297,35 @@
                         (function () {
                             const MIN_SCALE = 0.35;
 
-                            function getPrintableA4HeightPx() {
-                                const probe = document.createElement('div');
-                                probe.style.width = '100mm';
-                                probe.style.height = '100mm';
-                                probe.style.position = 'absolute';
-                                probe.style.left = '-9999px';
-                                probe.style.top = '-9999px';
-                                probe.style.visibility = 'hidden';
-                                document.body.appendChild(probe);
-                                const pxPerMm = probe.getBoundingClientRect().height / 100;
-                                probe.remove();
-
-                                const pageHeightMm = 297;
-                                const marginTopMm = 10;
-                                const marginBottomMm = 10;
-                                return Math.max(120, (pageHeightMm - marginTopMm - marginBottomMm) * pxPerMm);
-                            }
-
                             function autoFitInvoices() {
                                 const fitArea = document.getElementById('pdfFitArea');
                                 const copies = document.getElementById('pdfCopies');
+                                const actions = document.querySelector('.pdf-actions');
                                 if (!fitArea || !copies) return;
 
                                 document.documentElement.style.setProperty('--pdf-scale', '1');
                                 fitArea.style.height = 'auto';
 
-                                const availableHeight = getPrintableA4HeightPx();
+                                const shellStyle = window.getComputedStyle(document.querySelector('.pdf-shell'));
+                                const bodyStyle = window.getComputedStyle(document.body);
+                                const bodyPaddingTop = parseFloat(bodyStyle.paddingTop) || 0;
+                                const bodyPaddingBottom = parseFloat(bodyStyle.paddingBottom) || 0;
+                                const shellPaddingTop = parseFloat(shellStyle.paddingTop) || 0;
+                                const shellPaddingBottom = parseFloat(shellStyle.paddingBottom) || 0;
+                                const actionsHeight = actions && window.getComputedStyle(actions).display !== 'none'
+                                    ? actions.getBoundingClientRect().height + 12
+                                    : 0;
+
+                                const availableHeight = Math.max(
+                                    120,
+                                    window.innerHeight - bodyPaddingTop - bodyPaddingBottom - shellPaddingTop - shellPaddingBottom - actionsHeight
+                                );
 
                                 const rawHeight = Math.max(1, copies.scrollHeight);
                                 const scale = Math.max(MIN_SCALE, Math.min(1, availableHeight / rawHeight));
 
                                 document.documentElement.style.setProperty('--pdf-scale', String(scale));
-                                fitArea.style.height = (rawHeight * scale + 6) + 'px';
+                                fitArea.style.height = (rawHeight * scale) + 'px';
                             }
 
                             window.addEventListener('load', () => {

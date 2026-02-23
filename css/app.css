@@ -179,6 +179,15 @@ body.pdf-preview .pdf-copies {
     display: flex;
     flex-direction: column;
     gap: 8px;
+    transform-origin: top center;
+    transform: scale(var(--pdf-scale, 1));
+    width: calc(100% / var(--pdf-scale, 1));
+    margin: 0 auto;
+}
+
+body.pdf-preview .pdf-fit-area {
+    width: 100%;
+    overflow: hidden;
 }
 
 body.pdf-preview .pdf-copy {
@@ -318,6 +327,10 @@ body.pdf-preview .status-pending { background-color: #fef3c7; color: #92400e; bo
     }
 
     body.pdf-preview .pdf-actions { display: none; }
+
+    body.pdf-preview .pdf-fit-area {
+        overflow: hidden;
+    }
 
     body.pdf-preview .pdf-card {
         border: none;

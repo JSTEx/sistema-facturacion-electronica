@@ -1287,10 +1287,61 @@
                         <button class="pdf-action-btn pdf-action-print" onclick="window.print()">Imprimir</button>
                         <button class="pdf-action-btn pdf-action-close" onclick="window.close()">Cerrar</button>
                     </div>
-                    <div class="pdf-copies">
-                        ${copiesHtml}
+                    <div class="pdf-fit-area" id="pdfFitArea">
+                        <div class="pdf-copies" id="pdfCopies">
+                            ${copiesHtml}
+                        </div>
                     </div>
                     </div>
+                    <script>
+                        (function () {
+                            const MIN_SCALE = 0.35;
+
+                            function autoFitInvoices() {
+                                const fitArea = document.getElementById('pdfFitArea');
+                                const copies = document.getElementById('pdfCopies');
+                                const actions = document.querySelector('.pdf-actions');
+                                if (!fitArea || !copies) return;
+
+                                document.documentElement.style.setProperty('--pdf-scale', '1');
+                                fitArea.style.height = 'auto';
+
+                                const shellStyle = window.getComputedStyle(document.querySelector('.pdf-shell'));
+                                const bodyStyle = window.getComputedStyle(document.body);
+                                const bodyPaddingTop = parseFloat(bodyStyle.paddingTop) || 0;
+                                const bodyPaddingBottom = parseFloat(bodyStyle.paddingBottom) || 0;
+                                const shellPaddingTop = parseFloat(shellStyle.paddingTop) || 0;
+                                const shellPaddingBottom = parseFloat(shellStyle.paddingBottom) || 0;
+                                const actionsHeight = actions && window.getComputedStyle(actions).display !== 'none'
+                                    ? actions.getBoundingClientRect().height + 12
+                                    : 0;
+
+                                const availableHeight = Math.max(
+                                    120,
+                                    window.innerHeight - bodyPaddingTop - bodyPaddingBottom - shellPaddingTop - shellPaddingBottom - actionsHeight
+                                );
+
+                                const rawHeight = Math.max(1, copies.scrollHeight);
+                                const scale = Math.max(MIN_SCALE, Math.min(1, availableHeight / rawHeight));
+
+                                document.documentElement.style.setProperty('--pdf-scale', String(scale));
+                                fitArea.style.height = (rawHeight * scale) + 'px';
+                            }
+
+                            window.addEventListener('load', () => {
+                                autoFitInvoices();
+                                setTimeout(autoFitInvoices, 100);
+                                setTimeout(autoFitInvoices, 300);
+                            });
+
+                            window.addEventListener('resize', autoFitInvoices);
+                            window.addEventListener('beforeprint', autoFitInvoices);
+                            window.addEventListener('afterprint', autoFitInvoices);
+                            if (document.fonts && document.fonts.ready) {
+                                document.fonts.ready.then(autoFitInvoices).catch(() => {});
+                            }
+                        })();
+                    <\/script>
                 </body>
                 </html>
             `;

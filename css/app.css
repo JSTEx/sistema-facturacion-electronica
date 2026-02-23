@@ -175,6 +175,206 @@ body.pdf-preview .pdf-card {
     padding: 10px 14px;
 }
 
+body.pdf-preview .pdf-legacy-card {
+    background: #ffffff;
+    border: 1px solid #64748b;
+    border-radius: 6px;
+    padding: 8px;
+    color: #1f2937;
+}
+
+body.pdf-preview .pdf-legacy-head {
+    display: grid;
+    grid-template-columns: 1fr 185px;
+    gap: 8px;
+    margin-bottom: 6px;
+}
+
+body.pdf-preview .pdf-legacy-brand {
+    font-size: 9px;
+    line-height: 1.18;
+}
+
+body.pdf-preview .pdf-legacy-logo {
+    font-size: 24px;
+    line-height: 1;
+    margin-bottom: 1px;
+    color: #1e3a8a;
+    font-family: "Brush Script MT", "Segoe Script", cursive;
+}
+
+body.pdf-preview .pdf-legacy-brand-sub {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+}
+
+body.pdf-preview .pdf-legacy-pay {
+    margin-top: 4px;
+    font-weight: 700;
+}
+
+body.pdf-preview .pdf-legacy-pay span {
+    font-weight: 600;
+}
+
+body.pdf-preview .pdf-legacy-docbox {
+    border: 1px solid #1e3a8a;
+    border-radius: 8px;
+    padding: 5px 7px;
+    font-size: 9px;
+    line-height: 1.25;
+    color: #1e3a8a;
+    text-align: center;
+}
+
+body.pdf-preview .pdf-legacy-doc-title {
+    font-size: 10px;
+    font-weight: 700;
+}
+
+body.pdf-preview .pdf-legacy-doc-sub {
+    font-size: 10px;
+    font-weight: 700;
+    margin-bottom: 3px;
+}
+
+body.pdf-preview .pdf-legacy-doc-number-row {
+    display: flex;
+    justify-content: center;
+    align-items: baseline;
+    gap: 8px;
+    margin: 4px 0;
+}
+
+body.pdf-preview .pdf-legacy-doc-number-row span {
+    font-size: 20px;
+    line-height: 1;
+    color: #b45309;
+    font-weight: 700;
+}
+
+body.pdf-preview .pdf-legacy-doc-number-row strong {
+    font-size: 26px;
+    line-height: 1;
+    color: #dc2626;
+    letter-spacing: 0.08em;
+}
+
+body.pdf-preview .pdf-legacy-fields {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2px 8px;
+    margin: 4px 0 6px;
+}
+
+body.pdf-preview .pdf-legacy-field {
+    border-bottom: 1px solid #64748b;
+    font-size: 8px;
+    min-height: 11px;
+    display: flex;
+    gap: 4px;
+    align-items: flex-end;
+}
+
+body.pdf-preview .pdf-legacy-field span {
+    white-space: nowrap;
+}
+
+body.pdf-preview .pdf-legacy-field strong {
+    font-weight: 600;
+    min-width: 0;
+}
+
+body.pdf-preview .pdf-legacy-table-wrap {
+    margin-top: 3px;
+}
+
+body.pdf-preview .pdf-legacy-table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+}
+
+body.pdf-preview .pdf-legacy-table th,
+body.pdf-preview .pdf-legacy-table td {
+    border: 1px solid #64748b;
+    font-size: 7px;
+    padding: 1px 3px;
+    height: 12px;
+}
+
+body.pdf-preview .pdf-legacy-table th {
+    text-align: center;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+}
+
+body.pdf-preview .pdf-legacy-col-qty { width: 48px; }
+body.pdf-preview .pdf-legacy-col-price { width: 76px; }
+body.pdf-preview .pdf-legacy-col-tax { width: 62px; }
+
+body.pdf-preview .pdf-legacy-cell-center { text-align: center; }
+body.pdf-preview .pdf-legacy-cell-right { text-align: right; }
+
+body.pdf-preview .pdf-legacy-bottom {
+    display: grid;
+    grid-template-columns: 1fr 225px;
+    gap: 6px;
+    margin-top: 5px;
+}
+
+body.pdf-preview .pdf-legacy-son {
+    border: 1px solid #64748b;
+    min-height: 52px;
+    padding: 4px;
+    font-size: 8px;
+}
+
+body.pdf-preview .pdf-legacy-son strong {
+    font-weight: 700;
+}
+
+body.pdf-preview .pdf-legacy-totals {
+    border: 1px solid #64748b;
+}
+
+body.pdf-preview .pdf-legacy-totals div {
+    display: flex;
+    justify-content: space-between;
+    gap: 6px;
+    border-bottom: 1px solid #64748b;
+    padding: 2px 4px;
+    font-size: 8px;
+    min-height: 13px;
+    align-items: center;
+}
+
+body.pdf-preview .pdf-legacy-totals div:last-child {
+    border-bottom: none;
+}
+
+body.pdf-preview .pdf-legacy-totals span {
+    font-weight: 600;
+}
+
+body.pdf-preview .pdf-legacy-totals strong {
+    font-weight: 700;
+}
+
+body.pdf-preview .pdf-legacy-total-final {
+    background: #eff6ff;
+}
+
+body.pdf-preview .pdf-legacy-foot {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    margin-top: 5px;
+    font-size: 7px;
+    color: #334155;
+}
+
 body.pdf-preview .pdf-copies {
     display: flex;
     flex-direction: column;
@@ -379,6 +579,19 @@ body.pdf-preview .status-pending { background-color: #fef3c7; color: #92400e; bo
 
     body.pdf-preview .pdf-total-value {
         font-size: 20px;
+    }
+
+    body.pdf-preview .pdf-legacy-head {
+        grid-template-columns: 1fr;
+    }
+
+    body.pdf-preview .pdf-legacy-bottom {
+        grid-template-columns: 1fr;
+    }
+
+    body.pdf-preview .pdf-legacy-foot {
+        flex-direction: column;
+        gap: 2px;
     }
 }
 

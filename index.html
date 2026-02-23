@@ -1212,56 +1212,120 @@
         }
 
         function previewInvoicePdf(inv, canViewAmount) {
-            const statusClass = getStatusClass(inv.status);
             const statusText = getStatusText(inv.status);
             const addressText = canViewAmount ? (inv.address || 'N/A') : 'Oculta';
             const totalText = canViewAmount ? `$${Number(inv.amount || 0).toFixed(2)}` : 'Oculto';
+            const totalFinalText = canViewAmount ? `$${Number(inv.amount || 0).toFixed(2)}` : 'Oculto';
 
-            const itemsRows = (inv.items || []).map(item => {
-                const price = canViewAmount ? `$${Number(item.precio || 0).toFixed(2)}` : 'Oculto';
-                const rowTotal = canViewAmount ? `$${Number(item.total || 0).toFixed(2)}` : 'Oculto';
+            const amountValue = Number(inv.amount || 0);
+            const amountAsWords = canViewAmount
+                ? `${amountValue.toFixed(2)} dólares`
+                : 'Oculto';
+            const invoiceNumber = String(inv.number || '').padStart(5, '0');
+            const items = Array.isArray(inv.items) ? inv.items : [];
+            const minRows = 9;
+
+            const itemsRows = items.map(item => {
+                const qty = Number(item.cant || 0);
+                const priceValue = Number(item.precio || 0);
+                const lineTotalValue = Number(item.total || 0);
+                const priceText = canViewAmount ? `$${priceValue.toFixed(2)}` : 'Oculto';
+                const gravadaText = canViewAmount ? `$${lineTotalValue.toFixed(2)}` : 'Oculto';
+
                 return `
                     <tr>
-                        <td>${item.cant}</td>
-                        <td>${item.desc}</td>
-                        <td class="pdf-cell-right">${price}</td>
-                        <td class="pdf-cell-right">${rowTotal}</td>
+                        <td class="pdf-legacy-cell-center">${qty || ''}</td>
+                        <td>${item.desc || ''}</td>
+                        <td class="pdf-legacy-cell-right">${priceText}</td>
+                        <td class="pdf-legacy-cell-right"></td>
+                        <td class="pdf-legacy-cell-right"></td>
+                        <td class="pdf-legacy-cell-right">${gravadaText}</td>
                     </tr>
                 `;
             }).join('');
 
+            const emptyRowsCount = Math.max(0, minRows - items.length);
+            const emptyRows = Array.from({ length: emptyRowsCount }, () => `
+                <tr>
+                    <td>&nbsp;</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+            `).join('');
+
             const invoiceCardHtml = `
                     <div class="pdf-copy">
-                        <div class="pdf-card">
-                            <div class="pdf-header">
-                                <h1>Factura #${inv.number}</h1>
+                        <div class="pdf-legacy-card">
+                            <div class="pdf-legacy-head">
+                                <div class="pdf-legacy-brand">
+                                    <div class="pdf-legacy-logo">Creaciones Rachell</div>
+                                    <div class="pdf-legacy-brand-sub">CONFECCION DE ROPA INTIMA</div>
+                                    <div>Calle al Volcán, Col. Boquín San Ramón,</div>
+                                    <div>#9, Mejicanos, San Salvador.</div>
+                                    <div>Tel.: 2274-7541</div>
+                                    <div class="pdf-legacy-pay">Condiciones de Pago: <span>${statusText}</span></div>
+                                </div>
+                                <div class="pdf-legacy-docbox">
+                                    <div class="pdf-legacy-doc-title">COMPROBANTE DE CREDITO FISCAL</div>
+                                    <div class="pdf-legacy-doc-sub">19UN000C</div>
+                                    <div class="pdf-legacy-doc-number-row"><span>N°</span><strong>${invoiceNumber}</strong></div>
+                                    <div>REGISTRO N°: 238069-7</div>
+                                    <div>NIT: 1115-051273-102-7</div>
+                                </div>
                             </div>
-                            <div class="pdf-meta">
-                                <div><strong>Cliente:</strong> ${inv.client}</div>
-                                <div><strong>Dirección:</strong> ${addressText}</div>
-                                <div><strong>Fecha:</strong> ${inv.date}</div>
-                                <div class="pdf-status-row"><strong class="pdf-status-label">Estado:</strong> <span class="pdf-chip ${statusClass}">${statusText}</span></div>
+
+                            <div class="pdf-legacy-fields">
+                                <div class="pdf-legacy-field"><span>Señor:</span> <strong>${inv.client || 'N/A'}</strong></div>
+                                <div class="pdf-legacy-field"><span>Fecha:</span> <strong>${inv.date || ''}</strong></div>
+                                <div class="pdf-legacy-field"><span>Dirección:</span> <strong>${addressText}</strong></div>
+                                <div class="pdf-legacy-field"><span>NIT:</span> <strong></strong></div>
+                                <div class="pdf-legacy-field"><span>Dept.:</span> <strong></strong></div>
+                                <div class="pdf-legacy-field"><span>Registro No.:</span> <strong></strong></div>
+                                <div class="pdf-legacy-field"><span>No. y F. Nota de Remisión Anterior:</span> <strong></strong></div>
+                                <div class="pdf-legacy-field"><span>Giro:</span> <strong></strong></div>
+                                <div class="pdf-legacy-field"><span>Venta a Cuenta de:</span> <strong></strong></div>
+                                <div class="pdf-legacy-field"><span>Cond. de Pago:</span> <strong>${statusText}</strong></div>
                             </div>
-                            <div class="pdf-table-wrap">
-                                <table class="pdf-table">
+
+                            <div class="pdf-legacy-table-wrap">
+                                <table class="pdf-legacy-table">
                                     <thead>
                                         <tr>
-                                            <th class="pdf-col-qty">Cant.</th>
+                                            <th class="pdf-legacy-col-qty">CANT.</th>
                                             <th>Descripción</th>
-                                            <th class="pdf-col-price pdf-cell-right">Precio</th>
-                                            <th class="pdf-col-total pdf-cell-right">Total</th>
+                                            <th class="pdf-legacy-col-price pdf-legacy-cell-right">PRECIO UNITARIO</th>
+                                            <th class="pdf-legacy-col-tax pdf-legacy-cell-right">VTAS. NO SUJETAS</th>
+                                            <th class="pdf-legacy-col-tax pdf-legacy-cell-right">VENTAS EXENTAS</th>
+                                            <th class="pdf-legacy-col-tax pdf-legacy-cell-right">VENTAS GRAVADAS</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         ${itemsRows}
+                                        ${emptyRows}
                                     </tbody>
                                 </table>
                             </div>
-                            <div class="pdf-total">
-                                <div class="pdf-total-box">
-                                    <span class="pdf-total-label">Total</span>
-                                    <span class="pdf-total-value">${totalText}</span>
+
+                            <div class="pdf-legacy-bottom">
+                                <div class="pdf-legacy-son">SON: <strong>${amountAsWords}</strong></div>
+                                <div class="pdf-legacy-totals">
+                                    <div><span>SUMAS</span><strong>${totalText}</strong></div>
+                                    <div><span>(-) IVA RETENIDO</span><strong>$0.00</strong></div>
+                                    <div><span>13% DE IVA</span><strong>$0.00</strong></div>
+                                    <div><span>SUB-TOTAL</span><strong>${totalText}</strong></div>
+                                    <div><span>VENTAS NO SUJETAS</span><strong>$0.00</strong></div>
+                                    <div><span>VENTAS EXENTAS</span><strong>$0.00</strong></div>
+                                    <div class="pdf-legacy-total-final"><span>VENTA TOTAL</span><strong>${totalFinalText}</strong></div>
                                 </div>
+                            </div>
+
+                            <div class="pdf-legacy-foot">
+                                <div>Original-Cliente-Blanco</div>
+                                <div>Duplicado-Emisor-Amarillo</div>
+                                <div>Triplicado-Cliente-Verde</div>
                             </div>
                         </div>
                     </div>

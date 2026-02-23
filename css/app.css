@@ -553,17 +553,32 @@ body.pdf-preview .status-pending { background-color: #fef3c7; color: #92400e; bo
     }
 
     body.pdf-preview .pdf-copies {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
         gap: 8px;
+    }
+
+    body.pdf-preview .pdf-copy-slot {
+        break-inside: avoid;
+        page-break-inside: avoid;
+    }
+
+    body.pdf-preview .pdf-copy-slot:nth-child(3) {
+        grid-column: 1 / 2;
+        break-inside: avoid;
+        page-break-inside: avoid;
     }
 
     body.pdf-preview .pdf-cut-line {
         border-top: 1px dashed #374151;
         margin: 0;
+        display: none;
     }
 
     body.pdf-preview .pdf-copy {
-        break-inside: auto;
-        page-break-inside: auto;
+        break-inside: avoid;
+        page-break-inside: avoid;
+        width: 100%;
     }
 }
 

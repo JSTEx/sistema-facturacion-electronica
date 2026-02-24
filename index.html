@@ -1390,17 +1390,22 @@
                     <script>
                         (function () {
                             const MIN_SCALE = 0.1;
+                            const SAFETY_PX = 16;
 
                             function autoFitInvoices() {
                                 const copies = document.getElementById('pdfCopies');
-                                if (!copies) return;
+                                const fitArea = document.getElementById('pdfFitArea');
+                                if (!copies || !fitArea) return;
 
-                                const windowHeight = window.innerHeight || document.documentElement.clientHeight;
-                                const copiesRect = copies.getBoundingClientRect();
-                                const availableHeight = windowHeight - 120;
+                                const availableWidth = Math.max(1, fitArea.clientWidth - SAFETY_PX * 2);
+                                const availableHeight = Math.max(1, (window.innerHeight || document.documentElement.clientHeight) - fitArea.getBoundingClientRect().top - SAFETY_PX);
 
-                                const rawHeight = copies.scrollHeight;
-                                const scale = Math.max(MIN_SCALE, Math.min(1, availableHeight / rawHeight));
+                                const rawWidth = Math.max(1, copies.scrollWidth);
+                                const rawHeight = Math.max(1, copies.scrollHeight);
+
+                                const widthScale = availableWidth / rawWidth;
+                                const heightScale = availableHeight / rawHeight;
+                                const scale = Math.max(MIN_SCALE, Math.min(1, widthScale, heightScale));
 
                                 document.documentElement.style.setProperty('--pdf-scale', String(scale));
                             }

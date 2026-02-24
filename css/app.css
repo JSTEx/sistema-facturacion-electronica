@@ -389,12 +389,6 @@ body.pdf-preview .pdf-copy-slot {
     height: fit-content;
 }
 
-body.pdf-preview .pdf-copy-slot:nth-child(1) .pdf-copy,
-body.pdf-preview .pdf-copy-slot:nth-child(2) .pdf-copy {
-    transform: scale(1.05);
-    transform-origin: top left;
-}
-
 body.pdf-preview .pdf-copy-slot:nth-child(3) {
     overflow: visible;
     display: flex;
@@ -404,7 +398,6 @@ body.pdf-preview .pdf-copy-slot:nth-child(3) {
 
 body.pdf-preview .pdf-copy-slot:nth-child(3) .pdf-copy {
     transform-origin: top left;
-    width: 110%;
     transform: rotate(-90deg) translateX(-100%);
 }
 
@@ -594,20 +587,10 @@ body.pdf-preview .status-pending { background-color: #fef3c7; color: #92400e; bo
         padding: 6px;
     }
 
-    body.pdf-preview .pdf-copy-slot:nth-child(1) .pdf-copy {
-        transform: scale(1.05);
-        transform-origin: top left;
-    }
-
     body.pdf-preview .pdf-copy-slot:nth-child(2) {
         border-bottom: 1px dashed #000;
         border-left: 1px dashed #000;
         padding: 6px;
-    }
-
-    body.pdf-preview .pdf-copy-slot:nth-child(2) .pdf-copy {
-        transform: scale(1.05);
-        transform-origin: top left;
     }
 
     body.pdf-preview .pdf-copy-slot:nth-child(3) {
@@ -621,7 +604,6 @@ body.pdf-preview .status-pending { background-color: #fef3c7; color: #92400e; bo
 
     body.pdf-preview .pdf-copy-slot:nth-child(3) .pdf-copy {
         transform-origin: top left;
-        width: 110%;
         transform: rotate(-90deg) translateX(-100%);
     }
 

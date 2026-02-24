@@ -395,17 +395,19 @@ body.pdf-preview .pdf-copy-slot:nth-child(3) {
 
 body.pdf-preview .pdf-copy-slot-horizontal {
     grid-column: 1 / 3;
-    min-height: 240px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    min-height: 108mm;
+    display: block;
+    position: relative;
     overflow: visible;
 }
 
 body.pdf-preview .pdf-copy-slot-horizontal .pdf-copy {
-    width: 48%;
+    width: 92mm;
+    position: absolute;
+    left: 8px;
+    top: 98mm;
     transform: rotate(-90deg);
-    transform-origin: center center;
+    transform-origin: top left;
 }
 
 body.pdf-preview .pdf-fit-area {
@@ -609,11 +611,16 @@ body.pdf-preview .status-pending { background-color: #fef3c7; color: #92400e; bo
     }
 
     body.pdf-preview .pdf-copy-slot-horizontal {
-        min-height: 230px;
+        min-height: 106mm;
+        position: relative;
     }
 
     body.pdf-preview .pdf-copy-slot-horizontal .pdf-copy {
-        width: 46%;
+        width: 90mm;
+        left: 8px;
+        top: 96mm;
+        transform: rotate(-90deg);
+        transform-origin: top left;
     }
 
     body.pdf-preview .pdf-cut-line {
@@ -639,11 +646,14 @@ body.pdf-preview .status-pending { background-color: #fef3c7; color: #92400e; bo
     }
 
     body.pdf-preview .pdf-copy-slot-horizontal {
-        min-height: 180px;
+        min-height: auto;
+        position: static;
     }
 
     body.pdf-preview .pdf-copy-slot-horizontal .pdf-copy {
-        width: 70%;
+        width: 100%;
+        position: static;
+        transform: none;
     }
 
     body.pdf-preview {

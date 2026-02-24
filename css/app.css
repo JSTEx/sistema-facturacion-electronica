@@ -399,8 +399,8 @@ body.pdf-preview .pdf-copy-slot:nth-child(3) {
 
 body.pdf-preview .pdf-copy-slot:nth-child(3) .pdf-copy {
     transform-origin: top left;
-    width: 140%;
-    transform: rotate(-90deg) translateX(-100%);
+    width: 100%;
+    transform: none;
 }
 
 body.pdf-preview .pdf-fit-area {
@@ -607,8 +607,8 @@ body.pdf-preview .status-pending { background-color: #fef3c7; color: #92400e; bo
 
     body.pdf-preview .pdf-copy-slot:nth-child(3) .pdf-copy {
         transform-origin: top left;
-        width: 140%;
-        transform: rotate(-90deg) translateX(-100%);
+        width: 100%;
+        transform: none;
     }
 
     body.pdf-preview .pdf-cut-line {

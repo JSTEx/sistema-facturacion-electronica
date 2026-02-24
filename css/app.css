@@ -394,11 +394,12 @@ body.pdf-preview .pdf-copy-slot:nth-child(3) {
     overflow: visible;
     display: flex;
     justify-content: flex-start;
+    align-items: flex-start;
 }
 
 body.pdf-preview .pdf-copy-slot:nth-child(3) .pdf-copy {
     transform-origin: top left;
-    width: 185%;
+    width: 96%;
     transform: rotate(-90deg) translateX(-100%);
 }
 
@@ -601,11 +602,12 @@ body.pdf-preview .status-pending { background-color: #fef3c7; color: #92400e; bo
         overflow: visible;
         display: flex;
         justify-content: flex-start;
+        align-items: flex-start;
     }
 
     body.pdf-preview .pdf-copy-slot:nth-child(3) .pdf-copy {
         transform-origin: top left;
-        width: 185%;
+        width: 96%;
         transform: rotate(-90deg) translateX(-100%);
     }
 

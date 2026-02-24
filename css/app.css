@@ -587,15 +587,15 @@ body.pdf-preview .status-pending { background-color: #fef3c7; color: #92400e; bo
 
     body.pdf-preview .pdf-copy-slot:nth-child(3) {
         grid-column: 1 / 2;
-        border-right: 1px dashed #000;
+        border-right: none;
         padding: 6px;
         overflow: visible;
     }
 
     body.pdf-preview .pdf-copy-slot:nth-child(3) .pdf-copy {
         transform-origin: top left;
-        width: 136%;
-        transform: rotate(-90deg) translateX(-100%) scale(1.02);
+        width: 145%;
+        transform: rotate(-90deg) translateX(-100%) scale(1.0);
     }
 
     body.pdf-preview .pdf-cut-line {

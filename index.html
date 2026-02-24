@@ -182,6 +182,7 @@
                         <table class="w-full text-sm">
                             <thead class="items-table-head bg-gray-50 border-b border-gray-200">
                                 <tr>
+                                    <th class="text-left py-3 px-4 font-semibold text-gray-700 uppercase text-xs w-12">#</th>
                                     <th class="text-left py-3 px-4 font-semibold text-gray-700 uppercase text-xs w-20">Cant.</th>
                                     <th class="text-left py-3 px-4 font-semibold text-gray-700 uppercase text-xs">Descripción</th>
                                     <th class="text-left py-3 px-4 font-semibold text-gray-700 uppercase text-xs w-32">Precio</th>
@@ -191,6 +192,9 @@
                             </thead>
                             <tbody id="itemsTableBody">
                                 <tr class="border-b border-gray-100">
+                                    <td class="py-2 px-2 text-center" data-label="#">
+                                        <span class="item-index text-gray-700 font-semibold">1</span>
+                                    </td>
                                     <td class="py-2 px-2" data-label="Cant.">
                                         <input type="number" min="0" step="0.01" value="1" class="item-cant w-full px-2 py-1.5 border border-gray-200 rounded text-center text-sm focus:outline-none focus:border-gray-900" oninput="calculateTotals()">
                                     </td>
@@ -594,6 +598,9 @@
                         const row = document.createElement('tr');
                         row.className = 'border-b border-gray-100';
                         row.innerHTML = `
+                            <td class="py-2 px-2 text-center" data-label="#">
+                                <span class="item-index text-gray-700 font-semibold">${idx + 1}</span>
+                            </td>
                             <td class="py-2 px-2" data-label="Cant.">
                                 <input type="number" min="0" step="0.01" value="${item.cant || 1}" class="item-cant w-full px-2 py-1.5 border border-gray-200 rounded text-center text-sm focus:outline-none focus:border-gray-900" oninput="calculateTotals()">
                             </td>
@@ -617,6 +624,7 @@
                     });
                 }
 
+                renumberItemRows();
                 syncAllItemDescHeights();
                 calculateTotals();
                 showToast('Borrador restaurado', 'info', 1600, 'top-end', { toastType: 'success' });
@@ -725,6 +733,9 @@
         function resetItemsTable() {
             document.getElementById('itemsTableBody').innerHTML = `
                 <tr class="border-b border-gray-100">
+                    <td class="py-2 px-2 text-center" data-label="#">
+                        <span class="item-index text-gray-700 font-semibold">1</span>
+                    </td>
                     <td class="py-2 px-2" data-label="Cant.">
                         <input type="number" min="0" step="0.01" value="1" class="item-cant w-full px-2 py-1.5 border border-gray-200 rounded text-center text-sm focus:outline-none focus:border-gray-900" oninput="calculateTotals()">
                     </td>
@@ -745,7 +756,18 @@
                     </td>
                 </tr>
             `;
+            renumberItemRows();
             syncAllItemDescHeights();
+        }
+
+        function renumberItemRows() {
+            const rows = document.querySelectorAll('#itemsTableBody tr');
+            rows.forEach((row, index) => {
+                const indexEl = row.querySelector('.item-index');
+                if (indexEl) {
+                    indexEl.textContent = String(index + 1);
+                }
+            });
         }
 
         function addItem() {
@@ -754,6 +776,9 @@
             const newRow = document.createElement('tr');
             newRow.className = 'border-b border-gray-100';
             newRow.innerHTML = `
+                <td class="py-2 px-2 text-center" data-label="#">
+                    <span class="item-index text-gray-700 font-semibold">0</span>
+                </td>
                 <td class="py-2 px-2" data-label="Cant.">
                     <input type="number" min="0" step="0.01" value="1" class="item-cant w-full px-2 py-1.5 border border-gray-200 rounded text-center text-sm focus:outline-none focus:border-gray-900" oninput="calculateTotals()">
                 </td>
@@ -774,6 +799,7 @@
                 </td>
             `;
             tbody.appendChild(newRow);
+            renumberItemRows();
             syncAllItemDescHeights();
             scheduleDraftSave();
         }
@@ -783,6 +809,7 @@
             const rows = document.querySelectorAll('#itemsTableBody tr');
             if (rows.length > 1) {
                 btn.closest('tr').remove();
+                renumberItemRows();
                 calculateTotals();
                 scheduleDraftSave();
             } else {

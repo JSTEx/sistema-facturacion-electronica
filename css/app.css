@@ -836,6 +836,48 @@ body.page-index .item-desc-area {
     overflow-y: hidden;
 }
 
+body.page-index #invoiceFormView .item-index {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 24px;
+    height: 24px;
+    border-radius: 9999px;
+    border: 1px solid transparent;
+    background-color: var(--bg-primary);
+    color: var(--text-primary) !important;
+    font-weight: 700 !important;
+    font-size: 11px;
+    line-height: 1;
+}
+
+html:not(.dark-mode) body.page-index #invoiceFormView .item-index {
+    background-color: #e2e8f0;
+    border-color: #cbd5e1;
+    color: #334155 !important;
+    font-weight: 600 !important;
+    font-size: 11px;
+}
+
+html.dark-mode body.page-index #invoiceFormView .item-index {
+    background-color: #111827;
+    border-color: #334155;
+    color: #bfdbfe !important;
+}
+
+html:not(.dark-mode) body.page-index #invoiceFormView .items-table-head th:first-child {
+    background-color: #e2e8f0;
+    color: #334155 !important;
+    font-weight: 800;
+    border-right: 1px solid #cbd5e1;
+}
+
+html.dark-mode body.page-index #invoiceFormView .items-table-head th:first-child {
+    background-color: #111827;
+    color: #bfdbfe !important;
+    border-right: 1px solid #334155;
+}
+
 body.page-index #itemsTableBody .input-error {
     border-color: #ef4444 !important;
     background-color: rgba(239, 68, 68, 0.1);

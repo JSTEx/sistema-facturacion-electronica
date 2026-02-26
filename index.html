@@ -488,8 +488,144 @@
             return `Último respaldo exportado: ${formatDateTimeSV(raw)}`;
         }
 
-        function exportInvoicesBackup() {
+        function uint8ArrayToBase64(bytes) {
+            const binary = Array.from(bytes).map(byte => String.fromCharCode(byte)).join('');
+            return btoa(binary);
+        }
+
+        function base64ToUint8Array(base64) {
+            const binary = atob(base64);
+            return new Uint8Array(binary.split('').map(char => char.charCodeAt(0)));
+        }
+
+        async function deriveBackupKey(password, saltBytes) {
+            const encoder = new TextEncoder();
+            const keyMaterial = await window.crypto.subtle.importKey(
+                'raw',
+                encoder.encode(password),
+                { name: 'PBKDF2' },
+                false,
+                ['deriveKey']
+            );
+
+            return window.crypto.subtle.deriveKey(
+                {
+                    name: 'PBKDF2',
+                    salt: saltBytes,
+                    iterations: 120000,
+                    hash: 'SHA-256'
+                },
+                keyMaterial,
+                { name: 'AES-GCM', length: 256 },
+                false,
+                ['encrypt', 'decrypt']
+            );
+        }
+
+        async function requestBackupPassword(mode) {
+            const title = mode === 'import' ? 'Clave de respaldo' : 'Crear clave de respaldo';
+            const text = mode === 'import'
+                ? 'Ingresa la clave usada al exportar para descifrar el respaldo.'
+                : 'Crea una clave para cifrar este respaldo y proteger correos/datos sensibles.';
+
+            if (window.Swal) {
+                const result = await Swal.fire({
+                    title,
+                    text,
+                    input: 'password',
+                    inputPlaceholder: 'Clave (mínimo 6 caracteres)',
+                    inputAttributes: {
+                        autocapitalize: 'off',
+                        autocorrect: 'off'
+                    },
+                    showCancelButton: true,
+                    confirmButtonText: mode === 'import' ? 'Descifrar' : 'Cifrar y exportar',
+                    cancelButtonText: 'Cancelar',
+                    confirmButtonColor: '#1a1a1a',
+                    cancelButtonColor: '#334155',
+                    inputValidator: (value) => {
+                        const safe = String(value || '').trim();
+                        if (safe.length < 6) return 'Usa una clave de al menos 6 caracteres.';
+                        return undefined;
+                    }
+                });
+
+                if (!result.isConfirmed) return '';
+                return String(result.value || '').trim();
+            }
+
+            const fallback = window.prompt(mode === 'import'
+                ? 'Ingresa la clave del respaldo:'
+                : 'Crea una clave para cifrar el respaldo:');
+            const safe = String(fallback || '').trim();
+            return safe.length >= 6 ? safe : '';
+        }
+
+        async function encryptBackupPayload(payloadObject, password) {
+            const encoder = new TextEncoder();
+            const plainText = JSON.stringify(payloadObject);
+            const salt = window.crypto.getRandomValues(new Uint8Array(16));
+            const iv = window.crypto.getRandomValues(new Uint8Array(12));
+            const key = await deriveBackupKey(password, salt);
+
+            const encryptedBuffer = await window.crypto.subtle.encrypt(
+                { name: 'AES-GCM', iv },
+                key,
+                encoder.encode(plainText)
+            );
+
+            return {
+                metadata: {
+                    ...payloadObject.metadata,
+                    encrypted: true,
+                    algorithm: 'AES-GCM',
+                    kdf: 'PBKDF2-SHA-256',
+                    iterations: 120000
+                },
+                encryptedBackup: {
+                    salt: uint8ArrayToBase64(salt),
+                    iv: uint8ArrayToBase64(iv),
+                    cipher: uint8ArrayToBase64(new Uint8Array(encryptedBuffer))
+                }
+            };
+        }
+
+        async function decryptBackupPayload(encryptedJson, password) {
+            const encryptedBlock = encryptedJson?.encryptedBackup;
+            if (!encryptedBlock?.salt || !encryptedBlock?.iv || !encryptedBlock?.cipher) {
+                throw new Error('Formato de respaldo cifrado inválido');
+            }
+
+            const salt = base64ToUint8Array(encryptedBlock.salt);
+            const iv = base64ToUint8Array(encryptedBlock.iv);
+            const cipherBytes = base64ToUint8Array(encryptedBlock.cipher);
+            const key = await deriveBackupKey(password, salt);
+
+            const decryptedBuffer = await window.crypto.subtle.decrypt(
+                { name: 'AES-GCM', iv },
+                key,
+                cipherBytes
+            );
+
+            const decoder = new TextDecoder();
+            return JSON.parse(decoder.decode(decryptedBuffer));
+        }
+
+        async function exportInvoicesBackup() {
             if (!ensureAdminAction('el respaldo manual')) return;
+            if (!(window.crypto && window.crypto.subtle)) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Navegador no compatible',
+                    text: 'Tu navegador no soporta cifrado seguro para respaldos.',
+                    confirmButtonColor: '#1a1a1a'
+                });
+                return;
+            }
+
+            const backupPassword = await requestBackupPassword('export');
+            if (!backupPassword) return;
+
             const exportedAt = new Date().toISOString();
             const payload = {
                 metadata: {
@@ -501,19 +637,21 @@
                 invoices: toInvoicesMap(invoices)
             };
 
-            const fileContent = JSON.stringify(payload, null, 2);
+            const encryptedPayload = await encryptBackupPayload(payload, backupPassword);
+
+            const fileContent = JSON.stringify(encryptedPayload, null, 2);
             const blob = new Blob([fileContent], { type: 'application/json' });
             const url = URL.createObjectURL(blob);
             const anchor = document.createElement('a');
             const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
             anchor.href = url;
-            anchor.download = `backup-facturas-${timestamp}.json`;
+            anchor.download = `backup-seguro-facturas-${timestamp}.json`;
             document.body.appendChild(anchor);
             anchor.click();
             anchor.remove();
             URL.revokeObjectURL(url);
 
-            showToast('Copia de seguridad exportada', 'success', 2000, 'top-end', { toastType: 'success' });
+            showToast('Copia de seguridad cifrada exportada', 'success', 2200, 'top-end', { toastType: 'success' });
             localStorage.setItem(BACKUP_REMINDER_LAST_KEY, String(Date.now()));
             localStorage.setItem(BACKUP_LAST_EXPORT_KEY, exportedAt);
         }
@@ -536,7 +674,36 @@
                 return;
             }
 
-            const incomingSource = parsed?.invoices ?? parsed;
+            let sourceForImport = parsed;
+
+            if (parsed?.encryptedBackup?.cipher) {
+                if (!(window.crypto && window.crypto.subtle)) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Navegador no compatible',
+                        text: 'No se puede descifrar este respaldo en este navegador.',
+                        confirmButtonColor: '#1a1a1a'
+                    });
+                    return;
+                }
+
+                const password = await requestBackupPassword('import');
+                if (!password) return;
+
+                try {
+                    sourceForImport = await decryptBackupPayload(parsed, password);
+                } catch (error) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'No se pudo descifrar',
+                        text: 'Clave incorrecta o archivo de respaldo dañado.',
+                        confirmButtonColor: '#1a1a1a'
+                    });
+                    return;
+                }
+            }
+
+            const incomingSource = sourceForImport?.invoices ?? sourceForImport;
             const normalizedIncoming = normalizeInvoices(incomingSource);
             if (!normalizedIncoming.length) {
                 Swal.fire({

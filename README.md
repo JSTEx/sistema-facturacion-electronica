@@ -110,6 +110,8 @@ if (window.anime) {
 - Usa **Exportar** para descargar una copia JSON de las facturas.
 - Usa **Importar** para restaurar una copia JSON (reemplaza el dataset actual).
 - La app muestra un recordatorio para hacer respaldo manual; no crea copias automáticamente.
+- Los respaldos se exportan **cifrados con clave** para proteger datos sensibles.
+- **No pierdas la clave del respaldo**: sin esa clave no se puede descifrar ni importar la copia.
 
 ## Checklist de publicación / Pre-release checklist
 

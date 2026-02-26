@@ -1,5 +1,19 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
+html.theme-transitioning *,
+html.theme-transitioning *::before,
+html.theme-transitioning *::after {
+    transition: background-color 220ms ease, color 220ms ease, border-color 220ms ease, box-shadow 220ms ease, fill 220ms ease, stroke 220ms ease !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    html.theme-transitioning *,
+    html.theme-transitioning *::before,
+    html.theme-transitioning *::after {
+        transition: none !important;
+    }
+}
+
 body.page-index {
     --bg-primary: #ffffff;
     --bg-secondary: #f9fafb;
@@ -1209,9 +1223,9 @@ html.dark-mode body.page-index #addItemBtn:hover {
 body.page-index .removeItemBtn {
     padding: 6px 8px;
     border-radius: 6px;
-    background-color: transparent;
-    border: 1px solid transparent;
-    color: #9ca3af;
+    background-color: #fff1f2;
+    border: 1px solid #fecdd3;
+    color: #be123c;
     transition: all 0.3s ease;
     cursor: pointer;
     display: inline-flex;
@@ -1220,9 +1234,26 @@ body.page-index .removeItemBtn {
 }
 
 body.page-index .removeItemBtn:hover {
-    background-color: #fee2e2;
-    color: #dc2626;
-    border-color: #fecaca;
+    background-color: #ffe4e6;
+    color: #9f1239;
+    border-color: #fda4af;
+}
+
+html:not(.dark-mode) body.page-index .removeItemBtn {
+    color: #be123c !important;
+    background-color: #fff1f2 !important;
+    border-color: #fecdd3 !important;
+}
+
+html:not(.dark-mode) body.page-index .removeItemBtn svg {
+    color: #be123c !important;
+    stroke: currentColor;
+    stroke-width: 2.4;
+    opacity: 1;
+}
+
+html:not(.dark-mode) body.page-index .removeItemBtn:hover svg {
+    color: #9f1239 !important;
 }
 
 html.dark-mode body.page-index .removeItemBtn {
@@ -1536,6 +1567,18 @@ body.page-index .app-loading-hidden {
 
     body.page-index #invoiceFormView .removeItemBtn:hover {
         background-color: var(--bg-hover);
+    }
+
+    html:not(.dark-mode) body.page-index #invoiceFormView .removeItemBtn {
+        border-color: #fecdd3;
+        background-color: #fff1f2;
+        color: #be123c;
+    }
+
+    html:not(.dark-mode) body.page-index #invoiceFormView .removeItemBtn:hover {
+        background-color: #ffe4e6;
+        border-color: #fda4af;
+        color: #9f1239;
     }
 
     body.page-index #invoiceFormView .remove-label {

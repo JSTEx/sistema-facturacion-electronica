@@ -103,8 +103,44 @@ function initDarkMode(options = {}) {
 
 function toggleDarkMode(storageKey = 'darkMode') {
     const html = document.documentElement;
-    const isDarkMode = html.classList.toggle('dark-mode');
-    localStorage.setItem(storageKey, isDarkMode ? '1' : '0');
+    const nextIsDarkMode = !html.classList.contains('dark-mode');
+    const prefersReducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    const applyTheme = () => {
+        html.classList.toggle('dark-mode', nextIsDarkMode);
+        localStorage.setItem(storageKey, nextIsDarkMode ? '1' : '0');
+    };
+
+    if (prefersReducedMotion) {
+        applyTheme();
+        return;
+    }
+
+    html.classList.add('theme-transitioning');
+
+    const cleanup = () => {
+        setTimeout(() => {
+            html.classList.remove('theme-transitioning');
+        }, 260);
+    };
+
+    if (typeof document.startViewTransition === 'function') {
+        const transition = document.startViewTransition(() => {
+            applyTheme();
+        });
+
+        if (transition && transition.finished && typeof transition.finished.finally === 'function') {
+            transition.finished.finally(cleanup);
+        } else {
+            cleanup();
+        }
+        return;
+    }
+
+    requestAnimationFrame(() => {
+        applyTheme();
+        requestAnimationFrame(cleanup);
+    });
 }
 
 async function confirmLogout(options = {}) {

@@ -854,9 +854,8 @@
                 window.anime.remove(buttonEl);
                 window.anime({
                     targets: buttonEl,
-                    translateY: -2,
-                    scale: 1.02,
-                    duration: 180,
+                    scale: 1.035,
+                    duration: 150,
                     easing: 'easeOutQuad'
                 });
             });
@@ -865,7 +864,6 @@
                 window.anime.remove(buttonEl);
                 window.anime({
                     targets: buttonEl,
-                    translateY: 0,
                     scale: 1,
                     duration: 180,
                     easing: 'easeOutQuad'
@@ -876,9 +874,8 @@
                 window.anime.remove(buttonEl);
                 window.anime({
                     targets: buttonEl,
-                    translateY: 0,
-                    scale: 0.98,
-                    duration: 90,
+                    scale: 0.95,
+                    duration: 85,
                     easing: 'easeOutQuad'
                 });
             };
@@ -887,8 +884,17 @@
                 window.anime.remove(buttonEl);
                 window.anime({
                     targets: buttonEl,
-                    translateY: -2,
-                    scale: 1.02,
+                    scale: 1.035,
+                    duration: 115,
+                    easing: 'easeOutQuad'
+                });
+            };
+
+            const resetState = () => {
+                window.anime.remove(buttonEl);
+                window.anime({
+                    targets: buttonEl,
+                    scale: 1,
                     duration: 120,
                     easing: 'easeOutQuad'
                 });
@@ -896,19 +902,74 @@
 
             buttonEl.addEventListener('mousedown', pressDown);
             buttonEl.addEventListener('mouseup', pressUp);
-            buttonEl.addEventListener('mouseleave', pressUp);
+            buttonEl.addEventListener('mouseleave', resetState);
             buttonEl.addEventListener('touchstart', pressDown, { passive: true });
             buttonEl.addEventListener('touchend', pressUp, { passive: true });
-            buttonEl.addEventListener('blur', () => {
+            buttonEl.addEventListener('blur', resetState);
+        }
+
+        function attachAnimeSoftFeedback(buttonEl) {
+            if (!window.anime) return;
+
+            if (!buttonEl || buttonEl.dataset.animeSoftInit === '1') return;
+            buttonEl.dataset.animeSoftInit = '1';
+
+            buttonEl.addEventListener('mouseenter', () => {
                 window.anime.remove(buttonEl);
                 window.anime({
                     targets: buttonEl,
-                    translateY: 0,
+                    scale: 1.035,
+                    duration: 150,
+                    easing: 'easeOutQuad'
+                });
+            });
+
+            buttonEl.addEventListener('mouseleave', () => {
+                window.anime.remove(buttonEl);
+                window.anime({
+                    targets: buttonEl,
+                    scale: 1,
+                    duration: 170,
+                    easing: 'easeOutQuad'
+                });
+            });
+
+            const pressDown = () => {
+                window.anime.remove(buttonEl);
+                window.anime({
+                    targets: buttonEl,
+                    scale: 0.95,
+                    duration: 85,
+                    easing: 'easeOutQuad'
+                });
+            };
+
+            const pressUp = () => {
+                window.anime.remove(buttonEl);
+                window.anime({
+                    targets: buttonEl,
+                    scale: 1.035,
+                    duration: 115,
+                    easing: 'easeOutQuad'
+                });
+            };
+
+            const resetState = () => {
+                window.anime.remove(buttonEl);
+                window.anime({
+                    targets: buttonEl,
                     scale: 1,
                     duration: 120,
                     easing: 'easeOutQuad'
                 });
-            });
+            };
+
+            buttonEl.addEventListener('mousedown', pressDown);
+            buttonEl.addEventListener('mouseup', pressUp);
+            buttonEl.addEventListener('mouseleave', resetState);
+            buttonEl.addEventListener('touchstart', pressDown, { passive: true });
+            buttonEl.addEventListener('touchend', pressUp, { passive: true });
+            buttonEl.addEventListener('blur', resetState);
         }
 
         function initAnimeButtonDemo() {
@@ -917,12 +978,16 @@
             const interactiveButtons = [
                 document.getElementById('btnNewInvoice'),
                 document.getElementById('btnHistoryView'),
-                document.getElementById('btnBackupExport'),
-                document.getElementById('btnBackupImport'),
                 document.getElementById('btnAdminPanel')
             ];
 
+            const softButtons = [
+                document.getElementById('btnBackupExport'),
+                document.getElementById('btnBackupImport')
+            ];
+
             interactiveButtons.forEach(attachAnimePressFeedback);
+            softButtons.forEach(attachAnimeSoftFeedback);
         }
 
         function configurePageModeUI() {

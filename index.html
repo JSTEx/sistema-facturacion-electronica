@@ -20,6 +20,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="assets/css/app.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.2/lib/anime.min.js"></script>
     <script src="assets/js/app-utils.js"></script>
     <script src="assets/js/ui-utils.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
@@ -113,7 +114,7 @@
                 <div class="flex-1 relative">
                     <input type="text" id="searchInput" placeholder="Buscar facturas..." class="w-full h-10 px-4 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-gray-900 transition-colors">
                 </div>
-                <select id="filterSelect" class="h-10 px-4 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-gray-900 bg-white min-w-[180px] cursor-pointer">
+                <select id="filterSelect" class="h-10 pl-4 pr-10 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-gray-900 bg-white min-w-[180px] cursor-pointer">
                     <option value="all">Todas las activas</option>
                     <option value="dispatch">Despacho</option>
                     <option value="abono">Abono</option>
@@ -212,16 +213,18 @@
 
                     <div id="statusExtras" class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
                         <div id="dispatchWrapper" class="hidden sm:col-span-2">
-                            <label class="block text-xs font-semibold text-gray-700 uppercase mb-1.5">Detalle de despacho</label>
-                            <input type="text" id="detalleDespacho" class="w-full px-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:border-gray-900 transition-colors" placeholder="Ej: Entrega en bodega central">
+                            <label class="block text-xs font-semibold text-gray-700 uppercase mb-1.5">Detalle de Despacho</label>
+                            <input type="text" id="detalleDespacho" class="w-full px-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:border-gray-900 transition-colors" placeholder="Ej.: Entrega en bodega central">
                         </div>
                         <div id="dueDateWrapper">
                             <label class="block text-xs font-semibold text-gray-700 uppercase mb-1.5">Fecha de vencimiento</label>
                             <input type="date" id="fechaVencimiento" class="w-full px-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:border-gray-900 transition-colors">
+                            <p class="date-format-hint mt-1 text-xs text-gray-400">Formato mostrado: dd-mm-aaaa</p>
                         </div>
                         <div id="paidDateWrapper" class="hidden">
                             <label class="block text-xs font-semibold text-gray-700 uppercase mb-1.5">Fecha de pago</label>
                             <input type="date" id="fechaPago" class="w-full px-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:border-gray-900 transition-colors">
+                            <p class="date-format-hint mt-1 text-xs text-gray-400">Formato mostrado: dd-mm-aaaa</p>
                         </div>
                     </div>
 
@@ -348,6 +351,134 @@
             return normalized === 'paid' || normalized === 'pagada' || normalized === 'pagadas';
         }
 
+        function isInvoiceOverdue(invoice) {
+            if (!invoice) return false;
+            const normalizedStatus = String(invoice.status || '').toLowerCase();
+            const dueDate = String(invoice.dueDate || '').trim();
+            const today = getTodayISODate();
+            return normalizedStatus === 'late' || normalizedStatus === 'vencida' || (dueDate && dueDate < today);
+        }
+
+        function prioritizeOverdueInvoices(list) {
+            const safeList = Array.isArray(list) ? [...list] : [];
+            return safeList.sort((a, b) => {
+                const aOverdue = isInvoiceOverdue(a) ? 1 : 0;
+                const bOverdue = isInvoiceOverdue(b) ? 1 : 0;
+                if (aOverdue !== bOverdue) return bOverdue - aOverdue;
+                return Number(b?.id || 0) - Number(a?.id || 0);
+            });
+        }
+
+        function animateOverdueNotificationIcons() {
+            if (!window.anime) return;
+
+            document.querySelectorAll('.overdue-notification-icon').forEach((iconEl, index) => {
+                if (iconEl.dataset.animeInit === '1') return;
+                iconEl.dataset.animeInit = '1';
+
+                window.anime({
+                    targets: iconEl,
+                    scale: [1, 1.08, 1],
+                    duration: 1350,
+                    easing: 'easeInOutSine',
+                    loop: true,
+                    delay: index * 60
+                });
+
+                const dotEl = iconEl.querySelector('.overdue-notification-dot');
+                if (!dotEl) return;
+
+                window.anime({
+                    targets: dotEl,
+                    scale: [0.9, 1.18, 0.9],
+                    opacity: [1, 0.6, 1],
+                    duration: 1100,
+                    easing: 'easeOutQuad',
+                    loop: true,
+                    delay: index * 45
+                });
+            });
+        }
+
+        function attachAnimePressFeedback(buttonEl) {
+            if (!window.anime) return;
+
+            if (!buttonEl || buttonEl.dataset.animeHoverInit === '1') return;
+            buttonEl.dataset.animeHoverInit = '1';
+
+            buttonEl.addEventListener('mouseenter', () => {
+                window.anime.remove(buttonEl);
+                window.anime({
+                    targets: buttonEl,
+                    translateY: -2,
+                    scale: 1.02,
+                    duration: 180,
+                    easing: 'easeOutQuad'
+                });
+            });
+
+            buttonEl.addEventListener('mouseleave', () => {
+                window.anime.remove(buttonEl);
+                window.anime({
+                    targets: buttonEl,
+                    translateY: 0,
+                    scale: 1,
+                    duration: 180,
+                    easing: 'easeOutQuad'
+                });
+            });
+
+            const pressDown = () => {
+                window.anime.remove(buttonEl);
+                window.anime({
+                    targets: buttonEl,
+                    translateY: 0,
+                    scale: 0.98,
+                    duration: 90,
+                    easing: 'easeOutQuad'
+                });
+            };
+
+            const pressUp = () => {
+                window.anime.remove(buttonEl);
+                window.anime({
+                    targets: buttonEl,
+                    translateY: -2,
+                    scale: 1.02,
+                    duration: 120,
+                    easing: 'easeOutQuad'
+                });
+            };
+
+            buttonEl.addEventListener('mousedown', pressDown);
+            buttonEl.addEventListener('mouseup', pressUp);
+            buttonEl.addEventListener('mouseleave', pressUp);
+            buttonEl.addEventListener('touchstart', pressDown, { passive: true });
+            buttonEl.addEventListener('touchend', pressUp, { passive: true });
+            buttonEl.addEventListener('blur', () => {
+                window.anime.remove(buttonEl);
+                window.anime({
+                    targets: buttonEl,
+                    translateY: 0,
+                    scale: 1,
+                    duration: 120,
+                    easing: 'easeOutQuad'
+                });
+            });
+        }
+
+        function initAnimeButtonDemo() {
+            if (!window.anime) return;
+
+            const interactiveButtons = [
+                document.getElementById('btnNewInvoice'),
+                document.getElementById('btnHistoryView'),
+                document.getElementById('btnAdminPanel')
+            ];
+
+            interactiveButtons.forEach(attachAnimePressFeedback);
+        }
+
         function configurePageModeUI() {
             const historyBtn = document.getElementById('btnHistoryView');
             const historyBtnLabel = historyBtn ? historyBtn.querySelector('span') : null;
@@ -429,15 +560,15 @@
 
         function getInvoiceOwnershipBadge(invoice) {
             if (isInvoiceOwner(invoice) && canEditInvoice(invoice)) {
-                return '<p class="mt-2"><span class="owner-edit-badge">Creada por ti · editable</span></p>';
+                return '<p class="mt-1"><span class="owner-edit-badge">Creada por ti · editable</span></p>';
             }
 
             if (currentUser && currentUser.role === 'admin') {
-                return `<p class="mt-2"><span class="creator-info-badge">${getInvoiceCreatorText(invoice)}</span></p>`;
+                return `<p class="mt-1"><span class="creator-info-badge">${getInvoiceCreatorText(invoice)}</span></p>`;
             }
 
             if (currentUser && currentUser.role === 'user' && !isInvoiceOwner(invoice)) {
-                return '<p class="mt-2"><span class="not-owner-badge">Creada por otro usuario</span></p>';
+                return '<p class="mt-1"><span class="not-owner-badge">Creada por otro usuario</span></p>';
             }
 
             return '';
@@ -537,6 +668,7 @@
                                 btn.onclick = () => { window.location.href = 'pages/admin.html'; };
                                 adminContainer.appendChild(btn);
                             }
+                            initAnimeButtonDemo();
                         }
                     } catch(e) { console.error('admin button render error', e); }
                 });
@@ -991,6 +1123,24 @@
             return `${y}-${m}-${d}`;
         }
 
+        function formatDateSV(dateValue) {
+            const raw = String(dateValue || '').trim();
+            if (!raw) return '';
+
+            const isoMatch = raw.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+            if (isoMatch) {
+                return `${isoMatch[3]}-${isoMatch[2]}-${isoMatch[1]}`;
+            }
+
+            const parsedDate = new Date(raw);
+            if (Number.isNaN(parsedDate.getTime())) return raw;
+
+            const day = String(parsedDate.getDate()).padStart(2, '0');
+            const month = String(parsedDate.getMonth() + 1).padStart(2, '0');
+            const year = parsedDate.getFullYear();
+            return `${day}-${month}-${year}`;
+        }
+
         function updateStatusSections(statusValue) {
             const status = String(statusValue || '').toLowerCase();
             const dispatchWrapper = document.getElementById('dispatchWrapper');
@@ -1158,7 +1308,7 @@
             const fechaPago = document.getElementById('fechaPago').value;
 
             if (estado === 'dispatch' && !detalleDespacho) {
-                addError('detalleDespacho', 'Detalle de despacho requerido para estado Despacho');
+                addError('detalleDespacho', 'Detalle de Despacho requerido para estado Despacho');
             }
 
             if ((estado === 'pending' || estado === 'late') && !fechaVencimiento) {
@@ -1364,7 +1514,7 @@
             
             const visible = filterInvoicesByVisibility(invoices);
             let filtered = filterInvoicesByStatus(visible, currentFilter);
-            filtered = sortInvoicesDescById(filtered);
+            filtered = prioritizeOverdueInvoices(filtered);
             
             totalCount.textContent = IS_HISTORY_VIEW ? `${filtered.length} pagadas` : `${filtered.length} activas`;
             
@@ -1409,6 +1559,7 @@
             }
             const canDelete = currentUser && currentUser.role === 'admin';
             listContainer.innerHTML = paginatedInvoices.map(inv => renderInvoiceCard(inv, canDelete, true)).join('');
+            animateOverdueNotificationIcons();
         }
 
         function renderInvoiceCard(inv, canDelete, withTitle = false) {
@@ -1422,11 +1573,16 @@
             const saldoValue = Number.isFinite(Number(inv.saldoActual))
                 ? Math.max(0, Number(inv.saldoActual))
                 : Math.max(0, Number(inv.amount || 0) - abonoValue);
+            const isOverdue = isInvoiceOverdue(inv);
+            const today = getTodayISODate();
+            const dueIsLate = !!(inv.dueDate && (normalizedStatus === 'late' || inv.dueDate < today));
             const saldoHtml = (canViewAmount && abonoValue > 0 && String(inv.status || '').toLowerCase() !== 'paid')
-                ? `<p class="text-xs text-gray-500 mt-1">SALDO ACTUAL: $${saldoValue.toFixed(2)}</p>`
+                ? `<p class="mt-1 invoice-meta-row"><span class="invoice-meta-badge invoice-meta-badge-saldo">SALDO ACTUAL:</span><span class="invoice-meta-value invoice-meta-value-saldo">$${saldoValue.toFixed(2)}</span></p>`
                 : '';
-            const dueDateHtml = inv.dueDate ? `<p class="text-xs text-gray-500 mt-1">VENCE: ${inv.dueDate}</p>` : '';
-            const paidDateHtml = inv.paidDate ? `<p class="text-xs text-gray-500 mt-1">PAGADA: ${inv.paidDate}</p>` : '';
+            const dueDateHtml = inv.dueDate
+                ? `<p class="mt-1 invoice-meta-row"><span class="invoice-meta-badge ${dueIsLate ? 'invoice-meta-badge-due-late' : 'invoice-meta-badge-due'}">VENCE:</span><span class="invoice-meta-value ${dueIsLate ? 'invoice-meta-value-due-late' : 'invoice-meta-value-due'}">${formatDateSV(inv.dueDate)}</span></p>`
+                : '';
+            const paidDateHtml = inv.paidDate ? `<p class="text-xs text-gray-500 mt-1">FECHA DE PAGO: ${formatDateSV(inv.paidDate)}</p>` : '';
             const dispatchHtml = inv.dispatchDetail ? `<p class="text-xs text-gray-500 mt-1">DESPACHO: ${inv.dispatchDetail}</p>` : '';
             const manualStatusHtml = inv.manualStatusLocked
                 ? '<p class="text-xs italic text-gray-500 mb-2">Estado manual</p>'
@@ -1434,14 +1590,20 @@
             const statusDetailHtml = inv.status === 'dispatch'
                 ? dispatchHtml
                 : (inv.status === 'paid' ? paidDateHtml : dueDateHtml);
+            const overdueNotificationHtml = isOverdue
+                ? `<div class="overdue-notification-icon" title="Factura vencida" aria-label="Factura vencida"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg><i class="overdue-notification-dot" aria-hidden="true"></i></div>`
+                : '';
+            const actionRowClass = isOverdue ? 'flex justify-end gap-3 mb-2 pl-9' : 'flex justify-end gap-3 mb-2';
+            const cardStateClass = isOverdue ? 'invoice-card-overdue' : '';
             const viewTitle = withTitle ? ' title="Ver"' : '';
             const editTitle = withTitle ? ' title="Editar"' : '';
             const deleteTitle = withTitle ? ' title="Eliminar"' : '';
 
             return `
-            <div class="invoice-card bg-white border border-gray-200 rounded-lg p-5 relative">
+            <div class="invoice-card ${cardStateClass} bg-white border border-gray-200 rounded-lg p-5 relative">
                 ${manualStatusHtml}
-                <div class="flex justify-end gap-3 mb-2">
+                ${overdueNotificationHtml}
+                <div class="${actionRowClass}">
                     <button onclick="viewInvoice(${inv.id})" class="text-gray-400 hover:text-gray-600 transition-colors"${viewTitle}>
                         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
                     </button>
@@ -1456,9 +1618,9 @@
                     </button>
                     ` : ''}
                 </div>
-                <div class="mb-4">
+                <div class="mb-3">
                     <h3 class="text-lg font-semibold text-gray-900 leading-tight">${inv.client}</h3>
-                    <p class="text-sm text-gray-500 mt-0.5">Factura #${inv.number}</p>
+                    <p class="text-sm text-gray-500 mt-0">Factura #${inv.number}</p>
                     ${getInvoiceOwnershipBadge(inv)}
                 </div>
                 <div class="flex justify-between items-end">
@@ -1469,7 +1631,9 @@
                     </div>
                     <div class="flex items-center gap-6"></div>
                 </div>
-                <span class="status-badge ${statusClass} absolute bottom-3 right-3">${statusText}</span>
+                <div class="mt-2 flex justify-end">
+                    <span class="status-badge ${statusClass}">${statusText}</span>
+                </div>
             </div>
             `;
         }
@@ -1570,7 +1734,7 @@
             doc.setFont('helvetica', 'bold');
             doc.text('Fecha:', left, y);
             doc.setFont('helvetica', 'normal');
-            doc.text(String(inv.date || ''), left + 42, y);
+            doc.text(String(formatDateSV(inv.date) || ''), left + 42, y);
 
             y += 20;
             doc.setFont('helvetica', 'bold');
@@ -1580,6 +1744,119 @@
             doc.text(statusTextForPdf, left + 50, y);
             doc.setTextColor(17, 17, 17);
 
+            const today = getTodayISODate();
+            const dueIsLate = !!(inv.dueDate && (normalizedStatus === 'late' || inv.dueDate < today));
+            const saldoForPdf = canViewAmount
+                ? `$${Math.max(0, Number.isFinite(Number(inv.saldoActual)) ? Number(inv.saldoActual) : (Number(inv.amount || 0) - Number(inv.abono || 0))).toFixed(2)}`
+                : 'Oculto';
+
+            const metaBadges = [];
+            if (normalizedStatus === 'paid') {
+                metaBadges.push({
+                    text: 'PAGO: PAGADA AL 100%',
+                    bg: [220, 252, 231],
+                    fg: [22, 101, 52]
+                });
+            }
+
+            if (normalizedStatus !== 'paid' && Number(inv.abono || 0) > 0) {
+                metaBadges.push({
+                    text: `SALDO ACTUAL: ${saldoForPdf}`,
+                    bg: [237, 233, 254],
+                    fg: [91, 33, 182]
+                });
+            }
+
+            if (inv.dueDate) {
+                metaBadges.push({
+                    text: `VENCE: ${formatDateSV(inv.dueDate)}`,
+                    bg: dueIsLate ? [254, 226, 226] : [254, 243, 199],
+                    fg: dueIsLate ? [153, 27, 27] : [146, 64, 14]
+                });
+            }
+
+            if (inv.paidDate) {
+                metaBadges.push({
+                    text: `FECHA DE PAGO: ${formatDateSV(inv.paidDate)}`,
+                    bg: [209, 250, 229],
+                    fg: [6, 95, 70]
+                });
+            }
+
+            if (inv.dispatchDetail) {
+                const dispatchText = String(inv.dispatchDetail).trim();
+                const maxDispatchLineLength = 36;
+                const dispatchWords = dispatchText.split(/\s+/).filter(Boolean);
+                const dispatchChunks = [];
+                let currentChunk = '';
+
+                dispatchWords.forEach((word) => {
+                    const candidate = currentChunk ? `${currentChunk} ${word}` : word;
+                    if (candidate.length <= maxDispatchLineLength) {
+                        currentChunk = candidate;
+                        return;
+                    }
+
+                    if (currentChunk) {
+                        dispatchChunks.push(currentChunk);
+                        currentChunk = word;
+                    } else {
+                        dispatchChunks.push(word.slice(0, maxDispatchLineLength));
+                        currentChunk = word.slice(maxDispatchLineLength);
+                    }
+                });
+
+                if (currentChunk) {
+                    dispatchChunks.push(currentChunk);
+                }
+
+                if (!dispatchChunks.length) {
+                    dispatchChunks.push(dispatchText);
+                }
+
+                dispatchChunks.forEach((chunk, chunkIndex) => {
+                    metaBadges.push({
+                        text: chunkIndex === 0 ? `DESPACHO: ${chunk}` : chunk,
+                        bg: [219, 234, 254],
+                        fg: [30, 64, 175]
+                    });
+                });
+            }
+
+            let badgesEndY = y;
+            if (metaBadges.length) {
+                const badgePaddingX = 6;
+                const badgeHeight = 14;
+                const badgeGapX = 6;
+                const badgeGapY = 5;
+                let badgeX = left;
+                let badgeY = y + 10;
+
+                doc.setFont('helvetica', 'bold');
+                doc.setFontSize(8);
+
+                metaBadges.forEach((badge) => {
+                    const textWidth = doc.getTextWidth(badge.text);
+                    const badgeWidth = textWidth + (badgePaddingX * 2);
+                    const maxX = right;
+
+                    if (badgeX + badgeWidth > maxX) {
+                        badgeX = left;
+                        badgeY += badgeHeight + badgeGapY;
+                    }
+
+                    doc.setFillColor(...badge.bg);
+                    doc.roundedRect(badgeX, badgeY, badgeWidth, badgeHeight, 7, 7, 'F');
+                    doc.setTextColor(...badge.fg);
+                    doc.text(badge.text, badgeX + badgePaddingX, badgeY + 9.5);
+
+                    badgeX += badgeWidth + badgeGapX;
+                });
+
+                doc.setTextColor(17, 17, 17);
+                badgesEndY = badgeY + badgeHeight;
+            }
+
             const bodyRows = (inv.items || []).map(item => {
                 const price = canViewAmount ? `$${Number(item.precio || 0).toFixed(2)}` : 'Oculto';
                 const rowTotal = canViewAmount ? `$${Number(item.total || 0).toFixed(2)}` : 'Oculto';
@@ -1587,7 +1864,7 @@
             });
 
             doc.autoTable({
-                startY: y + 20,
+                startY: badgesEndY + 12,
                 head: [['Cant.', 'Descripción', 'Precio', 'Total']],
                 body: bodyRows,
                 margin: { left, right: 48 },
@@ -1619,10 +1896,34 @@
         function previewInvoicePdf(inv, canViewAmount) {
             if (!ensureCanViewInvoice(inv)) return;
             const normalizedStatus = String(inv.status || '').toLowerCase();
+            const today = getTodayISODate();
+            const dueIsLate = !!(inv.dueDate && (normalizedStatus === 'late' || inv.dueDate < today));
             const statusText = normalizedStatus === 'paid' ? 'Pagada al 100%' : getStatusText(inv.status);
             const addressText = canViewAmount ? (inv.address || 'N/A') : 'Oculta';
             const totalText = canViewAmount ? `$${Number(inv.amount || 0).toFixed(2)}` : 'Oculto';
             const totalFinalText = canViewAmount ? `$${Number(inv.amount || 0).toFixed(2)}` : 'Oculto';
+            const saldoPreview = canViewAmount
+                ? `$${Math.max(0, Number.isFinite(Number(inv.saldoActual)) ? Number(inv.saldoActual) : (Number(inv.amount || 0) - Number(inv.abono || 0))).toFixed(2)}`
+                : 'Oculto';
+
+            const paidBadgeHtml = normalizedStatus === 'paid'
+                ? `<span class="pdf-meta-badge pdf-meta-badge-paid">PAGO: PAGADA AL 100%</span>`
+                : '';
+            const saldoBadgeHtml = normalizedStatus !== 'paid' && Number(inv.abono || 0) > 0
+                ? `<span class="pdf-meta-badge pdf-meta-badge-saldo">SALDO ACTUAL: ${saldoPreview}</span>`
+                : '';
+            const dueBadgeHtml = inv.dueDate
+                ? `<span class="pdf-meta-badge ${dueIsLate ? 'pdf-meta-badge-due-late' : 'pdf-meta-badge-due'}">VENCE: ${formatDateSV(inv.dueDate)}</span>`
+                : '';
+            const paidDateBadgeHtml = inv.paidDate
+                ? `<span class="pdf-meta-badge pdf-meta-badge-paid-date">FECHA DE PAGO: ${formatDateSV(inv.paidDate)}</span>`
+                : '';
+            const dispatchBadgeHtml = inv.dispatchDetail
+                ? `<span class="pdf-meta-badge pdf-meta-badge-dispatch">DESPACHO: ${inv.dispatchDetail}</span>`
+                : '';
+            const metaBadgesHtml = [paidBadgeHtml, saldoBadgeHtml, dueBadgeHtml, paidDateBadgeHtml, dispatchBadgeHtml]
+                .filter(Boolean)
+                .join('');
 
             const amountValue = Number(inv.amount || 0);
             const amountAsWords = canViewAmount
@@ -1686,7 +1987,7 @@
 
                             <div class="pdf-legacy-fields">
                                 <div class="pdf-legacy-field"><span>Señor:</span> <strong>${inv.client || 'N/A'}</strong></div>
-                                <div class="pdf-legacy-field"><span>Fecha:</span> <strong>${inv.date || ''}</strong></div>
+                                <div class="pdf-legacy-field"><span>Fecha:</span> <strong>${formatDateSV(inv.date) || ''}</strong></div>
                                 <div class="pdf-legacy-field"><span>Dirección:</span> <strong>${addressText}</strong></div>
                                 <div class="pdf-legacy-field"><span>NIT:</span> <strong></strong></div>
                                 <div class="pdf-legacy-field"><span>Dept.:</span> <strong></strong></div>
@@ -1696,6 +1997,8 @@
                                 <div class="pdf-legacy-field"><span>Venta a Cuenta de:</span> <strong></strong></div>
                                 <div class="pdf-legacy-field"><span>Cond. de Pago:</span> <strong>${statusText}</strong></div>
                             </div>
+
+                            ${metaBadgesHtml ? `<div class="pdf-legacy-meta-badges">${metaBadgesHtml}</div>` : ''}
 
                             <div class="pdf-legacy-table-wrap">
                                 <table class="pdf-legacy-table">
@@ -1852,6 +2155,8 @@
             if (!inv) return;
             if (!ensureCanViewInvoice(inv)) return;
             const normalizedStatus = String(inv.status || '').toLowerCase();
+            const today = getTodayISODate();
+            const dueIsLate = !!(inv.dueDate && (normalizedStatus === 'late' || inv.dueDate < today));
             const statusText = normalizedStatus === 'paid' ? 'Pagada al 100%' : getStatusText(inv.status);
             const canViewAmount = canSeeInvoiceAmount(inv);
             const addressText = canViewAmount ? (inv.address || 'N/A') : 'Oculta';
@@ -1860,11 +2165,17 @@
                 ? `$${Math.max(0, Number.isFinite(Number(inv.saldoActual)) ? Number(inv.saldoActual) : (Number(inv.amount || 0) - Number(inv.abono || 0))).toFixed(2)}`
                 : 'Oculto';
             const paymentMeta = normalizedStatus === 'paid'
-                ? '<p><strong>Pago:</strong> Pagada al 100%</p>'
-                : `<p><strong>Abono:</strong> ${abonoText}</p><p><strong>Saldo actual:</strong> ${saldoText}</p>`;
-            const dueDateMeta = inv.dueDate ? `<p><strong>Vencimiento:</strong> ${inv.dueDate}</p>` : '';
-            const paidDateMeta = inv.paidDate ? `<p><strong>Fecha de pago:</strong> ${inv.paidDate}</p>` : '';
-            const dispatchMeta = inv.dispatchDetail ? `<p><strong>Despacho:</strong> ${inv.dispatchDetail}</p>` : '';
+                ? '<p class="mt-1"><span class="invoice-meta-badge invoice-meta-badge-paid">PAGO: PAGADA AL 100%</span></p>'
+                : `<p><strong>Abono:</strong> ${abonoText}</p><p class="mt-1 invoice-meta-row"><span class="invoice-meta-badge invoice-meta-badge-saldo">SALDO ACTUAL:</span><span class="invoice-meta-value invoice-meta-value-saldo">${saldoText}</span></p>`;
+            const dueDateMeta = inv.dueDate
+                ? `<p class="mt-1 invoice-meta-row"><span class="invoice-meta-badge ${dueIsLate ? 'invoice-meta-badge-due-late' : 'invoice-meta-badge-due'}">VENCE:</span><span class="invoice-meta-value ${dueIsLate ? 'invoice-meta-value-due-late' : 'invoice-meta-value-due'}">${formatDateSV(inv.dueDate)}</span></p>`
+                : '';
+            const paidDateMeta = inv.paidDate
+                ? `<p class="mt-1 invoice-meta-row"><span class="invoice-meta-badge invoice-meta-badge-paid-date">FECHA DE PAGO:</span><span class="invoice-meta-value invoice-meta-value-paid-date">${formatDateSV(inv.paidDate)}</span></p>`
+                : '';
+            const dispatchMeta = inv.dispatchDetail
+                ? `<p class="mt-1 invoice-meta-row"><span class="invoice-meta-badge invoice-meta-badge-dispatch">DESPACHO:</span><span class="invoice-meta-value invoice-meta-value-dispatch">${inv.dispatchDetail}</span></p>`
+                : '';
 
             let itemsHtml = '<table class="w-full text-sm border-collapse"><tr class="border-b"><th class="text-left p-2">Cant.</th><th class="text-left p-2">Descripción</th><th class="text-left p-2">Precio</th><th class="text-right p-2">Total</th></tr>';
             
@@ -1886,7 +2197,7 @@
                         <div class="invoice-modal-meta">
                             <p><strong>Cliente:</strong> ${inv.client}</p>
                             <p><strong>Dirección:</strong> ${addressText}</p>
-                            <p><strong>Fecha:</strong> ${inv.date}</p>
+                            <p><strong>Fecha:</strong> ${formatDateSV(inv.date)}</p>
                             <p><strong>Estado:</strong> ${statusText}</p>
                             ${paymentMeta}
                             ${dueDateMeta}
@@ -2076,7 +2387,7 @@
             const visible = filterInvoicesByVisibility(invoices);
             const baseFiltered = filterInvoicesByStatus(visible, currentFilter);
             let filtered = searchInvoices(baseFiltered, term);
-            filtered = sortInvoicesDescById(filtered);
+            filtered = prioritizeOverdueInvoices(filtered);
             
             if (term && filtered.length === 0) {
                 listContainer.classList.add('hidden');
@@ -2129,7 +2440,7 @@
             const listContainer = document.getElementById('invoiceList');
             const paginationContainer = document.getElementById('paginationContainer');
             
-            filtered = sortInvoicesDescById(filtered);
+            filtered = prioritizeOverdueInvoices(filtered);
             const paginationData = paginateList(filtered, currentPage, invoicesPerPage);
             const totalPages = paginationData.totalPages;
             currentPage = paginationData.currentPage;
@@ -2144,6 +2455,7 @@
             }
             const canDelete = currentUser && currentUser.role === 'admin';
             listContainer.innerHTML = paginatedInvoices.map(inv => renderInvoiceCard(inv, canDelete, false)).join('');
+            animateOverdueNotificationIcons();
         }
 
         document.getElementById('filterSelect').addEventListener('change', function(e) {
@@ -2172,6 +2484,9 @@
 
         // Inicializar apartados dinámicos por estado
         updateStatusSections(document.getElementById('estado').value || 'pending');
+
+        // Ejemplo mínimo de anime.js en botón
+        initAnimeButtonDemo();
 
         // Inicializar el select de filtro
         document.getElementById('filterSelect').value = 'all';

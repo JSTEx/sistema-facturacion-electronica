@@ -67,3 +67,40 @@ python -m http.server 5500
 
 - `http://localhost:5500/`
 - `http://localhost:5500/pages/login.html`
+
+## Instalar librerías (CDN) / Install libraries (CDN)
+
+Este proyecto es HTML/CSS/JS estático (sin `package.json`), así que la forma más simple es usar CDN.
+
+This project is static HTML/CSS/JS (no `package.json`), so the easiest approach is using a CDN.
+
+- Agrega el script en el `<head>` de `index.html` (o en la página donde lo usarás).
+- Usa la librería desde `window` en tu JavaScript.
+
+- Add the script in the `<head>` of `index.html` (or the specific page where it is used).
+- Use the library from `window` in your JavaScript.
+
+Ejemplo / Example (`anime.js`):
+
+```html
+<script src="https://cdn.jsdelivr.net/npm/animejs@3.2.2/lib/anime.min.js"></script>
+```
+
+```js
+if (window.anime) {
+    window.anime({
+        targets: '.mi-elemento',
+        translateY: [0, -4, 0],
+        duration: 1200,
+        loop: true
+    });
+}
+```
+
+### Librerías recomendadas (CDN) / Recommended libraries (CDN)
+
+| Librería / Library | Úsala para / Use it for | CDN (pegar en head) |
+| --- | --- | --- |
+| Anime.js | Animaciones UI (badges, notificaciones, transiciones) / UI animations (badges, notifications, transitions) | `<script src="https://cdn.jsdelivr.net/npm/animejs@3.2.2/lib/anime.min.js"></script>` |
+| Chart.js | Gráficas de ventas, pagadas vs pendientes, reportes / Sales charts, paid vs pending, reports | `<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>` |
+| IMask | Máscaras de input para dinero, NIT, teléfono / Input masks for currency, tax ID, phone | `<script src="https://cdn.jsdelivr.net/npm/imask"></script>` |

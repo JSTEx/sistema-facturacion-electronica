@@ -420,7 +420,7 @@
                             if (current && current.role === 'admin') {
                                 const btn = document.createElement('button');
                                 btn.id = 'btnAdminPanel';
-                                btn.className = 'px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md text-sm font-medium transition-colors';
+                                btn.className = 'admin-users-btn px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md text-sm font-medium transition-colors';
                                 btn.style.marginRight = '6px';
                                 btn.textContent = 'Usuarios';
                                 btn.onclick = () => { window.location.href = 'pages/admin.html'; };
@@ -804,22 +804,40 @@
             scheduleDraftSave();
         }
 
-        function removeItem(btn) {
+        async function removeItem(btn) {
             if (!ensureCanCreateInvoices()) return;
             const rows = document.querySelectorAll('#itemsTableBody tr');
-            if (rows.length > 1) {
-                btn.closest('tr').remove();
-                renumberItemRows();
-                calculateTotals();
-                scheduleDraftSave();
-            } else {
+            if (rows.length <= 1) {
                 Swal.fire({
                     icon: 'warning',
                     title: 'No se puede eliminar',
                     text: 'Debe haber al menos un item en la factura',
                     confirmButtonColor: '#1a1a1a'
                 });
+                return;
             }
+
+            if (window.Swal) {
+                const result = await Swal.fire({
+                    icon: 'warning',
+                    title: '¿Eliminar item?',
+                    text: 'Esta acción quitará el item de la factura.',
+                    showCancelButton: true,
+                    confirmButtonText: 'Sí, eliminar',
+                    cancelButtonText: 'Cancelar',
+                    confirmButtonColor: '#dc2626',
+                    cancelButtonColor: '#334155'
+                });
+
+                if (!result.isConfirmed) return;
+            } else if (!window.confirm('¿Eliminar este item de la factura?')) {
+                return;
+            }
+
+            btn.closest('tr').remove();
+            renumberItemRows();
+            calculateTotals();
+            scheduleDraftSave();
         }
 
         function autoResizeItemDesc(textarea) {

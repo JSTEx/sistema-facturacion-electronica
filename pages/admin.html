@@ -6,9 +6,9 @@
     <title>Admin - Usuarios</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%2322c55e' width='100' height='100' rx='20'/><text y='70' font-size='60' fill='white' text-anchor='middle' x='50' font-weight='bold'>$</text></svg>">
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="css/app.css">
+    <link rel="stylesheet" href="../assets/css/app.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="js/app-utils.js"></script>
+    <script src="../assets/js/app-utils.js"></script>
     
     <!-- Firebase SDK -->
     <script type="module">
@@ -47,7 +47,7 @@
         window.firebaseProvisionAuth = userProvisionAuth;
     </script>
     
-    <!-- Styles moved to css/app.css -->
+    <!-- Styles moved to ../assets/css/app.css -->
 </head>
 <body class="page-admin bg-white text-gray-900 min-h-screen flex flex-col">
     <div id="appLoading" class="app-loading-overlay">
@@ -60,7 +60,7 @@
     <nav class="admin-nav border-b border-gray-200 px-6 py-4 flex justify-between items-center bg-white sticky top-0 z-50">
         <div class="flex items-center gap-6">
             <span class="nav-title text-lg font-semibold">Facturación Electrónica - Admin</span>
-            <button onclick="window.location.href='index.html'" class="px-3 py-2 rounded-md text-sm font-medium transition-colors back-invoices-btn">
+            <button onclick="window.location.href='../index.html'" class="px-3 py-2 rounded-md text-sm font-medium transition-colors back-invoices-btn">
                 Volver a Facturas
             </button>
         </div>
@@ -521,7 +521,7 @@
             });
         });
     </script>
-    <script src="js/ui-utils.js"></script>
-    <script src="js/anti-inspection.js"></script>
+    <script src="../assets/js/ui-utils.js"></script>
+    <script src="../assets/js/anti-inspection.js"></script>
 </body>
 </html>

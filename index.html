@@ -6,10 +6,10 @@
     <title>Facturación</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%2322c55e' width='100' height='100' rx='20'/><text y='70' font-size='60' fill='white' text-anchor='middle' x='50' font-weight='bold'>$</text></svg>">
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="css/app.css">
+    <link rel="stylesheet" href="assets/css/app.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="js/app-utils.js"></script>
-    <script src="js/ui-utils.js"></script>
+    <script src="assets/js/app-utils.js"></script>
+    <script src="assets/js/ui-utils.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.2/dist/jspdf.plugin.autotable.min.js"></script>
     
@@ -44,7 +44,7 @@
         window.firebaseAuthStateChanged = onAuthStateChanged;
     </script>
     
-    <!-- Styles moved to css/app.css -->
+    <!-- Styles moved to assets/css/app.css -->
 </head>
 <body class="page-index bg-white text-gray-900 min-h-screen flex flex-col">
     <div id="appLoading" class="app-loading-overlay">
@@ -271,13 +271,13 @@
             const ready = await waitForFirebaseReady();
             if (!ready) {
                 hideAppLoading();
-                window.location.replace('login.html');
+                window.location.replace('pages/login.html');
                 return;
             }
 
             window.firebaseAuthStateChanged(window.firebaseAuth, async (user) => {
                 if (!user) {
-                    window.location.replace('login.html');
+                    window.location.replace('pages/login.html');
                     return;
                 }
 
@@ -287,7 +287,7 @@
                 if (!userData) {
                     await window.firebaseAuth.signOut();
                     hideAppLoading();
-                    window.location.replace('login.html');
+                    window.location.replace('pages/login.html');
                     return;
                 }
 
@@ -398,7 +398,7 @@
             try {
                 const current = loadCurrentUser();
                 if (!current) {
-                    window.location.href = 'login.html';
+                    window.location.href = 'pages/login.html';
                     return;
                 }
                 currentUser = current;
@@ -423,7 +423,7 @@
                                 btn.className = 'px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md text-sm font-medium transition-colors';
                                 btn.style.marginRight = '6px';
                                 btn.textContent = 'Usuarios';
-                                btn.onclick = () => { window.location.href = 'admin.html'; };
+                                btn.onclick = () => { window.location.href = 'pages/admin.html'; };
                                 adminContainer.appendChild(btn);
                             }
                         }
@@ -1400,7 +1400,7 @@
                     <meta name="viewport" content="width=device-width, initial-scale=1.0">
                     <title>Factura #${inv.number}</title>
                     <base href="${baseHref}">
-                    <link rel="stylesheet" href="css/app.css">
+                    <link rel="stylesheet" href="assets/css/app.css">
                 </head>
                 <body class="pdf-preview">
                     <div class="pdf-shell">
@@ -1759,6 +1759,7 @@
 
         function logout() {
             return confirmLogout({
+                redirectUrl: 'pages/login.html',
                 confirmTitle: 'Cerrar sesion',
                 confirmText: 'Estas seguro de que deseas salir?',
                 confirmButtonText: 'Si, salir',
@@ -1777,6 +1778,6 @@
         document.getElementById('filterSelect').value = 'all';
         updateInvoiceList();
     </script>
-    <script src="js/anti-inspection.js"></script>
+    <script src="assets/js/anti-inspection.js"></script>
 </body>
 </html>

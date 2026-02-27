@@ -1374,6 +1374,7 @@
                 document.getElementById('fechaPago').value = draft.fechaPago || '';
                 document.getElementById('estado').value = draft.estado || 'pending';
                 document.getElementById('estadoManualLock').checked = !!draft.estadoManualLock;
+                syncEstadoPreviousStatus();
 
                 if (Array.isArray(draft.items) && draft.items.length > 0) {
                     const tbody = document.getElementById('itemsTableBody');
@@ -1482,6 +1483,7 @@
             document.getElementById('fechaPago').value = '';
             document.getElementById('estado').value = 'pending';
             document.getElementById('estadoManualLock').checked = false;
+            syncEstadoPreviousStatus();
             updateStatusSections('pending');
             resetItemsTable();
             calculateTotals();
@@ -1822,6 +1824,12 @@
             if (paidDateWrapper) paidDateWrapper.classList.toggle('hidden', status !== 'paid');
         }
 
+        function syncEstadoPreviousStatus() {
+            const estadoEl = document.getElementById('estado');
+            if (!estadoEl) return;
+            estadoEl.dataset.prevStatus = String(estadoEl.value || 'pending').toLowerCase();
+        }
+
         function getPaymentSummary(totalValue) {
             const total = Math.max(0, Number(totalValue) || 0);
             const abonoInput = document.getElementById('abono');
@@ -1902,6 +1910,7 @@
             }
 
             updateStatusSections(estadoEl.value);
+            syncEstadoPreviousStatus();
         }
 
         function calculateTotals() {
@@ -1973,20 +1982,72 @@
                 addError('estado', 'Estado requerido');
             }
 
+            const allowedStatuses = new Set(['dispatch', 'abono', 'saldo_actual', 'paid', 'pending', 'late']);
+            if (estado && !allowedStatuses.has(estado)) {
+                addError('estado', 'Estado inválido');
+            }
+
             const detalleDespacho = document.getElementById('detalleDespacho').value.trim();
             const fechaVencimiento = document.getElementById('fechaVencimiento').value;
             const fechaPago = document.getElementById('fechaPago').value;
+            const invoiceDateIso = `${String(anio).padStart(4, '0')}-${String(mes).padStart(2, '0')}-${String(dia).padStart(2, '0')}`;
+            const todayIso = getTodayISODate();
+
+            const isValidIsoDate = (isoDate) => {
+                if (!isoDate) return false;
+                const parsed = new Date(`${isoDate}T00:00:00`);
+                if (Number.isNaN(parsed.getTime())) return false;
+                return parsed.toISOString().slice(0, 10) === isoDate;
+            };
+
+            if (dia && mes && anio && !isValidIsoDate(invoiceDateIso)) {
+                addError('dia', 'La fecha de factura no es válida');
+                addError('mes', 'La fecha de factura no es válida');
+                addError('anio', 'La fecha de factura no es válida');
+            }
 
             if (estado === 'dispatch' && !detalleDespacho) {
                 addError('detalleDespacho', 'Detalle de Despacho requerido para estado Despacho');
+            }
+
+            if (estado === 'dispatch' && detalleDespacho && detalleDespacho.length < 3) {
+                addError('detalleDespacho', 'Detalle de Despacho demasiado corto (mínimo 3 caracteres)');
             }
 
             if ((estado === 'pending' || estado === 'late') && !fechaVencimiento) {
                 addError('fechaVencimiento', 'Fecha de vencimiento requerida para estado Pendiente/Vencida');
             }
 
+            if (fechaVencimiento && !isValidIsoDate(fechaVencimiento)) {
+                addError('fechaVencimiento', 'Fecha de vencimiento inválida');
+            }
+
             if (estado === 'paid' && !fechaPago) {
                 addError('fechaPago', 'Fecha de pago requerida para estado Pagada');
+            }
+
+            if (fechaPago && !isValidIsoDate(fechaPago)) {
+                addError('fechaPago', 'Fecha de pago inválida');
+            }
+
+            if (fechaVencimiento && isValidIsoDate(invoiceDateIso) && fechaVencimiento < invoiceDateIso) {
+                addError('fechaVencimiento', 'La fecha de vencimiento no puede ser anterior a la fecha de factura');
+            }
+
+            if (fechaPago && isValidIsoDate(invoiceDateIso) && fechaPago < invoiceDateIso) {
+                addError('fechaPago', 'La fecha de pago no puede ser anterior a la fecha de factura');
+            }
+
+            if (estado !== 'paid' && fechaPago) {
+                addError('fechaPago', 'La fecha de pago solo aplica cuando el estado es Pagada');
+            }
+
+            if (estado === 'late' && fechaVencimiento && fechaVencimiento >= todayIso) {
+                addError('fechaVencimiento', 'Para estado Vencida, la fecha de vencimiento debe ser menor a hoy');
+            }
+
+            if (estado === 'pending' && fechaVencimiento && fechaVencimiento < todayIso) {
+                addError('fechaVencimiento', 'Para estado Pendiente, la fecha de vencimiento no puede ser anterior a hoy');
             }
 
             const rows = document.querySelectorAll('#itemsTableBody tr');
@@ -2032,11 +2093,24 @@
 
             const totalValue = parseFloat(document.getElementById('totalAmount').textContent) || 0;
             const abonoValue = parseFloat(document.getElementById('abono').value) || 0;
+
+            if (totalValue <= 0) {
+                errors.push('El total de la factura debe ser mayor a 0');
+            }
+
             if (abonoValue < 0) {
                 addError('abono', 'El abono no puede ser negativo');
             }
             if (abonoValue > totalValue) {
                 addError('abono', 'El abono no puede ser mayor al total de la factura');
+            }
+
+            if (estado === 'abono' && abonoValue <= 0) {
+                addError('abono', 'Para estado Abono, el abono debe ser mayor a 0');
+            }
+
+            if (estado === 'saldo_actual' && (abonoValue <= 0 || abonoValue >= totalValue)) {
+                addError('abono', 'Para estado Saldo Actual, el abono debe ser mayor a 0 y menor al total');
             }
 
             if (errors.length) {
@@ -2964,6 +3038,7 @@
             };
             const normalizedStatus = String(inv.status || '').toLowerCase();
             document.getElementById('estado').value = legacyToCanonicalStatus[normalizedStatus] || normalizedStatus || 'pending';
+            syncEstadoPreviousStatus();
             
             resetItemsTable();
             if (inv.items && inv.items.length > 0) {
@@ -3107,8 +3182,21 @@
         });
 
         document.getElementById('estado').addEventListener('change', function(e) {
+            const previousStatus = String(e.target.dataset.prevStatus || '').toLowerCase();
+            const nextStatus = String(e.target.value || '').toLowerCase();
+            const estadoManualLockEl = document.getElementById('estadoManualLock');
+            const abonoInputEl = document.getElementById('abono');
+
+            if (estadoManualLockEl && !estadoManualLockEl.checked && previousStatus === 'paid' && nextStatus !== 'paid') {
+                estadoManualLockEl.checked = true;
+                if (abonoInputEl) {
+                    abonoInputEl.value = '0.00';
+                }
+            }
+
             updateStatusSections(e.target.value);
             calculateTotals();
+            syncEstadoPreviousStatus();
         });
 
         document.getElementById('estadoManualLock').addEventListener('change', function() {

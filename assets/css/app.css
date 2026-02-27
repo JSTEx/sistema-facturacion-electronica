@@ -223,6 +223,8 @@ body.page-index .invoice-footer-signature {
 }
 
 body.pdf-preview {
+    --pdf-preview-scale: 0.62;
+    --pdf-print-scale: 0.62;
     font-family: 'Inter', sans-serif;
     margin: 0;
     padding: 24px;
@@ -537,7 +539,8 @@ body.pdf-preview .pdf-legacy-foot {
 body.pdf-preview .pdf-copies {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 8px;
+    grid-template-rows: auto auto;
+    gap: 6px;
     width: 100%;
     position: relative;
 }
@@ -548,6 +551,7 @@ body.pdf-preview .pdf-copy-slot {
 }
 
 body.pdf-preview .pdf-copy-slot:nth-child(3) {
+    grid-column: 1 / -1;
     overflow: visible;
     display: flex;
     justify-content: flex-start;
@@ -555,15 +559,17 @@ body.pdf-preview .pdf-copy-slot:nth-child(3) {
 }
 
 body.pdf-preview .pdf-copy-slot:nth-child(3) .pdf-copy {
-    transform-origin: top left;
-    width: 230%;
-    transform: rotate(-90deg) translateX(-100%);
+    width: 100%;
+    transform: none;
 }
 
 body.pdf-preview .pdf-fit-area {
     width: 100%;
     overflow: visible;
-    zoom: var(--pdf-scale, 1);
+    zoom: 1;
+    transform-origin: top left;
+    transform: scale(var(--pdf-preview-scale));
+    width: calc(100% / var(--pdf-preview-scale));
     transform-origin: top left;
 }
 
@@ -715,9 +721,12 @@ body.pdf-preview .status-pending { background-color: #fef3c7; color: #92400e; bo
     body.pdf-preview .pdf-actions { display: none; }
 
     body.pdf-preview .pdf-fit-area {
-        overflow: hidden;
+        overflow: visible;
         margin: 0;
         padding: 0;
+        transform: scale(var(--pdf-print-scale));
+        transform-origin: top left;
+        width: calc(100% / var(--pdf-print-scale));
     }
 
     body.pdf-preview .pdf-card {
@@ -730,6 +739,7 @@ body.pdf-preview .status-pending { background-color: #fef3c7; color: #92400e; bo
     body.pdf-preview .pdf-copies {
         display: grid;
         grid-template-columns: repeat(2, minmax(0, 1fr));
+        grid-template-rows: auto auto;
         gap: 0;
         overflow: hidden;
         page-break-after: avoid;
@@ -753,6 +763,7 @@ body.pdf-preview .status-pending { background-color: #fef3c7; color: #92400e; bo
     }
 
     body.pdf-preview .pdf-copy-slot:nth-child(3) {
+        grid-column: 1 / -1;
         border-right: none;
         padding: 6px;
         overflow: visible;
@@ -762,9 +773,8 @@ body.pdf-preview .status-pending { background-color: #fef3c7; color: #92400e; bo
     }
 
     body.pdf-preview .pdf-copy-slot:nth-child(3) .pdf-copy {
-        transform-origin: top left;
-        width: 230%;
-        transform: rotate(-90deg) translateX(-100%);
+        width: 100%;
+        transform: none;
     }
 
     body.pdf-preview .pdf-cut-line {

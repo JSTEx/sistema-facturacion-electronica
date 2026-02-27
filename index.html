@@ -2952,52 +2952,7 @@
                     </div>
                     </div>
                     <script>
-                        (function () {
-                            const MIN_SCALE = 0.1;
-                            const MAX_SCALE = 1.03;
-
-                            function autoFitInvoices() {
-                                const copies = document.getElementById('pdfCopies');
-                                if (!copies) return;
-
-                                const windowHeight = window.innerHeight || document.documentElement.clientHeight;
-                                const actions = document.querySelector('.pdf-actions');
-                                const actionsVisible = actions && window.getComputedStyle(actions).display !== 'none';
-                                const actionsHeight = actionsVisible ? actions.offsetHeight : 0;
-                                const bodyStyles = window.getComputedStyle(document.body);
-                                const bodyPaddingTop = parseFloat(bodyStyles.paddingTop) || 0;
-                                const bodyPaddingBottom = parseFloat(bodyStyles.paddingBottom) || 0;
-                                const availableHeight = Math.max(1, windowHeight - actionsHeight - bodyPaddingTop - bodyPaddingBottom - 4);
-
-                                const rawHeight = copies.scrollHeight;
-                                if (!rawHeight) return;
-                                const scale = Math.max(MIN_SCALE, Math.min(MAX_SCALE, availableHeight / rawHeight));
-
-                                document.documentElement.style.setProperty('--pdf-scale', String(scale));
-                            }
-
-                            window.addEventListener('load', () => {
-                                autoFitInvoices();
-                                setTimeout(autoFitInvoices, 100);
-                                setTimeout(autoFitInvoices, 300);
-                            });
-
-                            window.addEventListener('resize', autoFitInvoices);
-                            window.addEventListener('beforeprint', autoFitInvoices);
-                            window.addEventListener('afterprint', autoFitInvoices);
-                            if (window.matchMedia) {
-                                const mediaQuery = window.matchMedia('print');
-                                const onPrintChange = () => autoFitInvoices();
-                                if (typeof mediaQuery.addEventListener === 'function') {
-                                    mediaQuery.addEventListener('change', onPrintChange);
-                                } else if (typeof mediaQuery.addListener === 'function') {
-                                    mediaQuery.addListener(onPrintChange);
-                                }
-                            }
-                            if (document.fonts && document.fonts.ready) {
-                                document.fonts.ready.then(autoFitInvoices).catch(() => {});
-                            }
-                        })();
+                        document.documentElement.style.setProperty('--pdf-scale', '1');
                     <\/script>
                 </body>
                 </html>

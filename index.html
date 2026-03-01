@@ -1517,10 +1517,10 @@
             document.getElementById('detalleDespacho').value = '';
             document.getElementById('fechaVencimiento').value = '';
             document.getElementById('fechaPago').value = '';
-            document.getElementById('estado').value = 'pending';
+            document.getElementById('estado').value = 'dispatch';
             document.getElementById('estadoManualLock').checked = false;
             syncEstadoPreviousStatus();
-            updateStatusSections('pending');
+            updateStatusSections('dispatch');
             resetItemsTable();
             calculateTotals();
             restoreDraftIfExists();

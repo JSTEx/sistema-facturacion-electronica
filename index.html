@@ -507,6 +507,8 @@
         }
 
         function maybeNotifyBackupReminder(force = false) {
+            if (!(currentUser && currentUser.role === 'admin')) return;
+
             const now = Date.now();
             const last = Number(localStorage.getItem(BACKUP_REMINDER_LAST_KEY) || 0);
             if (!force && now - last < BACKUP_REMINDER_INTERVAL_MS) return;

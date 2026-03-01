@@ -2848,7 +2848,7 @@
                 : 'Oculto';
             const invoiceNumber = String(inv.number || '').padStart(5, '0');
             const items = Array.isArray(inv.items) ? inv.items : [];
-            const minRows = 12;
+            const minRows = 14;
 
             const itemsRows = items.map(item => {
                 const qty = Number(item.cant || 0);

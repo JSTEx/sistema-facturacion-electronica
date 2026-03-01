@@ -482,15 +482,15 @@ body.pdf-preview .pdf-legacy-cell-right { text-align: right; }
 
 body.pdf-preview .pdf-legacy-bottom {
     display: grid;
-    grid-template-columns: 1fr 225px;
+    grid-template-columns: 2fr 225px;
     gap: 6px;
-    margin-top: 5px;
+    margin-top: 0px;
 }
 
 body.pdf-preview .pdf-legacy-son {
     border: 1px solid #64748b;
-    min-height: 82px;
-    padding: 4px;
+    min-height: 92px;
+    padding: 0px;
     font-size: 8px;
 }
 
@@ -544,8 +544,7 @@ body.pdf-preview .pdf-copies {
     gap: var(--pdf-copies-gap);
     width: 100%;
     position: relative;
-    min-height: calc(var(--pdf-page-height) / var(--pdf-preview-scale));
-    align-content: space-between;
+    align-content: start;
 }
 
 body.pdf-preview .pdf-copy-slot {
@@ -568,7 +567,6 @@ body.pdf-preview .pdf-copy-slot:nth-child(3) .pdf-copy {
 body.pdf-preview .pdf-fit-area {
     width: 100%;
     overflow: visible;
-    min-height: calc(var(--pdf-page-height) / var(--pdf-preview-scale));
     zoom: var(--pdf-preview-scale);
     transform-origin: top left;
 }
@@ -724,8 +722,6 @@ body.pdf-preview .status-pending { background-color: #fef3c7; color: #92400e; bo
         overflow: visible;
         margin: 0;
         padding: 0;
-        height: calc(var(--pdf-page-height) / var(--pdf-print-scale));
-        min-height: calc(var(--pdf-page-height) / var(--pdf-print-scale));
         zoom: var(--pdf-print-scale) !important;
     }
 
@@ -742,8 +738,7 @@ body.pdf-preview .status-pending { background-color: #fef3c7; color: #92400e; bo
         gap: 1px;
         overflow: hidden;
         page-break-after: avoid;
-        min-height: calc(var(--pdf-page-height) / var(--pdf-print-scale));
-        align-content: space-between;
+        align-content: start;
     }
 
     body.pdf-preview .pdf-copy-slot {

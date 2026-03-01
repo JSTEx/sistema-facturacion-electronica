@@ -1449,7 +1449,7 @@
                 syncAllItemDescHeights();
                 updateStatusSections(document.getElementById('estado').value);
                 calculateTotals();
-                showToast('Borrador restaurado', 'info', 1600, 'top-end', { toastType: 'success' });
+                showToast('Borrador restaurado', 'info', 2500, 'top-end', { toastType: 'success' });
             } catch (error) {
                 console.warn('No se pudo restaurar el borrador:', error);
                 localStorage.removeItem(INVOICE_DRAFT_KEY);

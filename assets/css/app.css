@@ -223,8 +223,9 @@ body.page-index .invoice-footer-signature {
 }
 
 body.pdf-preview {
-    --pdf-preview-scale: 0.48;
-    --pdf-print-scale: 0.48;
+    --pdf-preview-scale: 0.78;
+    --pdf-print-scale: 0.82;
+    --pdf-copies-gap: 8px;
     font-family: 'Inter', sans-serif;
     margin: 0;
     padding: 24px;
@@ -539,22 +540,25 @@ body.pdf-preview .pdf-legacy-foot {
 body.pdf-preview .pdf-copies {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 6px;
+    gap: var(--pdf-copies-gap);
     width: 100%;
     position: relative;
 }
 
 body.pdf-preview .pdf-copy-slot {
     display: flex;
+    align-items: stretch;
     height: fit-content;
 }
 
 body.pdf-preview .pdf-copy-slot:nth-child(3) {
     grid-column: 1 / -1;
+    justify-content: center;
 }
 
 body.pdf-preview .pdf-copy-slot:nth-child(3) .pdf-copy {
     width: 100%;
+    max-width: calc((100% - var(--pdf-copies-gap)) / 2);
     transform: none;
 }
 
@@ -729,7 +733,7 @@ body.pdf-preview .status-pending { background-color: #fef3c7; color: #92400e; bo
     body.pdf-preview .pdf-copies {
         display: grid;
         grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 0;
+        gap: 2px;
         overflow: hidden;
         page-break-after: avoid;
     }
@@ -755,10 +759,12 @@ body.pdf-preview .status-pending { background-color: #fef3c7; color: #92400e; bo
         grid-column: 1 / -1;
         border-right: none;
         padding: 6px;
+        justify-content: center;
     }
 
     body.pdf-preview .pdf-copy-slot:nth-child(3) .pdf-copy {
         width: 100%;
+        max-width: calc((100% - 2px) / 2);
         transform: none;
     }
 

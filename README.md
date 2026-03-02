@@ -30,12 +30,7 @@ Web app for invoice management with Firebase authentication and an admin user pa
 │   ├── js/
 │   │   ├── anti-inspection.js
 │   │   ├── admin/
-│   │   │   ├── auth.js
-│   │   │   ├── config.js
-│   │   │   ├── data.js
-│   │   │   ├── users-dialogs.js
-│   │   │   ├── users-events.js
-│   │   │   └── users-table-render.js
+│   │   │   └── main.js
 │   │   ├── core/
 │   │   │   ├── firebase-utils.js
 │   │   │   ├── list-utils.js
@@ -105,13 +100,8 @@ flowchart TD
     C6 --> Z1[assets/js/anti-inspection.js]
 
     B --> D[pages/admin.html]
-    D --> D1[assets/js/admin/config.js]
-    D1 --> D2[assets/js/admin/data.js]
-    D2 --> D3[assets/js/admin/auth.js]
-    D3 --> D4[assets/js/admin/users-table-render.js]
-    D4 --> D5[assets/js/admin/users-dialogs.js]
-    D5 --> D6[assets/js/admin/users-events.js]
-    D6 --> Z2[assets/js/anti-inspection.js]
+    D --> D1[assets/js/admin/main.js]
+    D1 --> Z2[assets/js/anti-inspection.js]
 
     B --> E[pages/login.html]
     E --> E1[assets/js/login/config.js]

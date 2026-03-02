@@ -6,7 +6,7 @@ Este documento define cómo organizar el JavaScript del proyecto para mantener u
 
 - `assets/js/core/` → utilidades globales reutilizables en varias páginas.
 - `assets/js/index/` → lógica específica de `index.html`.
-- `assets/js/admin/` → lógica específica de `pages/admin.html`.
+- `assets/js/admin/` → lógica específica de `pages/admin.html` (actualmente estable en `main.js`).
 - `assets/js/login/` → lógica específica de `pages/login.html`.
 
 ## 2) Regla principal
@@ -14,6 +14,7 @@ Este documento define cómo organizar el JavaScript del proyecto para mantener u
 Separar por **funcionalidad**, no por tamaño arbitrario.
 
 Ejemplos:
+
 - autenticación / permisos
 - estado y datos
 - render de tabla/listado
@@ -30,9 +31,7 @@ Usar nombres descriptivos con guiones:
 - `invoices-form-and-validation.js`
 - `invoices-list-and-pagination.js`
 - `invoices-actions-and-events.js`
-- `users-table-render.js`
-- `users-dialogs.js`
-- `users-events.js`
+- `main.js` (excepción temporal para `admin`, por estabilidad)
 
 ## 4) Orden de carga en HTML
 
@@ -45,11 +44,14 @@ La carga debe respetar dependencias:
 
 Si un módulo usa funciones/variables globales de otro, debe cargarse después.
 
+Nota: en el panel de administración (`pages/admin.html`) se mantiene `assets/js/admin/main.js` como fuente única estable para evitar regresiones de carga.
+
 ## 5) Estado global (window)
 
 Cuando sea necesario compartir estado entre módulos, usar un único objeto global por página.
 
 Ejemplos:
+
 - `window.adminState`
 - `window.adminData`
 

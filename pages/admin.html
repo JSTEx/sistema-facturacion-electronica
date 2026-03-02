@@ -170,7 +170,14 @@
         </div>
     </main>
 
-    <script src="../assets/js/admin/main.js"></script>
+    <script src="../assets/js/admin/main.js?v=20260301d"></script>
+    <script>
+        setTimeout(function () {
+            var overlay = document.getElementById('appLoading');
+            if (!overlay) return;
+            overlay.classList.add('app-loading-hidden');
+        }, 12000);
+    </script>
     <script src="../assets/js/anti-inspection.js"></script>
 </body>
 </html>

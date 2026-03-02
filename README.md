@@ -10,13 +10,6 @@ Web app for invoice management with Firebase authentication and an admin user pa
 - Login: [https://jstex.github.io/sistema-facturacion-electronica/pages/login.html](https://jstex.github.io/sistema-facturacion-electronica/pages/login.html)
 - Admin: [https://jstex.github.io/sistema-facturacion-electronica/pages/admin.html](https://jstex.github.io/sistema-facturacion-electronica/pages/admin.html)
 
-## Licencia / License
-
-- Este proyecto está publicado bajo **GNU General Public License v2.0** (GPL-2.0-only).
-- This project is distributed under **GNU General Public License v2.0** (GPL-2.0-only).
-- Ver texto completo en `LICENSE`.
-- Resumen práctico en `docs/LICENCIA_RESUMEN.md`.
-
 ## Estructura del proyecto / Project Structure
 
 ```text

@@ -22,32 +22,8 @@ Web app for invoice management with Firebase authentication and an admin user pa
 │   │   └── app.css
 │   ├── js/
 │   │   ├── anti-inspection.js
-│   │   ├── admin/
-│   │   │   ├── auth.js
-│   │   │   ├── config.js
-│   │   │   ├── data.js
-│   │   │   ├── users-dialogs.js
-│   │   │   ├── users-events.js
-│   │   │   └── users-table-render.js
-│   │   ├── core/
-│   │   │   ├── firebase-utils.js
-│   │   │   ├── list-utils.js
-│   │   │   ├── loading-utils.js
-│   │   │   ├── password-utils.js
-│   │   │   ├── session-utils.js
-│   │   │   ├── status-utils.js
-│   │   │   ├── theme-utils.js
-│   │   │   └── toast-utils.js
-│   │   ├── index/
-│   │   │   ├── access-control-auth.js
-│   │   │   ├── backup-and-shared-utils.js
-│   │   │   ├── invoices-actions-and-events.js
-│   │   │   ├── invoices-form-and-validation.js
-│   │   │   ├── invoices-list-and-pagination.js
-│   │   │   └── invoices-store-and-draft.js
-│   │   └── login/
-│   │       ├── auth.js
-│   │       └── config.js
+│   │   ├── app-utils.js
+│   │   └── ui-utils.js
 │   └── external/
 │       ├── files/
 │       ├── images/
@@ -55,7 +31,6 @@ Web app for invoice management with Firebase authentication and an admin user pa
 ├── config/
 │   └── firebase-inicial.json
 ├── docs/
-│   ├── CONVENCION_MODULOS_JS.md
 │   └── INSTRUCCIONES_FIREBASE.md
 ├── pages/
 │   ├── admin.html
@@ -72,45 +47,6 @@ Web app for invoice management with Firebase authentication and an admin user pa
 - Para recursos multimedia nuevos, usa `assets/external/`.
 - For new media resources, use `assets/external/`.
 - Documentación Firebase / Firebase docs: `docs/INSTRUCCIONES_FIREBASE.md`.
-- Convención de módulos JS / JS module conventions: `docs/CONVENCION_MODULOS_JS.md`.
-
-## Reglas rápidas de módulos JS / Quick JS module rules
-
-1. Separar por **funcionalidad** (auth, render, eventos, validación, backup), no por tamaño arbitrario.
-2. Cargar scripts en orden de dependencia: librerías externas → `assets/js/core/*` → módulos de página.
-3. Usar nombres descriptivos con guiones (ejemplo: `invoices-form-and-validation.js`).
-4. Evitar scripts inline grandes en HTML; mover lógica a `assets/js/<pagina>/`.
-5. Cuando haya estado compartido, centralizarlo en un objeto global por página (ejemplo: `window.adminState`).
-
-### Flujo de carga de scripts (Mermaid)
-
-```mermaid
-flowchart TD
-    A[Librerías externas<br/>Tailwind / SweetAlert / Anime / Firebase] --> B[assets/js/core/*]
-
-    B --> C[index.html]
-    C --> C1[assets/js/index/backup-and-shared-utils.js]
-    C1 --> C2[assets/js/index/invoices-store-and-draft.js]
-    C2 --> C3[assets/js/index/invoices-form-and-validation.js]
-    C3 --> C4[assets/js/index/access-control-auth.js]
-    C4 --> C5[assets/js/index/invoices-list-and-pagination.js]
-    C5 --> C6[assets/js/index/invoices-actions-and-events.js]
-    C6 --> Z1[assets/js/anti-inspection.js]
-
-    B --> D[pages/admin.html]
-    D --> D1[assets/js/admin/config.js]
-    D1 --> D2[assets/js/admin/data.js]
-    D2 --> D3[assets/js/admin/auth.js]
-    D3 --> D4[assets/js/admin/users-table-render.js]
-    D4 --> D5[assets/js/admin/users-dialogs.js]
-    D5 --> D6[assets/js/admin/users-events.js]
-    D6 --> Z2[assets/js/anti-inspection.js]
-
-    B --> E[pages/login.html]
-    E --> E1[assets/js/login/config.js]
-    E1 --> E2[assets/js/login/auth.js]
-    E2 --> Z3[assets/js/anti-inspection.js]
-```
 
 ## Ejecutar localmente / Run Locally
 

@@ -1,8 +1,32 @@
-﻿        function updateInvoiceList() {
+﻿        function renderInvoiceSkeletonList(count = 6) {
+            const listContainer = document.getElementById('invoiceList');
+            const emptyState = document.getElementById('emptyState');
+            const paginationContainer = document.getElementById('paginationContainer');
+            const totalCount = document.getElementById('totalCount');
+            if (!listContainer || !emptyState || !paginationContainer) return;
+
+            if (totalCount) totalCount.textContent = 'Cargando...';
+            emptyState.classList.add('hidden');
+            paginationContainer.classList.add('hidden');
+            listContainer.classList.remove('hidden');
+            listContainer.classList.add('invoice-skeleton-grid');
+            listContainer.innerHTML = window.createSkeletonCards
+                ? window.createSkeletonCards({ count })
+                : Array.from({ length: count }).map(() => '<div class="invoice-skeleton-card"><div class="skeleton-line"></div></div>').join('');
+        }
+
+        function updateInvoiceList() {
             const listContainer = document.getElementById('invoiceList');
             const emptyState = document.getElementById('emptyState');
             const totalCount = document.getElementById('totalCount');
             const paginationContainer = document.getElementById('paginationContainer');
+
+            if (window.__invoiceDataLoading === true) {
+                renderInvoiceSkeletonList(6);
+                return;
+            }
+
+            if (listContainer) listContainer.classList.remove('invoice-skeleton-grid');
             
             const visible = filterInvoicesByVisibility(invoices);
             let filtered = filterInvoicesByStatus(visible, currentFilter);

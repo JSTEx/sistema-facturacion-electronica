@@ -166,13 +166,21 @@ function countAdmins(list) {
 let currentPage = 1;
 let pageSize = 10;
 let currentFilter = '';
+let usersSkeletonPending = true;
 
 async function renderUsers() {
     const tbody = document.getElementById('usersBody');
     if (!tbody) return;
 
     try {
+        if (usersSkeletonPending) {
+            tbody.innerHTML = window.createSkeletonRows
+                ? window.createSkeletonRows({ count: 5, columns: 4 })
+                : '<tr><td colspan="4" class="p-3 text-center muted-text">Cargando usuarios...</td></tr>';
+        }
+
         const allUsers = await loadUsers();
+        usersSkeletonPending = false;
         const current = JSON.parse(localStorage.getItem('currentUser') || 'null');
 
         const filter = String(currentFilter || '').toLowerCase();

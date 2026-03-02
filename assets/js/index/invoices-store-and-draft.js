@@ -217,19 +217,21 @@
             if (invoicesInitialized) return;
             invoicesInitialized = true;
 
-            showAppLoading('Cargando facturas...');
+            window.__invoiceDataLoading = true;
+            hideAppLoading();
+            updateInvoiceList();
 
             try {
                 invoices = await loadInvoicesWithRetry();
+                window.__invoiceDataLoading = false;
                 updateInvoiceList();
                 maybeNotifyBackupReminder();
-                hideAppLoading();
             } catch (error) {
                 console.error('No se pudieron cargar facturas al iniciar:', error);
                 invoices = [];
+                window.__invoiceDataLoading = false;
                 updateInvoiceList();
                 maybeNotifyBackupReminder();
-                hideAppLoading();
             }
 
             const subscribe = () => {

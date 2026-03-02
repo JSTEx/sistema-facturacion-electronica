@@ -24,6 +24,7 @@ Web app for invoice management with Firebase authentication and an admin user pa
 ├── index.html
 ├── LICENSE
 ├── README.md
+├── sw.js
 ├── assets/
 │   ├── css/
 │   │   └── app.css
@@ -36,8 +37,10 @@ Web app for invoice management with Firebase authentication and an admin user pa
 │   │   │   ├── list-utils.js
 │   │   │   ├── loading-utils.js
 │   │   │   ├── password-utils.js
+│   │   │   ├── performance-utils.js
 │   │   │   ├── session-utils.js
 │   │   │   ├── status-utils.js
+│   │   │   ├── sw-register.js
 │   │   │   ├── theme-utils.js
 │   │   │   └── toast-utils.js
 │   │   ├── index/
@@ -83,6 +86,13 @@ Web app for invoice management with Firebase authentication and an admin user pa
 3. Usar nombres descriptivos con guiones (ejemplo: `invoices-form-and-validation.js`).
 4. Evitar scripts inline grandes en HTML; mover lógica a `assets/js/<pagina>/`.
 5. Cuando haya estado compartido, centralizarlo en un objeto global por página (ejemplo: `window.adminState`).
+
+## Rendimiento / Performance
+
+- Skeleton screens activos en listados de facturas y usuarios durante carga inicial.
+- Lazy loading listo para multimedia diferida (`data-src`, `data-srcset`, `data-poster`, `data-bg-src`) en `assets/js/core/performance-utils.js`.
+- Caché de navegador con Service Worker (`sw.js`) y registro automático en `assets/js/core/sw-register.js`.
+- Recomendación para recursos pesados: convertir imágenes a WebP y evitar widgets/scripts no esenciales.
 
 ### Flujo de carga de scripts (Mermaid)
 

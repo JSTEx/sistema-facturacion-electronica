@@ -1,8 +1,59 @@
 async function logAction(action, target) {
     const admin = JSON.parse(localStorage.getItem('currentUser') || 'null');
-    const audits = await getFirebaseData('adminAudit') || [];
+    const rawAudits = await getFirebaseData('adminAudit');
+    const audits = Array.isArray(rawAudits)
+        ? [...rawAudits]
+        : (rawAudits && typeof rawAudits === 'object' ? Object.values(rawAudits).filter(Boolean) : []);
     audits.push({ time: new Date().toISOString(), admin: admin ? admin.email : null, action, target });
     await setFirebaseData('adminAudit', audits);
+}
+
+function isLikelyUserRecord(value) {
+    if (!value || typeof value !== 'object') return false;
+    const hasEmail = ['email', 'userEmail', 'mail', 'correo'].some((key) => {
+        const candidate = value[key];
+        return candidate !== undefined && candidate !== null && String(candidate).trim() !== '';
+    });
+    const hasNestedEmail = ['profile', 'user', 'data', 'info', 'usuario'].some((key) => {
+        const nested = value[key];
+        if (!nested || typeof nested !== 'object') return false;
+        return ['email', 'userEmail', 'mail', 'correo'].some((emailKey) => {
+            const candidate = nested[emailKey];
+            return candidate !== undefined && candidate !== null && String(candidate).trim() !== '';
+        });
+    });
+    return hasEmail || hasNestedEmail;
+}
+
+function extractUserRecords(rawUsers, depth = 0) {
+    if (depth > 4 || rawUsers === null || rawUsers === undefined) return [];
+
+    if (Array.isArray(rawUsers)) {
+        return rawUsers.flatMap((item) => extractUserRecords(item, depth + 1));
+    }
+
+    if (typeof rawUsers !== 'object') {
+        return [];
+    }
+
+    if (isLikelyUserRecord(rawUsers)) {
+        return [rawUsers];
+    }
+
+    const containerKeys = ['users', 'usuarios', 'Usuarios', 'Users', 'items', 'list', 'data', 'records'];
+    const collected = [];
+
+    containerKeys.forEach((key) => {
+        if (rawUsers[key] !== undefined) {
+            collected.push(...extractUserRecords(rawUsers[key], depth + 1));
+        }
+    });
+
+    if (collected.length > 0) {
+        return collected;
+    }
+
+    return Object.values(rawUsers).flatMap((value) => extractUserRecords(value, depth + 1));
 }
 
 function pickFirstString(candidates, keys) {
@@ -65,11 +116,15 @@ function normalizeSingleUser(record) {
 
 async function readUsersFromKnownPaths() {
     const paths = ['users', 'usuarios', 'Usuarios', 'Users'];
+    let best = { path: null, value: null, count: -1 };
 
     for (const path of paths) {
         const fromWrapper = await getFirebaseData(path);
         if (fromWrapper && (Array.isArray(fromWrapper) || typeof fromWrapper === 'object')) {
-            return fromWrapper;
+            const count = extractUserRecords(fromWrapper).length;
+            if (count > best.count) {
+                best = { path, value: fromWrapper, count };
+            }
         }
     }
 
@@ -80,7 +135,10 @@ async function readUsersFromKnownPaths() {
                 if (snapshot.exists()) {
                     const value = snapshot.val();
                     if (value && (Array.isArray(value) || typeof value === 'object')) {
-                        return value;
+                        const count = extractUserRecords(value).length;
+                        if (count > best.count) {
+                            best = { path, value, count };
+                        }
                     }
                 }
             } catch (error) {
@@ -89,12 +147,15 @@ async function readUsersFromKnownPaths() {
         }
     }
 
-    return null;
+    window.adminUsersPath = best.path || 'users';
+    return best.value;
 }
 
 async function loadUsers() {
     const rawUsers = await readUsersFromKnownPaths();
-    const users = normalizeUsers(rawUsers)
+    const extracted = extractUserRecords(rawUsers);
+    const source = extracted.length > 0 ? extracted : normalizeUsers(rawUsers);
+    const users = source
         .map((record) => normalizeSingleUser(record))
         .filter(Boolean);
 
@@ -107,7 +168,8 @@ async function loadUsers() {
 }
 
 async function saveUsers(list) {
-    await setFirebaseData('users', list);
+    const targetPath = window.adminUsersPath || 'users';
+    await setFirebaseData(targetPath, list);
 }
 
 function countAdmins(list) {

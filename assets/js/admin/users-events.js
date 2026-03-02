@@ -1,4 +1,10 @@
-﻿function bindAdminEvents() {
+﻿async function refreshUsersTable() {
+    if (typeof window.render === 'function') {
+        await window.render();
+    }
+}
+
+function bindAdminEvents() {
     const state = window.adminState;
 
     document.getElementById('userForm').addEventListener('submit', async function (e) {
@@ -34,7 +40,7 @@
             this.reset();
             await logAction('create', email);
             showToast('Usuario creado en Firebase Auth', 'success', 1400);
-            await render();
+            await refreshUsersTable();
         } catch (error) {
             console.error('Error creando usuario:', error);
             if (error.code === 'auth/email-already-in-use') {
@@ -75,7 +81,7 @@
                 if (!valid) throw new Error('Formato incorrecto');
                 await setFirebaseData('users', imported);
                 showToast('Usuarios importados', 'success', 1200);
-                await render();
+                await refreshUsersTable();
             } catch (err) {
                 Swal.fire({ icon: 'error', title: 'Error', text: err.message || 'Archivo inválido' });
             }
@@ -86,25 +92,25 @@
     document.getElementById('userSearch').addEventListener('input', function (e) {
         state.currentFilter = e.target.value;
         state.currentPage = 1;
-        render();
+        refreshUsersTable();
     });
 
     document.getElementById('pageSize').addEventListener('change', function (e) {
         state.pageSize = parseInt(e.target.value);
         state.currentPage = 1;
-        render();
+        refreshUsersTable();
     });
 
     document.getElementById('prevPage').addEventListener('click', function () {
         if (state.currentPage > 1) {
             state.currentPage--;
-            render();
+            refreshUsersTable();
         }
     });
 
     document.getElementById('nextPage').addEventListener('click', function () {
         state.currentPage++;
-        render();
+        refreshUsersTable();
     });
 }
 
@@ -114,10 +120,7 @@ async function waitForAdminSessionReady(options = {}) {
 
     for (let attempt = 0; attempt < maxAttempts; attempt++) {
         const firebaseUserReady = !!(window.firebaseAuth && window.firebaseAuth.currentUser);
-        const localUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
-        const hasAdminLocalState = !!(localUser && localUser.email && String(localUser.role || '').toLowerCase() === 'admin');
-
-        if (firebaseUserReady || hasAdminLocalState) return true;
+        if (firebaseUserReady) return true;
         await new Promise((resolve) => setTimeout(resolve, intervalMs));
     }
 
@@ -128,9 +131,12 @@ function startUsersRealtimeSubscription() {
     if (window.__adminUsersRealtimeBound) return;
     if (!window.firebaseRef || !window.firebaseDB || !window.firebaseOnValue) return;
 
-    const usersRef = window.firebaseRef(window.firebaseDB, 'users');
-    window.firebaseOnValue(usersRef, () => {
-        render();
+    const subscribedPaths = ['users', 'usuarios', 'Users', 'Usuarios'];
+    subscribedPaths.forEach((path) => {
+        const usersRef = window.firebaseRef(window.firebaseDB, path);
+        window.firebaseOnValue(usersRef, () => {
+            refreshUsersTable();
+        });
     });
 
     window.__adminUsersRealtimeBound = true;
@@ -154,15 +160,15 @@ document.addEventListener('DOMContentLoaded', async function () {
         return;
     }
 
-    await waitForAdminSessionReady();
-    await render();
-    startUsersRealtimeSubscription();
+    const authReady = await waitForAdminSessionReady({ maxAttempts: 220, intervalMs: 50 });
+    if (authReady) {
+        await refreshUsersTable();
+        startUsersRealtimeSubscription();
+    }
 });
 
 window.addEventListener('admin-auth-ready', async function () {
-    await render();
+    await refreshUsersTable();
     startUsersRealtimeSubscription();
 });
-
-window.render = render;
 window.openEditDialog = openEditDialog;

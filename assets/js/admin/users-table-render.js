@@ -1,44 +1,45 @@
 ﻿const { logAction, loadUsers, saveUsers, countAdmins } = window.adminData;
 
 async function render() {
-    const state = window.adminState;
-    const allUsers = await loadUsers();
     const tbody = document.getElementById('usersBody');
     if (!tbody) return;
-    const current = JSON.parse(localStorage.getItem('currentUser') || 'null');
+    try {
+        const state = window.adminState;
+        const allUsers = await loadUsers();
+        const current = JSON.parse(localStorage.getItem('currentUser') || 'null');
 
-    const filter = (state.currentFilter || '').toLowerCase();
-    const filtered = allUsers.filter((u) => String(u?.email || '').toLowerCase().includes(filter));
+        const filter = (state.currentFilter || '').toLowerCase();
+        const filtered = allUsers.filter((u) => String(u?.email || '').toLowerCase().includes(filter));
 
-    state.pageSize = parseInt(document.getElementById('pageSize').value || '10');
-    const totalPages = Math.max(1, Math.ceil(filtered.length / state.pageSize));
-    if (state.currentPage > totalPages) state.currentPage = totalPages;
+        state.pageSize = parseInt(document.getElementById('pageSize').value || '10');
+        const totalPages = Math.max(1, Math.ceil(filtered.length / state.pageSize));
+        if (state.currentPage > totalPages) state.currentPage = totalPages;
 
-    const start = (state.currentPage - 1) * state.pageSize;
-    const pageItems = filtered.slice(start, start + state.pageSize);
+        const start = (state.currentPage - 1) * state.pageSize;
+        const pageItems = filtered.slice(start, start + state.pageSize);
 
-    tbody.innerHTML = '';
-    if (pageItems.length === 0) {
-        const emptyRow = document.createElement('tr');
-        emptyRow.innerHTML = '<td colspan="4" class="p-3 text-center muted-text">No hay usuarios para mostrar.</td>';
-        tbody.appendChild(emptyRow);
-    }
+        tbody.innerHTML = '';
+        if (pageItems.length === 0) {
+            const emptyRow = document.createElement('tr');
+            emptyRow.innerHTML = '<td colspan="4" class="p-3 text-center muted-text">No hay usuarios para mostrar.</td>';
+            tbody.appendChild(emptyRow);
+        }
 
-    pageItems.forEach((u, idx) => {
-        const globalIndex = allUsers.indexOf(u);
-        const userEmail = String(u?.email || '');
-        const userRole = String(u?.role || '');
-        const isCurrent = current && current.email && (userEmail.toLowerCase() === String(current.email).toLowerCase());
-        const rowNumber = start + idx + 1;
-        const descriptionIndicator = u.description ? ` <span class="admin-description-indicator text-xs" title="${u.description}">📝</span>` : '';
-        const tr = document.createElement('tr');
-        tr.innerHTML = `<td class="admin-row-number p-2 text-center font-semibold">${rowNumber}</td><td class="p-2">${userEmail}${descriptionIndicator}${isCurrent ? ' <span class="text-xs muted-text">(Cuenta actual)</span>' : ''}</td><td class="p-2 text-center">${userRole}</td><td class="p-2 text-center">${isCurrent ? '<span class="text-xs muted-text">-</span>' : `<button data-index="${globalIndex}" class="editBtn px-2 py-1 bg-blue-500 text-white rounded mr-2">Editar</button><button data-index="${globalIndex}" class="delBtn px-2 py-1 bg-red-500 text-white rounded">Eliminar</button>`}</td>`;
-        tbody.appendChild(tr);
-    });
+        pageItems.forEach((u, idx) => {
+            const globalIndex = allUsers.indexOf(u);
+            const userEmail = String(u?.email || '');
+            const userRole = String(u?.role || '');
+            const isCurrent = current && current.email && (userEmail.toLowerCase() === String(current.email).toLowerCase());
+            const rowNumber = start + idx + 1;
+            const descriptionIndicator = u.description ? ` <span class="admin-description-indicator text-xs" title="${u.description}">📝</span>` : '';
+            const tr = document.createElement('tr');
+            tr.innerHTML = `<td class="admin-row-number p-2 text-center font-semibold">${rowNumber}</td><td class="p-2">${userEmail}${descriptionIndicator}${isCurrent ? ' <span class="text-xs muted-text">(Cuenta actual)</span>' : ''}</td><td class="p-2 text-center">${userRole}</td><td class="p-2 text-center">${isCurrent ? '<span class="text-xs muted-text">-</span>' : `<button data-index="${globalIndex}" class="editBtn px-2 py-1 bg-blue-500 text-white rounded mr-2">Editar</button><button data-index="${globalIndex}" class="delBtn px-2 py-1 bg-red-500 text-white rounded">Eliminar</button>`}</td>`;
+            tbody.appendChild(tr);
+        });
 
-    document.getElementById('currentPage').textContent = state.currentPage;
+        document.getElementById('currentPage').textContent = state.currentPage;
 
-    document.querySelectorAll('.delBtn').forEach(b => b.addEventListener('click', async function () {
+        document.querySelectorAll('.delBtn').forEach(b => b.addEventListener('click', async function () {
         const idx = parseInt(this.getAttribute('data-index'));
         const users = await loadUsers();
         const target = users[idx];
@@ -132,11 +133,17 @@ async function render() {
                 }
             }
         });
-    }));
+        }));
 
-    document.querySelectorAll('.editBtn').forEach(b => b.addEventListener('click', function () {
-        const idx = parseInt(this.getAttribute('data-index'));
-        openEditDialog(idx);
-    }));
+        document.querySelectorAll('.editBtn').forEach(b => b.addEventListener('click', function () {
+            const idx = parseInt(this.getAttribute('data-index'));
+            openEditDialog(idx);
+        }));
+    } catch (error) {
+        console.error('Admin render error:', error);
+        tbody.innerHTML = '<tr><td colspan="4" class="p-3 text-center text-red-400">Error cargando usuarios.</td></tr>';
+    }
 }
+
+window.render = render;
 

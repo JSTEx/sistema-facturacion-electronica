@@ -26,6 +26,7 @@ showAppLoading('Verificando sesion...');
 
         localStorage.setItem('currentUser', JSON.stringify({ email: userData.email, role: userData.role }));
         hideAppLoading();
+        window.dispatchEvent(new CustomEvent('admin-auth-ready'));
     });
 })();
 

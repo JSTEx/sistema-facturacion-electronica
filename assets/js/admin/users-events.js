@@ -108,6 +108,34 @@
     });
 }
 
+async function waitForAdminSessionReady(options = {}) {
+    const maxAttempts = Number(options.maxAttempts) || 120;
+    const intervalMs = Number(options.intervalMs) || 40;
+
+    for (let attempt = 0; attempt < maxAttempts; attempt++) {
+        const firebaseUserReady = !!(window.firebaseAuth && window.firebaseAuth.currentUser);
+        const localUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
+        const hasAdminLocalState = !!(localUser && localUser.email && String(localUser.role || '').toLowerCase() === 'admin');
+
+        if (firebaseUserReady || hasAdminLocalState) return true;
+        await new Promise((resolve) => setTimeout(resolve, intervalMs));
+    }
+
+    return false;
+}
+
+function startUsersRealtimeSubscription() {
+    if (window.__adminUsersRealtimeBound) return;
+    if (!window.firebaseRef || !window.firebaseDB || !window.firebaseOnValue) return;
+
+    const usersRef = window.firebaseRef(window.firebaseDB, 'users');
+    window.firebaseOnValue(usersRef, () => {
+        render();
+    });
+
+    window.__adminUsersRealtimeBound = true;
+}
+
 document.addEventListener('DOMContentLoaded', async function () {
     initDarkMode({ respectSystem: false });
 
@@ -116,12 +144,24 @@ document.addEventListener('DOMContentLoaded', async function () {
     if (el && cur) el.textContent = cur.email;
 
     bindAdminEvents();
-    await render();
 
-    const usersRef = window.firebaseRef(window.firebaseDB, 'users');
-    window.firebaseOnValue(usersRef, () => {
-        render();
+    const firebaseReady = await waitForFirebaseReady({
+        required: ['firebaseDB', 'firebaseRef', 'firebaseOnValue', 'firebaseGet', 'firebaseChild']
     });
+
+    if (!firebaseReady) {
+        showToast('No se pudo conectar a Firebase para cargar usuarios.', 'error', 2600);
+        return;
+    }
+
+    await waitForAdminSessionReady();
+    await render();
+    startUsersRealtimeSubscription();
+});
+
+window.addEventListener('admin-auth-ready', async function () {
+    await render();
+    startUsersRealtimeSubscription();
 });
 
 window.render = render;

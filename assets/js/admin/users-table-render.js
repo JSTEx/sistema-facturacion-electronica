@@ -18,6 +18,12 @@ async function render() {
     const pageItems = filtered.slice(start, start + state.pageSize);
 
     tbody.innerHTML = '';
+    if (pageItems.length === 0) {
+        const emptyRow = document.createElement('tr');
+        emptyRow.innerHTML = '<td colspan="4" class="p-3 text-center muted-text">No hay usuarios para mostrar.</td>';
+        tbody.appendChild(emptyRow);
+    }
+
     pageItems.forEach((u, idx) => {
         const globalIndex = allUsers.indexOf(u);
         const userEmail = String(u?.email || '');

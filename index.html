@@ -57,8 +57,14 @@
         </style>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.2/lib/anime.min.js"></script>
-    <script src="assets/js/app-utils.js"></script>
-    <script src="assets/js/ui-utils.js"></script>
+    <script src="assets/js/core/password-utils.js"></script>
+    <script src="assets/js/core/loading-utils.js"></script>
+    <script src="assets/js/core/firebase-utils.js"></script>
+    <script src="assets/js/core/theme-utils.js"></script>
+    <script src="assets/js/core/session-utils.js"></script>
+    <script src="assets/js/core/toast-utils.js"></script>
+    <script src="assets/js/core/status-utils.js"></script>
+    <script src="assets/js/core/list-utils.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.2/dist/jspdf.plugin.autotable.min.js"></script>
     
@@ -347,7 +353,7 @@
 
     </main>
 
-    <script>
+    <script type="application/json" id="legacy-index-inline-disabled">
         window.toastTheme = {
             background: '#ecfdf5',
             color: '#065f46',
@@ -3423,6 +3429,10 @@
         document.getElementById('filterSelect').value = 'all';
         updateInvoiceList();
     </script>
+    <script src="assets/js/index/shared.js"></script>
+    <script src="assets/js/index/data-form.js"></script>
+    <script src="assets/js/index/auth-permissions.js"></script>
+    <script src="assets/js/index/ui-view.js"></script>
     <script src="assets/js/anti-inspection.js"></script>
 </body>
 </html>

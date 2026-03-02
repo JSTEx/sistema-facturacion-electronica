@@ -6,7 +6,13 @@ async function logAction(action, target) {
 }
 
 async function loadUsers() {
-    return normalizeUsers(await getFirebaseData('users'));
+    const users = normalizeUsers(await getFirebaseData('users'));
+    return users.filter((user) => {
+        if (!user || typeof user !== 'object') return false;
+        const email = String(user.email || '').trim();
+        const role = String(user.role || '').trim();
+        return email.length > 0 && role.length > 0;
+    });
 }
 
 async function saveUsers(list) {
@@ -14,7 +20,7 @@ async function saveUsers(list) {
 }
 
 function countAdmins(list) {
-    return list.filter(u => u.role === 'admin').length;
+    return list.filter(u => String(u?.role || '').toLowerCase() === 'admin').length;
 }
 
 window.adminData = {

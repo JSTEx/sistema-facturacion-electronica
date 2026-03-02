@@ -20,7 +20,7 @@
         }
 
         const users = await loadUsers();
-        if (users.find(u => u.email.toLowerCase() === email.toLowerCase())) {
+        if (users.find(u => String(u?.email || '').toLowerCase() === email.toLowerCase())) {
             Swal.fire({ icon: 'error', title: 'Error', text: 'El usuario ya existe', confirmButtonColor: '#1f2937' });
             return;
         }
@@ -71,7 +71,7 @@
             try {
                 const imported = JSON.parse(reader.result);
                 if (!Array.isArray(imported)) throw new Error('Formato incorrecto');
-                const valid = imported.every(u => u.email && u.password && u.role);
+                const valid = imported.every(u => u && u.email && u.role);
                 if (!valid) throw new Error('Formato incorrecto');
                 await setFirebaseData('users', imported);
                 showToast('Usuarios importados', 'success', 1200);

@@ -3158,11 +3158,26 @@ body.page-index .hamburger-btn {
     body.page-index nav.app-nav {
         flex-wrap: nowrap;
         align-items: center;
+        gap: 0.5rem;
+        overflow: hidden;
     }
 
     /* Div con Nueva Factura: empujado a la derecha */
     body.page-index nav.app-nav > div.shrink-0 {
         margin-left: auto;
+        min-width: 0;
+    }
+
+    /* Nueva Factura: mantener en la misma línea sin romper layout */
+    body.page-index nav.app-nav #btnNewInvoice {
+        width: auto;
+        max-width: calc(100vw - 92px);
+        min-width: 0;
+        padding-inline: 0.9rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        justify-content: center;
     }
 
     /* Nav colapsable: oculto por defecto, dropdown cuando .is-open */
@@ -3274,6 +3289,22 @@ body.page-index .hamburger-btn {
 
     body.page-index .hamburger-btn.is-active .hamburger-line:nth-child(3) {
         transform: translateY(-7px) rotate(-45deg);
+    }
+}
+
+@media (max-width: 420px) {
+    body.page-index nav.app-nav {
+        padding-inline: 0.65rem;
+    }
+
+    body.page-index nav.app-nav #btnNewInvoice {
+        font-size: 0.88rem;
+        padding-inline: 0.72rem;
+    }
+
+    body.page-index nav.app-nav #btnNewInvoice svg {
+        width: 14px;
+        height: 14px;
     }
 }
 

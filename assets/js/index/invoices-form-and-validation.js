@@ -399,7 +399,7 @@
             const dueDateWrapper = document.getElementById('dueDateWrapper');
             const paidDateWrapper = document.getElementById('paidDateWrapper');
 
-            if (dispatchWrapper) dispatchWrapper.classList.toggle('hidden', status !== 'dispatch');
+            if (dispatchWrapper) dispatchWrapper.classList.remove('hidden');
             if (dueDateWrapper) dueDateWrapper.classList.remove('hidden');
             if (paidDateWrapper) paidDateWrapper.classList.toggle('hidden', status !== 'paid');
         }

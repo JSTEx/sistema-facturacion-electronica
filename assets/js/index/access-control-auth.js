@@ -242,6 +242,20 @@
             const filterSelect = document.getElementById('filterSelect');
             const searchInput = document.getElementById('searchInput');
 
+            const setPrimaryNavButtonAsNewInvoice = () => {
+                if (!newInvoiceBtn) return;
+                newInvoiceBtn.classList.remove('hidden');
+                newInvoiceBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>Nueva Factura';
+                newInvoiceBtn.setAttribute('onclick', 'showInvoiceForm()');
+            };
+
+            const setPrimaryNavButtonAsBackToActive = () => {
+                if (!newInvoiceBtn) return;
+                newInvoiceBtn.classList.remove('hidden');
+                newInvoiceBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>Volver a activas';
+                newInvoiceBtn.setAttribute('onclick', "window.location.href='index.html'");
+            };
+
             if (historyBtn) {
                 if (IS_HISTORY_VIEW) {
                     if (historyBtnLabel) historyBtnLabel.textContent = 'Volver a activas';
@@ -250,6 +264,7 @@
                         historyBtnIcon.innerHTML = '<line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline>';
                     }
                     historyBtn.href = 'index.html';
+                    historyBtn.classList.add('hidden');
                 } else {
                     if (historyBtnLabel) historyBtnLabel.textContent = 'Historial pagadas';
                     else historyBtn.textContent = 'Historial pagadas';
@@ -257,6 +272,7 @@
                         historyBtnIcon.innerHTML = '<path d="M12 8v4l3 3"></path><circle cx="12" cy="12" r="10"></circle>';
                     }
                     historyBtn.href = 'pages/historial.html';
+                    historyBtn.classList.remove('hidden');
                 }
             }
 
@@ -264,8 +280,10 @@
                 listTitle.textContent = IS_HISTORY_VIEW ? 'Historial de Pagadas' : 'Facturas Activas';
             }
 
-            if (newInvoiceBtn && IS_HISTORY_VIEW) {
-                newInvoiceBtn.classList.add('hidden');
+            if (IS_HISTORY_VIEW) {
+                setPrimaryNavButtonAsBackToActive();
+            } else {
+                setPrimaryNavButtonAsNewInvoice();
             }
 
             if (searchInput) {
@@ -415,7 +433,7 @@
                     if (el) el.textContent = current.email;
 
                     const newInvoiceBtn = document.getElementById('btnNewInvoice');
-                    if (newInvoiceBtn && !canCreateInvoices()) {
+                    if (newInvoiceBtn && !IS_HISTORY_VIEW && !canCreateInvoices()) {
                         newInvoiceBtn.classList.add('hidden');
                     }
 

@@ -1,5 +1,5 @@
 // Configuración centralizada de Firebase - compartida entre todas las páginas
-const FIREBASE_CONFIG = {
+window.FIREBASE_CONFIG = {
     apiKey: "AIzaSyB3spppto5IEYRAxFOe0jdBGAnMvJRn8K8",
     authDomain: "facturacionelectronica-c2155.firebaseapp.com",
     databaseURL: "https://facturacionelectronica-c2155-default-rtdb.firebaseio.com",

@@ -207,7 +207,8 @@
             doc.setFontSize(24);
             doc.text(totalValue, right - 20, tableEndY + 42, { align: 'right' });
 
-            doc.save(`Factura-${inv.number}.pdf`);
+            const clientNameForFile = (inv.client || 'Factura').replace(/[^a-zA-Z0-9áéíóúñÁÉÍÓÚÑ\s-]/g, '').trim().substring(0, 40) || 'Factura';
+            doc.save(`${clientNameForFile}-${inv.number}.pdf`);
         }
 
 // Funcion: previewInvoicePdf

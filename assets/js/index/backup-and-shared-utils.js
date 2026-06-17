@@ -183,7 +183,7 @@
             localStorage.setItem(BACKUP_REMINDER_LAST_KEY, String(now));
 
             if (window.showToast) {
-                showToast('Recordatorio: realiza una copia de seguridad manual (Exportar)', 'warning', 4200, 'top-end', { toastType: 'warning' });
+                showToast('Recordatorio: realiza una copia de seguridad manual (Exportar)', 'warning', 7000, 'top-end', { toastType: 'warning' });
             }
         }
 

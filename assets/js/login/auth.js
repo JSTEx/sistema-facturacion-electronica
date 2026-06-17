@@ -22,7 +22,7 @@ async function initAuthFlow() {
             const userData = users.find(u => u.email && u.email.toLowerCase() === user.email.toLowerCase());
             if (userData) {
                 localStorage.setItem('currentUser', JSON.stringify({ email: userData.email, role: userData.role }));
-                window.location.replace(userData.role === 'admin' ? 'admin.html' : '../index.html');
+                window.location.replace('../index.html');
             }
         }
     });
@@ -56,7 +56,7 @@ async function initAuthFlow() {
                 localStorage.setItem('currentUser', JSON.stringify({ email: userData.email, role: userData.role }));
                 showToast('Inicio de sesion exitoso.', 'success', 1400);
                 setTimeout(() => {
-                    window.location.replace(userData.role === 'admin' ? 'admin.html' : '../index.html');
+                    window.location.replace('../index.html');
                 }, 350);
             } else {
                 errorMessage.textContent = 'Usuario autenticado, pero sin rol asignado en la base de datos.';

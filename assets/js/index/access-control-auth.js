@@ -513,7 +513,7 @@
                                 btn.className = 'admin-users-btn px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md text-sm font-medium transition-colors flex items-center gap-2';
                                 btn.style.marginRight = '6px';
                                 btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><line x1="20" y1="8" x2="20" y2="14"></line><line x1="23" y1="11" x2="17" y2="11"></line></svg><span>Usuarios</span>';
-                                btn.onclick = () => { window.location.href = 'pages/admin.html'; };
+                                btn.onclick = () => { window.location.href = 'index.html'; };
                                 adminContainer.appendChild(btn);
                             }
                             initAnimeButtonDemo();

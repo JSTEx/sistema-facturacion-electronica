@@ -8,6 +8,7 @@ const STATIC_ASSETS = [
     './pages/login.html',
     './pages/admin.html',
     './assets/css/app.css',
+    './assets/js/core/firebase-config.js',
     './assets/js/core/password-utils.js',
     './assets/js/core/loading-utils.js',
     './assets/js/core/firebase-utils.js',

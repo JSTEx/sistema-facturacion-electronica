@@ -220,146 +220,179 @@
 
         <!-- Formulario de Factura Provisional (Oculto por defecto) -->
         <div id="invoiceFormView" class="hidden max-w-3xl mx-auto">
-            <div class="invoice-form-card bg-white border border-gray-200 rounded-xl p-8 shadow-sm">
-                <h2 class="invoice-form-title invoiceFormTitle text-xl font-bold text-center uppercase tracking-wide mb-8 text-gray-900 border-b border-gray-100 pb-4">Crear Factura Provisional</h2>
+            <div class="invoice-form-card bg-white border border-gray-200 shadow-sm">
+                <h2 class="invoice-form-title invoiceFormTitle text-xl font-bold uppercase tracking-wide text-gray-900">Crear Factura Provisional</h2>
+                <p class="invoice-form-subtitle">Complete los campos requeridos para generar una nueva factura</p>
                 
                 <form id="invoiceForm" class="invoiceForm" onsubmit="handleSubmit(event)">
                     <!-- Fecha y Número -->
-                    <div class="grid grid-cols-4 gap-4 mb-6">
-                        <div>
-                            <label class="block text-xs font-semibold text-gray-700 uppercase mb-1.5">Día</label>
-                            <input type="number" id="dia" min="1" max="31" class="w-full px-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:border-gray-900 transition-colors" placeholder="19">
+                    <div class="invoice-form-section">
+                        <div class="invoice-form-section-header">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                            <span class="invoice-form-section-title">Fecha y Número de Factura</span>
                         </div>
-                        <div>
-                            <label class="block text-xs font-semibold text-gray-700 uppercase mb-1.5">Mes</label>
-                            <input type="number" id="mes" min="1" max="12" class="w-full px-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:border-gray-900 transition-colors" placeholder="2">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-semibold text-gray-700 uppercase mb-1.5">Año</label>
-                            <input type="number" id="anio" min="2020" max="2100" class="w-full px-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:border-gray-900 transition-colors" placeholder="2026">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-semibold text-gray-700 uppercase mb-1.5">N°</label>
-                            <input type="number" id="numero" class="w-full px-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:border-gray-900 transition-colors" placeholder="8420" readonly>
-                        </div>
-                    </div>
-
-                    <!-- Cliente, Dirección, Estado -->
-                    <div class="grid grid-cols-3 gap-4 mb-6">
-                        <div>
-                            <label class="block text-xs font-semibold text-gray-700 uppercase mb-1.5">Cliente</label>
-                            <input type="text" id="cliente" class="w-full px-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:border-gray-900 transition-colors">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-semibold text-gray-700 uppercase mb-1.5">Dirección</label>
-                            <input type="text" id="direccion" class="w-full px-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:border-gray-900 transition-colors">
-                        </div>
-                        <div>
-                            <label class="status-label block text-xs font-bold text-orange-500 uppercase mb-1.5 tracking-wider">Estado</label>
-                            <select id="estado" class="status-select w-full px-3 py-2 border-2 rounded-md text-sm focus:outline-none bg-white cursor-pointer font-semibold">
-                                <option value="dispatch">Despacho</option>
-                                <option value="abono">Abono</option>
-                                <option value="saldo_actual">Saldo Actual</option>
-                                <option value="paid">Pagada</option>
-                                <option value="pending">Pendiente</option>
-                                <option value="late">Vencida</option>
-                            </select>
-                            <label class="mt-2 inline-flex items-center gap-2 text-xs text-gray-600">
-                                <input type="checkbox" id="estadoManualLock" class="h-4 w-4 border border-gray-300 rounded">
-                                <span>Mantener estado manual</span>
-                            </label>
-                        </div>
-                    </div>
-
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
-                        <div>
-                            <label class="block text-xs font-semibold text-gray-700 uppercase mb-1.5">Abono</label>
-                            <input type="number" id="abono" min="0" step="0.01" value="0" class="w-full px-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:border-gray-900 transition-colors" placeholder="0.00" oninput="calculateTotals()">
-                        </div>
-                        <div id="saldoActualWrapper" class="hidden">
-                            <label class="block text-xs font-semibold text-gray-700 uppercase mb-1.5">Saldo Actual</label>
-                            <div class="invoice-saldo-box w-full px-3 py-2 rounded-md text-sm font-semibold">
-                                <span class="invoice-saldo-currency">$</span> <span id="saldoActualAmount">0.00</span>
+                        <div class="grid grid-cols-4 gap-4">
+                            <div>
+                                <label class="block font-semibold uppercase">Día</label>
+                                <input type="number" id="dia" min="1" max="31" class="w-full px-3 py-2 border border-gray-200 text-sm" placeholder="19">
+                            </div>
+                            <div>
+                                <label class="block font-semibold uppercase">Mes</label>
+                                <input type="number" id="mes" min="1" max="12" class="w-full px-3 py-2 border border-gray-200 text-sm" placeholder="2">
+                            </div>
+                            <div>
+                                <label class="block font-semibold uppercase">Año</label>
+                                <input type="number" id="anio" min="2020" max="2100" class="w-full px-3 py-2 border border-gray-200 text-sm" placeholder="2026">
+                            </div>
+                            <div>
+                                <label class="block font-semibold uppercase">N°</label>
+                                <input type="number" id="numero" class="w-full px-3 py-2 border border-gray-200 text-sm" placeholder="8420" readonly>
                             </div>
                         </div>
                     </div>
 
-                    <div id="statusExtras" class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
-                        <div id="dispatchWrapper" class="sm:col-span-2">
-                            <label class="block text-xs font-semibold text-gray-700 uppercase mb-1.5">Detalle de Despacho</label>
-                            <textarea id="detalleDespacho" rows="2" class="w-full px-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:border-gray-900 transition-colors resize-y min-h-[44px]" placeholder="Ej.: Entrega en bodega central"></textarea>
+                    <!-- Cliente y Estado -->
+                    <div class="invoice-form-section">
+                        <div class="invoice-form-section-header">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                            <span class="invoice-form-section-title">Cliente y Estado</span>
                         </div>
-                        <div id="dueDateWrapper">
-                            <label class="block text-xs font-semibold text-gray-700 uppercase mb-1.5">Fecha de vencimiento</label>
-                            <input type="date" id="fechaVencimiento" class="w-full px-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:border-gray-900 transition-colors">
-                            <p class="date-format-hint mt-1 text-xs text-gray-400">Formato mostrado: dd-mm-aaaa</p>
-                        </div>
-                        <div id="paidDateWrapper" class="hidden">
-                            <label class="block text-xs font-semibold text-gray-700 uppercase mb-1.5">Fecha de pago</label>
-                            <input type="date" id="fechaPago" class="w-full px-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:border-gray-900 transition-colors">
-                            <p class="date-format-hint mt-1 text-xs text-gray-400">Formato mostrado: dd-mm-aaaa</p>
+                        <div class="grid grid-cols-3 gap-4">
+                            <div>
+                                <label class="block font-semibold uppercase">Cliente</label>
+                                <input type="text" id="cliente" class="w-full px-3 py-2 border border-gray-200 text-sm">
+                            </div>
+                            <div>
+                                <label class="block font-semibold uppercase">Dirección</label>
+                                <input type="text" id="direccion" class="w-full px-3 py-2 border border-gray-200 text-sm">
+                            </div>
+                            <div>
+                                <label class="status-label block font-bold uppercase">Estado</label>
+                                <select id="estado" class="status-select w-full px-3 py-2 text-sm cursor-pointer font-semibold">
+                                    <option value="dispatch">Despacho</option>
+                                    <option value="abono">Abono</option>
+                                    <option value="saldo_actual">Saldo Actual</option>
+                                    <option value="paid">Pagada</option>
+                                    <option value="pending">Pendiente</option>
+                                    <option value="late">Vencida</option>
+                                </select>
+                                <label class="mt-2 inline-flex items-center gap-2 text-xs">
+                                    <input type="checkbox" id="estadoManualLock" class="border border-gray-300 rounded">
+                                    <span>Mantener estado manual</span>
+                                </label>
+                            </div>
                         </div>
                     </div>
 
-                    <!-- Tabla de Items -->
-                    <div class="items-table-wrapper mb-6 border border-gray-200 rounded-lg overflow-x-auto">
-                        <table class="w-full text-sm">
-                            <thead class="items-table-head bg-gray-50 border-b border-gray-200">
-                                <tr>
-                                    <th class="text-left py-3 px-4 font-semibold text-gray-700 uppercase text-xs w-12">#</th>
-                                    <th class="text-left py-3 px-4 font-semibold text-gray-700 uppercase text-xs w-20">Cant.</th>
-                                    <th class="text-left py-3 px-4 font-semibold text-gray-700 uppercase text-xs">Descripción</th>
-                                    <th class="text-left py-3 px-4 font-semibold text-gray-700 uppercase text-xs w-32">Precio</th>
-                                    <th class="text-right py-3 px-4 font-semibold text-gray-700 uppercase text-xs w-32">Valor</th>
-                                    <th class="w-10"></th>
-                                </tr>
-                            </thead>
-                            <tbody id="itemsTableBody">
-                                <tr class="border-b border-gray-100">
-                                    <td class="py-2 px-2 text-center" data-label="#">
-                                        <span class="item-index text-gray-700 font-semibold">1</span>
-                                    </td>
-                                    <td class="py-2 px-2" data-label="Cant.">
-                                        <input type="number" min="0" step="0.01" value="1" class="item-cant w-full px-2 py-1.5 border border-gray-200 rounded text-center text-sm focus:outline-none focus:border-gray-900" oninput="calculateTotals()">
-                                    </td>
-                                    <td class="py-2 px-2" data-label="Descripcion">
-                                        <textarea class="item-desc item-desc-area w-full px-2 py-1.5 border border-gray-200 rounded text-sm focus:outline-none focus:border-gray-900" placeholder="Descripción del item" rows="2"></textarea>
-                                    </td>
-                                    <td class="py-2 px-2" data-label="Precio">
-                                        <input type="number" min="0" step="0.01" class="item-precio w-full px-2 py-1.5 border border-gray-200 rounded text-sm focus:outline-none focus:border-gray-900" placeholder="0.00" oninput="calculateTotals()">
-                                    </td>
-                                    <td class="py-2 px-2 text-right" data-label="Valor">
-                                        <span class="item-valor text-gray-900 font-medium">0</span>
-                                    </td>
-                                    <td class="py-2 px-2 text-center remove-cell" data-label="Eliminar">
-                                        <button type="button" class="removeItemBtn" onclick="removeItem(this)">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-                                            <span class="remove-label">Eliminar item</span>
-                                        </button>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                        <button type="button" id="addItemBtn" onclick="addItem()" class="add-item-btn w-full py-2 text-sm text-gray-500 hover:text-gray-900 hover:bg-gray-50 transition-colors border-t border-gray-200 flex items-center justify-center gap-2">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                            Agregar Item
-                        </button>
+                    <!-- Abono y Saldo -->
+                    <div class="invoice-form-section">
+                        <div class="invoice-form-section-header">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+                            <span class="invoice-form-section-title">Abono y Saldo</span>
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block font-semibold uppercase">Abono</label>
+                                <input type="number" id="abono" min="0" step="0.01" value="0" class="w-full px-3 py-2 border border-gray-200 text-sm" placeholder="0.00" oninput="calculateTotals()">
+                            </div>
+                            <div id="saldoActualWrapper" class="hidden">
+                                <label class="block font-semibold uppercase">Saldo Actual</label>
+                                <div class="invoice-saldo-box w-full text-sm font-semibold">
+                                    <span class="invoice-saldo-currency">$</span> <span id="saldoActualAmount">0.00</span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
-                    <!-- Total -->
-                    <div class="invoice-total-row flex justify-end mb-8 border-t border-gray-200 pt-4">
-                        <div class="text-right">
-                            <span class="invoice-total-label text-sm font-semibold text-gray-700 uppercase mr-2">Total</span>
-                            <span class="invoice-total-amount text-lg font-bold text-gray-900">$ <span id="totalAmount">0.00</span></span>
+                    <!-- Fechas y Despacho -->
+                    <div class="invoice-form-section">
+                        <div class="invoice-form-section-header">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                            <span class="invoice-form-section-title">Fechas y Detalles</span>
+                        </div>
+                        <div id="statusExtras" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div id="dispatchWrapper" class="sm:col-span-2">
+                                <label class="block font-semibold uppercase">Detalle de Despacho</label>
+                                <textarea id="detalleDespacho" rows="2" class="w-full px-3 py-2 border border-gray-200 text-sm resize-y min-h-[44px]" placeholder="Ej.: Entrega en bodega central"></textarea>
+                            </div>
+                            <div id="dueDateWrapper">
+                                <label class="block font-semibold uppercase">Fecha de vencimiento</label>
+                                <input type="date" id="fechaVencimiento" class="w-full px-3 py-2 border border-gray-200 text-sm">
+                                <p class="date-format-hint text-xs">Formato mostrado: dd-mm-aaaa</p>
+                            </div>
+                            <div id="paidDateWrapper" class="hidden">
+                                <label class="block font-semibold uppercase">Fecha de pago</label>
+                                <input type="date" id="fechaPago" class="w-full px-3 py-2 border border-gray-200 text-sm">
+                                <p class="date-format-hint text-xs">Formato mostrado: dd-mm-aaaa</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Items de Factura -->
+                    <div class="invoice-form-section">
+                        <div class="invoice-form-section-header">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                            <span class="invoice-form-section-title">Items de Factura</span>
+                        </div>
+                        <div class="items-table-wrapper border border-gray-200 rounded-lg overflow-x-auto">
+                            <table class="w-full text-sm">
+                                <thead class="items-table-head bg-gray-50 border-b border-gray-200">
+                                    <tr>
+                                        <th class="text-left py-3 px-4 font-semibold text-gray-700 uppercase text-xs w-12">#</th>
+                                        <th class="text-left py-3 px-4 font-semibold text-gray-700 uppercase text-xs w-20">Cant.</th>
+                                        <th class="text-left py-3 px-4 font-semibold text-gray-700 uppercase text-xs">Descripción</th>
+                                        <th class="text-left py-3 px-4 font-semibold text-gray-700 uppercase text-xs w-32">Precio</th>
+                                        <th class="text-right py-3 px-4 font-semibold text-gray-700 uppercase text-xs w-32">Valor</th>
+                                        <th class="w-10"></th>
+                                    </tr>
+                                </thead>
+                                <tbody id="itemsTableBody">
+                                    <tr class="border-b border-gray-100">
+                                        <td class="py-2 px-2 text-center" data-label="#">
+                                            <span class="item-index text-gray-700 font-semibold">1</span>
+                                        </td>
+                                        <td class="py-2 px-2" data-label="Cant.">
+                                            <input type="number" min="0" step="0.01" value="1" class="item-cant w-full px-2 py-1.5 border border-gray-200 rounded text-center text-sm" oninput="calculateTotals()">
+                                        </td>
+                                        <td class="py-2 px-2" data-label="Descripcion">
+                                            <textarea class="item-desc item-desc-area w-full px-2 py-1.5 border border-gray-200 rounded text-sm" placeholder="Descripción del item" rows="2"></textarea>
+                                        </td>
+                                        <td class="py-2 px-2" data-label="Precio">
+                                            <input type="number" min="0" step="0.01" class="item-precio w-full px-2 py-1.5 border border-gray-200 rounded text-sm" placeholder="0.00" oninput="calculateTotals()">
+                                        </td>
+                                        <td class="py-2 px-2 text-right" data-label="Valor">
+                                            <span class="item-valor text-gray-900 font-medium">0</span>
+                                        </td>
+                                        <td class="py-2 px-2 text-center remove-cell" data-label="Eliminar">
+                                            <button type="button" class="removeItemBtn" onclick="removeItem(this)">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                                                <span class="remove-label">Eliminar item</span>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <button type="button" id="addItemBtn" onclick="addItem()" class="add-item-btn w-full py-2 text-sm flex items-center justify-center gap-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                                Agregar Item
+                            </button>
+                        </div>
+
+                        <!-- Total -->
+                        <div class="invoice-total-row flex justify-end border-t border-gray-200 pt-4">
+                            <div class="text-right">
+                                <span class="invoice-total-label text-sm font-semibold text-gray-700 uppercase mr-2">Total</span>
+                                <span class="invoice-total-amount text-lg font-bold text-gray-900">$ <span id="totalAmount">0.00</span></span>
+                            </div>
                         </div>
                     </div>
 
                     <!-- Botones -->
-                    <div class="flex justify-end gap-3">
-                        <button id="cancelBtn" type="button" onclick="cancelInvoice()" class="px-6 py-2.5 text-sm font-medium rounded-lg transition-colors">
+                    <div class="invoice-form-actions">
+                        <button id="cancelBtn" type="button" onclick="cancelInvoice()" class="text-sm font-medium">
                             Cancelar
                         </button>
-                        <button type="submit" id="submitBtn" class="px-6 py-2.5 bg-gray-900 hover:bg-gray-800 text-white text-sm font-medium rounded-lg transition-colors">
+                        <button type="submit" id="submitBtn" class="text-sm font-medium">
                             Crear factura
                         </button>
                     </div>

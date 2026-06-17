@@ -3324,3 +3324,509 @@ body.page-index .hamburger-btn {
         display: none;
     }
 }
+
+/* ==============================================
+   MEJORAS DE DISEÑO - FORMULARIO FACTURA PROVISIONAL
+   ============================================== */
+
+/* Card principal con sombra y bordes mejorados */
+body.page-index .invoice-form-card {
+    background-color: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+    padding: 32px;
+}
+
+html.dark-mode body.page-index .invoice-form-card {
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
+}
+
+/* Título del formulario con icono decorativo */
+body.page-index .invoice-form-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    padding-bottom: 20px;
+    margin-bottom: 28px;
+    border-bottom: 2px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+body.page-index .invoice-form-title::before {
+    content: '';
+    display: inline-block;
+    width: 6px;
+    height: 28px;
+    background: linear-gradient(180deg, #22c55e, #16a34a);
+    border-radius: 3px;
+    flex-shrink: 0;
+}
+
+html.dark-mode body.page-index .invoice-form-title::before {
+    background: linear-gradient(180deg, #4ade80, #22c55e);
+}
+
+/* Subtítulo del formulario */
+body.page-index .invoice-form-subtitle {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    font-weight: 400;
+    margin-top: -16px;
+    margin-bottom: 24px;
+    padding-left: 18px;
+}
+
+/* Separador de secciones */
+body.page-index .invoice-form-section {
+    margin-bottom: 28px;
+}
+
+body.page-index .invoice-form-section-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+body.page-index .invoice-form-section-header svg {
+    width: 18px;
+    height: 18px;
+    color: #22c55e;
+    flex-shrink: 0;
+}
+
+html.dark-mode body.page-index .invoice-form-section-header svg {
+    color: #4ade80;
+}
+
+body.page-index .invoice-form-section-title {
+    font-size: 0.82rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-secondary);
+}
+
+/* Inputs con mejor enfoque y transiciones */
+body.page-index #invoiceFormView input,
+body.page-index #invoiceFormView select,
+body.page-index #invoiceFormView textarea {
+    border: 1.5px solid var(--input-border);
+    border-radius: 10px;
+    padding: 10px 14px;
+    font-size: 0.875rem;
+    transition: all 0.2s ease;
+    background-color: var(--input-bg);
+    color: var(--text-primary);
+}
+
+body.page-index #invoiceFormView input:focus,
+body.page-index #invoiceFormView select:focus,
+body.page-index #invoiceFormView textarea:focus {
+    border-color: #22c55e;
+    box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.12);
+    outline: none;
+}
+
+html.dark-mode body.page-index #invoiceFormView input:focus,
+html.dark-mode body.page-index #invoiceFormView select:focus,
+html.dark-mode body.page-index #invoiceFormView textarea:focus {
+    border-color: #4ade80;
+    box-shadow: 0 0 0 3px rgba(74, 222, 128, 0.15);
+}
+
+/* Labels mejorados */
+body.page-index #invoiceFormView label:not(.status-label) {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--text-secondary);
+    margin-bottom: 6px;
+    display: block;
+}
+
+/* Status label con estilo especial */
+body.page-index .status-label {
+    font-size: 0.75rem !important;
+    font-weight: 700 !important;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 6px;
+    display: block;
+}
+
+/* Select de estado con colores */
+body.page-index .status-select {
+    border: 2px solid transparent;
+    border-radius: 10px;
+    padding: 9px 14px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    appearance: auto;
+}
+
+body.page-index .status-select option {
+    font-weight: 500;
+}
+
+/* Checkbox "Mantener estado manual" mejorado */
+body.page-index #estadoManualLock ~ span {
+    font-size: 0.78rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+body.page-index #estadoManualLock {
+    accent-color: #22c55e;
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+}
+
+/* Input readonly con estilo más pulcro */
+body.page-index #invoiceFormView input[readonly] {
+    border-style: dashed;
+    border-color: var(--border-color);
+    background-color: var(--bg-primary);
+    color: var(--text-secondary);
+    cursor: not-allowed;
+    opacity: 0.85;
+}
+
+body.page-index #invoiceFormView input[readonly]:focus {
+    border-color: var(--border-color);
+    box-shadow: none;
+}
+
+/* Saldo actual box mejorado */
+body.page-index .invoice-saldo-box {
+    border: 1.5px dashed var(--border-color);
+    border-radius: 10px;
+    background-color: var(--bg-primary);
+    padding: 10px 14px;
+    font-size: 0.875rem;
+    font-weight: 700;
+    min-height: 42px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+body.page-index .invoice-saldo-currency {
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+
+body.page-index #saldoActualAmount {
+    color: #5b21b6;
+    font-weight: 700;
+}
+
+html.dark-mode body.page-index #saldoActualAmount {
+    color: #a78bfa;
+}
+
+/* Items table - cabecera más estilizada */
+body.page-index #invoiceFormView .items-table-head th {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 12px 14px;
+    color: var(--text-secondary);
+    border-bottom: 2px solid var(--border-color);
+}
+
+body.page-index #invoiceFormView .items-table-head th:first-child {
+    border-radius: 0;
+}
+
+/* Items table - celdas mejoradas */
+body.page-index #invoiceFormView #itemsTableBody td {
+    padding: 8px 6px;
+    vertical-align: middle;
+}
+
+/* Items table - número de índice circular */
+body.page-index #invoiceFormView .item-index {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    font-size: 0.78rem;
+    font-weight: 700;
+}
+
+/* Items table - inputs más compactos en tabla */
+body.page-index #invoiceFormView #itemsTableBody input,
+body.page-index #invoiceFormView #itemsTableBody textarea {
+    border-radius: 8px;
+    padding: 8px 10px;
+    font-size: 0.85rem;
+    border: 1.5px solid var(--input-border);
+}
+
+body.page-index #invoiceFormView #itemsTableBody .item-cant {
+    text-align: center;
+    font-weight: 600;
+}
+
+body.page-index #invoiceFormView #itemsTableBody .item-precio {
+    font-weight: 600;
+    text-align: right;
+}
+
+body.page-index #invoiceFormView #itemsTableBody .item-valor {
+    font-weight: 700;
+    font-size: 0.9rem;
+    display: block;
+    padding: 8px 10px;
+}
+
+/* Botón agregar item mejorado */
+body.page-index #addItemBtn {
+    font-weight: 600;
+    font-size: 0.85rem;
+    padding: 12px;
+    border-radius: 0 0 10px 10px;
+    border: 1.5px dashed #bae6fd;
+    background-color: #f0f9ff !important;
+    color: #0369a1 !important;
+    transition: all 0.25s ease;
+}
+
+body.page-index #addItemBtn:hover {
+    background-color: #e0f2fe !important;
+    color: #0284c7 !important;
+    border-color: #7dd3fc !important;
+    gap: 10px;
+}
+
+html.dark-mode body.page-index #addItemBtn {
+    background-color: #164e63 !important;
+    color: #06b6d4 !important;
+    border: 1.5px dashed #22d3ee !important;
+}
+
+html.dark-mode body.page-index #addItemBtn:hover {
+    background-color: #0e7490 !important;
+    color: #ffffff !important;
+    border-color: #06b6d4 !important;
+}
+
+/* Botón eliminar item mejorado */
+body.page-index .removeItemBtn {
+    padding: 8px 10px;
+    border-radius: 8px;
+    background-color: #fff1f2;
+    border: 1.5px solid #fecdd3;
+    color: #be123c;
+    transition: all 0.25s ease;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 36px;
+    min-height: 36px;
+}
+
+body.page-index .removeItemBtn:hover {
+    background-color: #ffe4e6;
+    color: #9f1239;
+    border-color: #fda4af;
+    transform: scale(1.05);
+}
+
+html.dark-mode body.page-index .removeItemBtn {
+    color: #9ca3af;
+    background-color: transparent;
+    border: 1.5px solid transparent;
+}
+
+html.dark-mode body.page-index .removeItemBtn:hover {
+    background-color: #7f1d1d;
+    color: #fca5a5;
+    border-color: #dc2626;
+    transform: scale(1.05);
+}
+
+/* Total display mejorado */
+body.page-index .invoice-total-row {
+    margin-top: 8px;
+    padding-top: 20px;
+    border-top: 2px solid var(--border-color);
+}
+
+body.page-index .invoice-total-amount {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--text-primary);
+    background: linear-gradient(135deg, #22c55e, #16a34a);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+html.dark-mode body.page-index .invoice-total-amount {
+    background: linear-gradient(135deg, #4ade80, #22c55e);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+body.page-index .invoice-total-label {
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-secondary);
+}
+
+/* Botones de acción mejorados */
+body.page-index #submitBtn {
+    background: linear-gradient(135deg, #1f2937, #111827) !important;
+    border: none !important;
+    border-radius: 10px;
+    padding: 12px 28px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
+}
+
+body.page-index #submitBtn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+}
+
+html.dark-mode body.page-index #submitBtn {
+    background: linear-gradient(135deg, #22c55e, #16a34a) !important;
+    box-shadow: 0 4px 16px rgba(34, 197, 94, 0.35);
+}
+
+html.dark-mode body.page-index #submitBtn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 28px rgba(34, 197, 94, 0.5);
+}
+
+body.page-index #cancelBtn {
+    border-radius: 10px;
+    padding: 12px 28px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    border: 1.5px solid var(--border-color);
+    background-color: transparent;
+    color: var(--text-secondary);
+    transition: all 0.25s ease;
+}
+
+body.page-index #cancelBtn:hover {
+    border-color: var(--input-border);
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+}
+
+/* Grupo de botones */
+body.page-index .invoice-form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 24px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border-color);
+}
+
+/* Fecha de vencimiento y pago - hint más discreto */
+body.page-index .date-format-hint {
+    font-size: 0.7rem;
+    color: var(--text-secondary);
+    margin-top: 4px;
+    opacity: 0.7;
+}
+
+/* Abono input con icono de moneda */
+body.page-index #abono {
+    font-weight: 600;
+}
+
+/* Wrapper de campos condicionales */
+body.page-index #statusExtras {
+    background-color: var(--bg-primary);
+    border-radius: 12px;
+    padding: 16px 20px;
+    border: 1px solid var(--border-color);
+    margin-bottom: 20px;
+}
+
+body.page-index #dispatchWrapper textarea {
+    min-height: 44px;
+    resize: vertical;
+}
+
+/* Responsive adjustments for the improved design */
+@media (max-width: 640px) {
+    body.page-index .invoice-form-card {
+        padding: 20px;
+        border-radius: 12px;
+    }
+
+    body.page-index .invoice-form-title {
+        font-size: 1.2rem;
+        padding-bottom: 16px;
+        margin-bottom: 20px;
+    }
+
+    body.page-index .invoice-form-title::before {
+        height: 22px;
+    }
+
+    body.page-index .invoice-form-subtitle {
+        font-size: 0.8rem;
+        margin-top: -12px;
+        margin-bottom: 18px;
+        padding-left: 14px;
+    }
+
+    body.page-index #statusExtras {
+        padding: 12px 14px;
+    }
+
+    body.page-index .invoice-total-amount {
+        font-size: 1.25rem;
+    }
+
+    body.page-index #submitBtn,
+    body.page-index #cancelBtn {
+        padding: 10px 20px;
+        font-size: 0.85rem;
+    }
+
+    body.page-index .invoice-form-actions {
+        flex-direction: column-reverse;
+        gap: 8px;
+    }
+
+    body.page-index .invoice-form-actions button {
+        width: 100%;
+        justify-content: center;
+    }
+
+    body.page-index .invoice-form-section-header {
+        margin-bottom: 12px;
+    }
+
+    body.page-index .invoice-form-section {
+        margin-bottom: 22px;
+    }
+}

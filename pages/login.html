@@ -19,6 +19,7 @@
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%2322c55e' width='100' height='100' rx='20'/><text y='70' font-size='60' fill='white' text-anchor='middle' x='50' font-weight='bold'>$</text></svg>">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="../assets/css/app.css">
+    <script src="../assets/js/core/firebase-config.js"></script>
     <script src="../assets/js/core/password-utils.js"></script>
     <script src="../assets/js/core/loading-utils.js"></script>
     <script src="../assets/js/core/firebase-utils.js"></script>
@@ -36,16 +37,7 @@
         import { getDatabase, ref, set, get, child } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js';
         import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
         
-        const firebaseConfig = {
-            apiKey: "AIzaSyB3spppto5IEYRAxFOe0jdBGAnMvJRn8K8",
-            authDomain: "facturacionelectronica-c2155.firebaseapp.com",
-            databaseURL: "https://facturacionelectronica-c2155-default-rtdb.firebaseio.com",
-            projectId: "facturacionelectronica-c2155",
-            storageBucket: "facturacionelectronica-c2155.firebasestorage.app",
-            messagingSenderId: "1071386903920",
-            appId: "1:1071386903920:web:c58b1a0148d3856b5a3bb5",
-            measurementId: "G-13S9Z6SMB4"
-        };
+        const firebaseConfig = window.FIREBASE_CONFIG;
         
         const app = initializeApp(firebaseConfig);
         const database = getDatabase(app);

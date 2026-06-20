@@ -3,6 +3,8 @@
 // Que hace: Gestiona la logica de downloadInvoicePdf.
         function downloadInvoicePdf(inv, canViewAmount) {
             if (!ensureCanViewInvoice(inv)) return;
+
+            showToast('Generando PDF...', 'info', 3000, 'top-end', { toastType: 'info' });
             if (!window.jspdf || !window.jspdf.jsPDF) {
                 Swal.fire({
                     icon: 'error',

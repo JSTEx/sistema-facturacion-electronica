@@ -8,14 +8,13 @@
             document.getElementById('invoiceFormView').classList.remove('hidden');
             
             const today = new Date();
-            document.getElementById('dia').value = today.getDate();
-            document.getElementById('mes').value = today.getMonth() + 1;
-            document.getElementById('anio').value = today.getFullYear();
+            const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+            document.getElementById('fecha').value = todayStr;
             
             generateInvoiceNumber();
             
-            document.querySelector('.invoiceFormTitle').textContent = 'Crear Factura Provisional';
-            document.getElementById('submitBtn').textContent = 'Crear factura';
+            document.querySelector('.invoiceFormTitle').textContent = 'Nueva Factura';
+            document.getElementById('submitBtn').textContent = 'Crear Factura';
             
             // Limpiar solo los campos específicos en lugar de hacer reset completo
             document.getElementById('cliente').value = '';
@@ -24,10 +23,9 @@
             document.getElementById('detalleDespacho').value = '';
             document.getElementById('fechaVencimiento').value = '';
             document.getElementById('fechaPago').value = '';
-            document.getElementById('estado').value = 'dispatch';
-            document.getElementById('estadoManualLock').checked = false;
+            document.getElementById('estado').value = 'pending';
             syncEstadoPreviousStatus();
-            updateStatusSections('dispatch');
+            updateStatusSections('pending');
             resetItemsTable();
             calculateTotals();
             restoreDraftIfExists();
@@ -644,15 +642,22 @@
             e.preventDefault();
             if (!ensureCanCreateInvoices()) return;
             
-            const dia = document.getElementById('dia').value;
-            const mes = document.getElementById('mes').value;
-            const anio = document.getElementById('anio').value;
+            const fechaInput = document.getElementById('fecha').value;
             const numero = document.getElementById('numero').value;
             const cliente = document.getElementById('cliente').value.trim();
             
+            // Extraer día, mes, año del input de fecha
+            const fechaParts = fechaInput ? fechaInput.split('-') : [];
+            const anio = fechaParts[0] || '';
+            const mes = fechaParts[1] || '';
+            const dia = fechaParts[2] || '';
+            
             const errors = [];
-            const clearIds = ['dia', 'mes', 'anio', 'numero', 'cliente', 'estado', 'abono', 'detalleDespacho', 'fechaVencimiento', 'fechaPago'];
-            clearIds.forEach(id => document.getElementById(id).classList.remove('input-error'));
+            const clearIds = ['fecha', 'numero', 'cliente', 'estado', 'abono', 'detalleDespacho', 'fechaVencimiento', 'fechaPago'];
+            clearIds.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.classList.remove('input-error');
+            });
 
 // Funcion: addError
 // Que hace: Gestiona la logica de addError.
@@ -662,22 +667,24 @@
                 errors.push(message);
             };
 
-            if (!dia) {
-                addError('dia', 'Día requerido');
-            } else if (dia < 1 || dia > 31) {
-                addError('dia', 'Día inválido (1 a 31)');
-            }
+            if (!fechaInput) {
+                addError('fecha', 'Fecha de factura requerida');
+            } else {
+                const invoiceDateIso = fechaInput;
+                const todayIso = getTodayISODate();
 
-            if (!mes) {
-                addError('mes', 'Mes requerido');
-            } else if (mes < 1 || mes > 12) {
-                addError('mes', 'Mes inválido (1 a 12)');
-            }
+// Funcion: isValidIsoDate
+// Que hace: Gestiona la logica de isValidIsoDate.
+                const isValidIsoDate = (isoDate) => {
+                    if (!isoDate) return false;
+                    const parsed = new Date(`${isoDate}T00:00:00`);
+                    if (Number.isNaN(parsed.getTime())) return false;
+                    return parsed.toISOString().slice(0, 10) === isoDate;
+                };
 
-            if (!anio) {
-                addError('anio', 'Año requerido');
-            } else if (anio < 2020 || anio > 2100) {
-                addError('anio', 'Año inválido (2020 a 2100)');
+                if (!isValidIsoDate(invoiceDateIso)) {
+                    addError('fecha', 'La fecha de factura no es válida');
+                }
             }
 
             if (!numero) {
@@ -701,23 +708,8 @@
             const detalleDespacho = document.getElementById('detalleDespacho').value.trim();
             const fechaVencimiento = document.getElementById('fechaVencimiento').value;
             const fechaPago = document.getElementById('fechaPago').value;
-            const invoiceDateIso = `${String(anio).padStart(4, '0')}-${String(mes).padStart(2, '0')}-${String(dia).padStart(2, '0')}`;
+            const invoiceDateIso = fechaInput || '';
             const todayIso = getTodayISODate();
-
-// Funcion: isValidIsoDate
-// Que hace: Gestiona la logica de isValidIsoDate.
-            const isValidIsoDate = (isoDate) => {
-                if (!isoDate) return false;
-                const parsed = new Date(`${isoDate}T00:00:00`);
-                if (Number.isNaN(parsed.getTime())) return false;
-                return parsed.toISOString().slice(0, 10) === isoDate;
-            };
-
-            if (dia && mes && anio && !isValidIsoDate(invoiceDateIso)) {
-                addError('dia', 'La fecha de factura no es válida');
-                addError('mes', 'La fecha de factura no es válida');
-                addError('anio', 'La fecha de factura no es válida');
-            }
 
             if (estado === 'dispatch' && !detalleDespacho) {
                 addError('detalleDespacho', 'Detalle de Despacho requerido para estado Despacho');
@@ -890,6 +882,7 @@
             });
 
             const nowIso = new Date().toISOString();
+            const invoiceDate = fechaInput || getTodayISODate();
 
             if (editingId) {
                 const invoiceIndex = invoices.findIndex(inv => inv.id === editingId);
@@ -901,12 +894,12 @@
                         ...existingInvoice,
                         number: document.getElementById('numero').value,
                         client: document.getElementById('cliente').value,
-                        date: `${document.getElementById('anio').value}-${String(document.getElementById('mes').value).padStart(2, '0')}-${String(document.getElementById('dia').value).padStart(2, '0')}`,
+                        date: invoiceDate,
                         amount: total,
                         status: statusToSave,
                         abono: paymentToSave.abono,
                         saldoActual: paymentToSave.saldoActual,
-                        manualStatusLocked: estadoManualLock,
+                        manualStatusLocked: false,
                         dispatchDetail,
                         dueDate: dueDateToSave,
                         paidDate,
@@ -941,12 +934,12 @@
                     id: Date.now(),
                     number: document.getElementById('numero').value,
                     client: document.getElementById('cliente').value,
-                    date: `${document.getElementById('anio').value}-${String(document.getElementById('mes').value).padStart(2, '0')}-${String(document.getElementById('dia').value).padStart(2, '0')}`,
+                    date: invoiceDate,
                     amount: total,
                     status: statusToSave,
                     abono: paymentToSave.abono,
                     saldoActual: paymentToSave.saldoActual,
-                    manualStatusLocked: estadoManualLock,
+                    manualStatusLocked: false,
                     dispatchDetail,
                     dueDate: dueDateToSave,
                     paidDate,

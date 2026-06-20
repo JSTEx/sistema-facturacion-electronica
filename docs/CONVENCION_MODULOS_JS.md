@@ -40,7 +40,6 @@ La carga debe respetar dependencias:
 1. librerías externas (`SweetAlert`, `anime`, `Firebase`, etc.)
 2. `assets/js/core/*`
 3. módulos de página de menor a mayor dependencia
-4. `assets/js/anti-inspection.js`
 
 Si un módulo usa funciones/variables globales de otro, debe cargarse después.
 

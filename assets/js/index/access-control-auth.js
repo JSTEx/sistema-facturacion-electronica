@@ -34,15 +34,11 @@
         const PAGE_VIEW = new URLSearchParams(window.location.search).get('view') === 'history' ? 'history' : 'active';
         const IS_HISTORY_VIEW = PAGE_VIEW === 'history';
 
-// Funcion: isPaidInvoiceStatus
-// Que hace: Gestiona la logica de isPaidInvoiceStatus.
         function isPaidInvoiceStatus(status) {
             const normalized = String(status || '').toLowerCase();
             return normalized === 'paid' || normalized === 'pagada' || normalized === 'pagadas';
         }
 
-// Funcion: isInvoiceOverdue
-// Que hace: Gestiona la logica de isInvoiceOverdue.
         function isInvoiceOverdue(invoice) {
             if (!invoice) return false;
             const normalizedStatus = String(invoice.status || '').toLowerCase();
@@ -51,8 +47,6 @@
             return normalizedStatus === 'late' || normalizedStatus === 'vencida' || (dueDate && dueDate < today);
         }
 
-// Funcion: prioritizeOverdueInvoices
-// Que hace: Gestiona la logica de prioritizeOverdueInvoices.
         function prioritizeOverdueInvoices(list) {
             const safeList = Array.isArray(list) ? [...list] : [];
             return safeList.sort((a, b) => {
@@ -63,205 +57,6 @@
             });
         }
 
-// Funcion: animateOverdueNotificationIcons
-// Que hace: Gestiona la logica de animateOverdueNotificationIcons.
-        function animateOverdueNotificationIcons() {
-            if (!window.anime) return;
-
-            document.querySelectorAll('.overdue-notification-icon').forEach((iconEl, index) => {
-                if (iconEl.dataset.animeInit === '1') return;
-                iconEl.dataset.animeInit = '1';
-
-                window.anime({
-                    targets: iconEl,
-                    scale: [1, 1.08, 1],
-                    duration: 1350,
-                    easing: 'easeInOutSine',
-                    loop: true,
-                    delay: index * 60
-                });
-
-                const dotEl = iconEl.querySelector('.overdue-notification-dot');
-                if (!dotEl) return;
-
-                window.anime({
-                    targets: dotEl,
-                    scale: [0.9, 1.18, 0.9],
-                    opacity: [1, 0.6, 1],
-                    duration: 1100,
-                    easing: 'easeOutQuad',
-                    loop: true,
-                    delay: index * 45
-                });
-            });
-        }
-
-// Funcion: attachAnimePressFeedback
-// Que hace: Gestiona la logica de attachAnimePressFeedback.
-        function attachAnimePressFeedback(buttonEl) {
-            if (!window.anime) return;
-
-            if (!buttonEl || buttonEl.dataset.animeHoverInit === '1') return;
-            buttonEl.dataset.animeHoverInit = '1';
-
-            buttonEl.addEventListener('mouseenter', () => {
-                window.anime.remove(buttonEl);
-                window.anime({
-                    targets: buttonEl,
-                    scale: 1.035,
-                    duration: 150,
-                    easing: 'easeOutQuad'
-                });
-            });
-
-            buttonEl.addEventListener('mouseleave', () => {
-                window.anime.remove(buttonEl);
-                window.anime({
-                    targets: buttonEl,
-                    scale: 1,
-                    duration: 180,
-                    easing: 'easeOutQuad'
-                });
-            });
-
-// Funcion: pressDown
-// Que hace: Gestiona la logica de pressDown.
-            const pressDown = () => {
-                window.anime.remove(buttonEl);
-                window.anime({
-                    targets: buttonEl,
-                    scale: 0.95,
-                    duration: 85,
-                    easing: 'easeOutQuad'
-                });
-            };
-
-// Funcion: pressUp
-// Que hace: Gestiona la logica de pressUp.
-            const pressUp = () => {
-                window.anime.remove(buttonEl);
-                window.anime({
-                    targets: buttonEl,
-                    scale: 1.035,
-                    duration: 115,
-                    easing: 'easeOutQuad'
-                });
-            };
-
-// Funcion: resetState
-// Que hace: Gestiona la logica de resetState.
-            const resetState = () => {
-                window.anime.remove(buttonEl);
-                window.anime({
-                    targets: buttonEl,
-                    scale: 1,
-                    duration: 120,
-                    easing: 'easeOutQuad'
-                });
-            };
-
-            buttonEl.addEventListener('mousedown', pressDown);
-            buttonEl.addEventListener('mouseup', pressUp);
-            buttonEl.addEventListener('mouseleave', resetState);
-            buttonEl.addEventListener('touchstart', pressDown, { passive: true });
-            buttonEl.addEventListener('touchend', pressUp, { passive: true });
-            buttonEl.addEventListener('blur', resetState);
-        }
-
-// Funcion: attachAnimeSoftFeedback
-// Que hace: Gestiona la logica de attachAnimeSoftFeedback.
-        function attachAnimeSoftFeedback(buttonEl) {
-            if (!window.anime) return;
-
-            if (!buttonEl || buttonEl.dataset.animeSoftInit === '1') return;
-            buttonEl.dataset.animeSoftInit = '1';
-
-            buttonEl.addEventListener('mouseenter', () => {
-                window.anime.remove(buttonEl);
-                window.anime({
-                    targets: buttonEl,
-                    scale: 1.035,
-                    duration: 150,
-                    easing: 'easeOutQuad'
-                });
-            });
-
-            buttonEl.addEventListener('mouseleave', () => {
-                window.anime.remove(buttonEl);
-                window.anime({
-                    targets: buttonEl,
-                    scale: 1,
-                    duration: 170,
-                    easing: 'easeOutQuad'
-                });
-            });
-
-// Funcion: pressDown
-// Que hace: Gestiona la logica de pressDown.
-            const pressDown = () => {
-                window.anime.remove(buttonEl);
-                window.anime({
-                    targets: buttonEl,
-                    scale: 0.95,
-                    duration: 85,
-                    easing: 'easeOutQuad'
-                });
-            };
-
-// Funcion: pressUp
-// Que hace: Gestiona la logica de pressUp.
-            const pressUp = () => {
-                window.anime.remove(buttonEl);
-                window.anime({
-                    targets: buttonEl,
-                    scale: 1.035,
-                    duration: 115,
-                    easing: 'easeOutQuad'
-                });
-            };
-
-// Funcion: resetState
-// Que hace: Gestiona la logica de resetState.
-            const resetState = () => {
-                window.anime.remove(buttonEl);
-                window.anime({
-                    targets: buttonEl,
-                    scale: 1,
-                    duration: 120,
-                    easing: 'easeOutQuad'
-                });
-            };
-
-            buttonEl.addEventListener('mousedown', pressDown);
-            buttonEl.addEventListener('mouseup', pressUp);
-            buttonEl.addEventListener('mouseleave', resetState);
-            buttonEl.addEventListener('touchstart', pressDown, { passive: true });
-            buttonEl.addEventListener('touchend', pressUp, { passive: true });
-            buttonEl.addEventListener('blur', resetState);
-        }
-
-// Funcion: initAnimeButtonDemo
-// Que hace: Gestiona la logica de initAnimeButtonDemo.
-        function initAnimeButtonDemo() {
-            if (!window.anime) return;
-
-            const interactiveButtons = [
-                document.getElementById('btnNewInvoice'),
-                document.getElementById('btnHistoryView'),
-                document.getElementById('btnAdminPanel')
-            ];
-
-            const softButtons = [
-                document.getElementById('btnBackupExport'),
-                document.getElementById('btnBackupImport')
-            ];
-
-            interactiveButtons.forEach(attachAnimePressFeedback);
-            softButtons.forEach(attachAnimeSoftFeedback);
-        }
-
-// Funcion: configurePageModeUI
-// Que hace: Gestiona la logica de configurePageModeUI.
         function configurePageModeUI() {
             const historyBtn = document.getElementById('btnHistoryView');
             const historyBtnLabel = historyBtn ? historyBtn.querySelector('span') : null;
@@ -271,8 +66,6 @@
             const filterSelect = document.getElementById('filterSelect');
             const searchInput = document.getElementById('searchInput');
 
-// Funcion: setPrimaryNavButtonAsNewInvoice
-// Que hace: Gestiona la logica de setPrimaryNavButtonAsNewInvoice.
             const setPrimaryNavButtonAsNewInvoice = () => {
                 if (!newInvoiceBtn) return;
                 newInvoiceBtn.classList.remove('hidden');
@@ -280,8 +73,6 @@
                 newInvoiceBtn.setAttribute('onclick', 'showInvoiceForm()');
             };
 
-// Funcion: setPrimaryNavButtonAsBackToActive
-// Que hace: Gestiona la logica de setPrimaryNavButtonAsBackToActive.
             const setPrimaryNavButtonAsBackToActive = () => {
                 if (!newInvoiceBtn) return;
                 newInvoiceBtn.classList.remove('hidden');
@@ -342,8 +133,6 @@
             }
         }
 
-// Funcion: loadCurrentUser
-// Que hace: Gestiona la logica de loadCurrentUser.
         function loadCurrentUser() {
             try {
                 return JSON.parse(localStorage.getItem('currentUser') || 'null');
@@ -352,27 +141,19 @@
             }
         }
 
-// Funcion: canCreateInvoices
-// Que hace: Gestiona la logica de canCreateInvoices.
         function canCreateInvoices() {
             return !!currentUser;
         }
 
-// Funcion: isInvoiceOwner
-// Que hace: Gestiona la logica de isInvoiceOwner.
         function isInvoiceOwner(invoice) {
             return !!(currentUser && invoice && invoice.createdByEmail && invoice.createdByEmail.toLowerCase() === currentUser.email.toLowerCase());
         }
 
-// Funcion: getInvoiceCreatorText
-// Que hace: Gestiona la logica de getInvoiceCreatorText.
         function getInvoiceCreatorText(invoice) {
             if (!invoice || !invoice.createdByEmail) return 'Creada por: Usuario no registrado';
             return `Creada por: ${invoice.createdByEmail}`;
         }
 
-// Funcion: getInvoiceOwnershipBadge
-// Que hace: Gestiona la logica de getInvoiceOwnershipBadge.
         function getInvoiceOwnershipBadge(invoice) {
             if (isInvoiceOwner(invoice) && canEditInvoice(invoice)) {
                 return '<p class="mt-1"><span class="owner-edit-badge">Creada por ti · editable</span></p>';
@@ -389,32 +170,24 @@
             return '';
         }
 
-// Funcion: canEditInvoice
-// Que hace: Gestiona la logica de canEditInvoice.
         function canEditInvoice(invoice) {
             if (!currentUser) return false;
             if (currentUser.role === 'admin') return true;
             return isInvoiceOwner(invoice);
         }
 
-// Funcion: canSeeInvoiceAmount
-// Que hace: Gestiona la logica de canSeeInvoiceAmount.
         function canSeeInvoiceAmount(invoice) {
             if (!currentUser || !invoice) return false;
             if (currentUser.role === 'admin') return true;
             return isInvoiceOwner(invoice);
         }
 
-// Funcion: canViewInvoice
-// Que hace: Gestiona la logica de canViewInvoice.
         function canViewInvoice(invoice) {
             if (!currentUser || !invoice) return false;
             if (currentUser.role === 'admin') return true;
             return isInvoiceOwner(invoice);
         }
 
-// Funcion: filterInvoicesByVisibility
-// Que hace: Gestiona la logica de filterInvoicesByVisibility.
         function filterInvoicesByVisibility(list) {
             if (!currentUser || !Array.isArray(list)) return [];
             const baseList = currentUser.role === 'admin' ? list : list.filter(inv => isInvoiceOwner(inv));
@@ -424,8 +197,6 @@
             return baseList.filter(inv => !isPaidInvoiceStatus(inv && inv.status));
         }
 
-// Funcion: ensureCanCreateInvoices
-// Que hace: Gestiona la logica de ensureCanCreateInvoices.
         function ensureCanCreateInvoices() {
             if (canCreateInvoices()) return true;
             Swal.fire({
@@ -437,8 +208,6 @@
             return false;
         }
 
-// Funcion: ensureCanEditInvoice
-// Que hace: Gestiona la logica de ensureCanEditInvoice.
         function ensureCanEditInvoice(invoice) {
             if (canEditInvoice(invoice)) return true;
             Swal.fire({
@@ -450,8 +219,6 @@
             return false;
         }
 
-// Funcion: ensureCanViewInvoice
-// Que hace: Gestiona la logica de ensureCanViewInvoice.
         function ensureCanViewInvoice(invoice) {
             if (canViewInvoice(invoice)) return true;
             Swal.fire({
@@ -463,8 +230,6 @@
             return false;
         }
 
-// Funcion: ensureAdminAction
-// Que hace: Gestiona la logica de ensureAdminAction.
         function ensureAdminAction(actionName = 'esta acción') {
             if (currentUser && currentUser.role === 'admin') return true;
             Swal.fire({
@@ -516,7 +281,6 @@
                                 btn.onclick = () => { window.location.href = 'pages/admin.html'; };
                                 adminContainer.appendChild(btn);
                             }
-                            initAnimeButtonDemo();
                         }
                     } catch(e) { console.error('admin button render error', e); }
                 });

@@ -27,8 +27,7 @@ const STATIC_ASSETS = [
     './assets/js/index/invoices-form-and-validation.js',
     './assets/js/index/access-control-auth.js',
     './assets/js/index/invoices-list-and-pagination.js',
-    './assets/js/index/invoices-actions-and-events.js',
-    './assets/js/anti-inspection.js'
+    './assets/js/index/invoices-actions-and-events.js'
 ];
 
 // Instalacion: precache de assets criticos y activacion inmediata del nuevo SW.

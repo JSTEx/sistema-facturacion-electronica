@@ -29,7 +29,6 @@ Web app for invoice management with Firebase authentication and an admin user pa
 │   ├── css/
 │   │   └── app.css
 │   ├── js/
-│   │   ├── anti-inspection.js
 │   │   ├── admin/
 │   │   │   └── main.js
 │   │   ├── core/
@@ -98,7 +97,7 @@ Web app for invoice management with Firebase authentication and an admin user pa
 
 ```mermaid
 flowchart TD
-    A[Librerías externas<br/>Tailwind / SweetAlert / Anime / Firebase] --> B[assets/js/core/*]
+    A[Librerías externas<br/>Tailwind / SweetAlert / Firebase] --> B[assets/js/core/*]
 
     B --> C[index.html]
     C --> C1[assets/js/index/backup-and-shared-utils.js]
@@ -107,16 +106,13 @@ flowchart TD
     C3 --> C4[assets/js/index/access-control-auth.js]
     C4 --> C5[assets/js/index/invoices-list-and-pagination.js]
     C5 --> C6[assets/js/index/invoices-actions-and-events.js]
-    C6 --> Z1[assets/js/anti-inspection.js]
 
     B --> D[pages/admin.html]
     D --> D1[assets/js/admin/main.js]
-    D1 --> Z2[assets/js/anti-inspection.js]
 
     B --> E[pages/login.html]
     E --> E1[assets/js/login/config.js]
     E1 --> E2[assets/js/login/auth.js]
-    E2 --> Z3[assets/js/anti-inspection.js]
 ```
 
 ## Ejecutar localmente / Run Locally
@@ -151,28 +147,20 @@ This project is static HTML/CSS/JS (no `package.json`), so the easiest approach 
 - Add the script in the `<head>` of `index.html` (or the specific page where it is used).
 - Use the library from `window` in your JavaScript.
 
-Ejemplo / Example (`anime.js`):
+Ejemplo / Example (Firebase):
 
 ```html
-<script src="https://cdn.jsdelivr.net/npm/animejs@3.2.2/lib/anime.min.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js"></script>
 ```
 
 ```js
-if (window.anime) {
-    window.anime({
-        targets: '.mi-elemento',
-        translateY: [0, -4, 0],
-        duration: 1200,
-        loop: true
-    });
-}
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js';
 ```
 
 ### Librerías recomendadas (CDN) / Recommended libraries (CDN)
 
 | Librería / Library | Úsala para / Use it for | CDN (pegar en head) |
 | --- | --- | --- |
-| Anime.js | Animaciones UI (badges, notificaciones, transiciones) / UI animations (badges, notifications, transitions) | `<script src="https://cdn.jsdelivr.net/npm/animejs@3.2.2/lib/anime.min.js"></script>` |
 | Chart.js | Gráficas de ventas, pagadas vs pendientes, reportes / Sales charts, paid vs pending, reports | `<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>` |
 | IMask | Máscaras de input para dinero, NIT, teléfono / Input masks for currency, tax ID, phone | `<script src="https://cdn.jsdelivr.net/npm/imask"></script>` |
 

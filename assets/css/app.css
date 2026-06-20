@@ -1266,6 +1266,7 @@ body.page-index #itemsTableBody .input-error:focus {
     box-shadow: 0 0 12px rgba(239, 68, 68, 0.6) !important;
 }
 
+body.page-index #fecha.input-error,
 body.page-index #numero.input-error,
 body.page-index #cliente.input-error,
 body.page-index #direccion.input-error,
@@ -1282,6 +1283,7 @@ body.page-index #estado.input-error {
     box-shadow: 0 0 8px rgba(239, 68, 68, 0.4) !important;
 }
 
+body.page-index #fecha.input-error:focus,
 body.page-index #numero.input-error:focus,
 body.page-index #cliente.input-error:focus,
 body.page-index #direccion.input-error:focus,
@@ -1308,6 +1310,7 @@ html.dark-mode body.page-index #itemsTableBody .input-error:focus {
     box-shadow: 0 0 12px rgba(239, 68, 68, 0.6) !important;
 }
 
+html.dark-mode body.page-index #fecha.input-error,
 html.dark-mode body.page-index #numero.input-error,
 html.dark-mode body.page-index #cliente.input-error,
 html.dark-mode body.page-index #direccion.input-error,
@@ -1324,6 +1327,7 @@ html.dark-mode body.page-index #estado.input-error {
     box-shadow: 0 0 8px rgba(239, 68, 68, 0.4) !important;
 }
 
+html.dark-mode body.page-index #fecha.input-error:focus,
 html.dark-mode body.page-index #numero.input-error:focus,
 html.dark-mode body.page-index #cliente.input-error:focus,
 html.dark-mode body.page-index #direccion.input-error:focus,

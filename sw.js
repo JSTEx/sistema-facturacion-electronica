@@ -19,6 +19,7 @@ const STATIC_ASSETS = [
     './assets/js/core/list-utils.js',
     './assets/js/core/performance-utils.js',
     './assets/js/core/sw-register.js',
+    './assets/js/core/security.js',
     './assets/js/admin/main.js',
     './assets/js/login/config.js',
     './assets/js/login/auth.js',

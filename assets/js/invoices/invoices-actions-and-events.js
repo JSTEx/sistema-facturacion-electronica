@@ -656,7 +656,7 @@ function deleteInvoice(id) {
                 Swal.fire({
                     icon: 'error',
                     title: 'No se pudo eliminar',
-                    text: 'Firebase rechazó la operación. Verifica sesión y reglas de seguridad.',
+                    text: 'La base de datos rechazó la operación. Verifica tu sesión e intenta de nuevo.',
                     confirmButtonColor: '#1a1a1a'
                 });
             }

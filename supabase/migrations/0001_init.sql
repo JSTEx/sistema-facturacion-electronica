@@ -139,7 +139,7 @@ create policy invoices_delete on public.invoices
     for delete to authenticated
     using (owner_id = auth.uid() or public.is_admin());
 
--- Auditoria: solo admin lee y escribe.
+-- Auditoria: cualquier usuario autenticado puede registrar acciones; solo admin lee.
 drop policy if exists admin_audit_select on public.admin_audit;
 create policy admin_audit_select on public.admin_audit
     for select to authenticated
@@ -148,7 +148,7 @@ create policy admin_audit_select on public.admin_audit
 drop policy if exists admin_audit_insert on public.admin_audit;
 create policy admin_audit_insert on public.admin_audit
     for insert to authenticated
-    with check (public.is_admin());
+    with check (true);
 
 -- -----------------------------------------------------------------------------
 -- 7) GRANTs explicitos (necesarios porque el proyecto NO auto-expone tablas)

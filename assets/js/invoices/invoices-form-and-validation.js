@@ -927,7 +927,7 @@ async function saveInvoice(fechaInput) {
                 Swal.fire({
                     icon: 'error',
                     title: 'No se pudo guardar',
-                    text: 'Firebase rechazó el guardado. Verifica sesión y reglas de seguridad.',
+                    text: 'La base de datos rechazó el guardado. Verifica tu sesión e intenta de nuevo.',
                     confirmButtonColor: '#1a1a1a'
                 });
             }
@@ -974,7 +974,7 @@ async function saveInvoice(fechaInput) {
             Swal.fire({
                 icon: 'error',
                 title: 'No se pudo crear la factura',
-                text: 'Firebase rechazó el guardado. Verifica sesión y reglas de seguridad.',
+                text: 'La base de datos rechazó el guardado. Verifica tu sesión e intenta de nuevo.',
                 confirmButtonColor: '#1a1a1a'
             });
         }

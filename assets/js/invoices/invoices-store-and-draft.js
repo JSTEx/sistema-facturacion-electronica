@@ -1,80 +1,81 @@
-// Persistencia local de borradores y sincronizacion de datos del formulario.
+// Persistencia y sincronizacion de facturas contra Supabase.
 async function loadInvoices() {
-    const data = await getFirebaseData('invoices');
-    return normalizeInvoices(data);
-}
+    const { data, error } = await window.supabaseClient
+        .from('invoices')
+        .select('*')
+        .order('id', { ascending: false });
 
-async function saveInvoices(invoicesList) {
-    const ok = await setFirebaseData('invoices', invoicesList);
-    if (!ok) {
-        throw new Error('No se pudo guardar en Firebase');
-    }
-}
-
-async function saveInvoiceRecord(invoice) {
-    const ok = await setFirebaseData(`invoices/${String(invoice.id)}`, invoice);
-    if (!ok) {
-        throw new Error('No se pudo guardar la factura en Firebase');
-    }
-}
-
-async function deleteInvoiceRecord(id) {
-    const ok = await setFirebaseData(`invoices/${String(id)}`, null);
-    if (!ok) {
-        throw new Error('No se pudo eliminar la factura en Firebase');
-    }
-}
-
-// Funcion: isLegacyInvoicesObject
-// Que hace: Gestiona la logica de isLegacyInvoicesObject.
-function isLegacyInvoicesObject(rawInvoices) {
-    if (!rawInvoices || typeof rawInvoices !== 'object' || Array.isArray(rawInvoices)) return false;
-    const keys = Object.keys(rawInvoices);
-    if (keys.length === 0) return false;
-    const allNumericKeys = keys.every(key => String(parseInt(key, 10)) === key);
-    if (!allNumericKeys) return false;
-    return true;
-}
-
-async function migrateInvoicesIfLegacy(rawInvoices) {
-    let legacyList = null;
-    if (Array.isArray(rawInvoices)) {
-        legacyList = rawInvoices.filter(Boolean);
-    } else if (isLegacyInvoicesObject(rawInvoices)) {
-        legacyList = Object.values(rawInvoices).filter(Boolean);
+    if (error) {
+        console.error('Error cargando facturas:', error);
+        throw error;
     }
 
-    if (!legacyList) return rawInvoices;
-
-    const migrated = {};
-    legacyList.forEach((inv) => {
-        if (inv && inv.id) {
-            migrated[String(inv.id)] = inv;
-        }
-    });
-    await setFirebaseData('invoices', migrated);
-    return migrated;
-}
-
-async function readInvoicesStrict() {
-    const invoicesRef = window.firebaseRef(window.firebaseDB, 'invoices');
-    const snapshot = await window.firebaseGet(invoicesRef);
-    return snapshot.exists() ? snapshot.val() : [];
+    return normalizeInvoices((data || []).map(rowToInvoice));
 }
 
 async function loadInvoicesWithRetry(maxAttempts = 6) {
     for (let attempt = 1; attempt <= maxAttempts; attempt++) {
         try {
-            let raw = await readInvoicesStrict();
-            raw = await migrateInvoicesIfLegacy(raw);
-            return normalizeInvoices(raw);
+            return await loadInvoices();
         } catch (error) {
             console.error(`Error cargando facturas (intento ${attempt}/${maxAttempts}):`, error);
             if (attempt === maxAttempts) throw error;
-            await new Promise(resolve => setTimeout(resolve, 250 * attempt));
+            await new Promise((resolve) => setTimeout(resolve, 250 * attempt));
         }
     }
     return [];
+}
+
+async function saveInvoiceRecord(invoice) {
+    const row = invoiceToRow(invoice);
+    const { error } = await window.supabaseClient
+        .from('invoices')
+        .upsert(row, { onConflict: 'id' });
+
+    if (error) {
+        console.error('Error guardando factura:', error);
+        throw new Error('No se pudo guardar la factura en la base de datos');
+    }
+}
+
+async function deleteInvoiceRecord(id) {
+    const { error } = await window.supabaseClient
+        .from('invoices')
+        .delete()
+        .eq('id', Number(id));
+
+    if (error) {
+        console.error('Error eliminando factura:', error);
+        throw new Error('No se pudo eliminar la factura de la base de datos');
+    }
+}
+
+// Funcion: saveInvoices
+// Que hace: Reemplaza todas las facturas por la lista dada (usado al importar respaldos).
+async function saveInvoices(invoicesList) {
+    const rows = normalizeInvoices(invoicesList).map((inv) => invoiceToRow(inv));
+    const ids = rows.map((row) => row.id);
+
+    let deleteQuery = window.supabaseClient.from('invoices').delete();
+    deleteQuery = ids.length > 0
+        ? deleteQuery.not('id', 'in', `(${ids.join(',')})`)
+        : deleteQuery.neq('id', -1);
+
+    const { error: deleteError } = await deleteQuery;
+    if (deleteError) {
+        console.error('Error limpiando facturas antes de importar:', deleteError);
+        throw new Error('No se pudo actualizar la base de datos al importar');
+    }
+
+    if (rows.length > 0) {
+        const { error: upsertError } = await window.supabaseClient
+            .from('invoices')
+            .upsert(rows, { onConflict: 'id' });
+        if (upsertError) {
+            console.error('Error importando facturas:', upsertError);
+            throw new Error('No se pudo guardar el respaldo en la base de datos');
+        }
+    }
 }
 
 let invoices = [];
@@ -223,7 +224,7 @@ function restoreDraftIfExists() {
     }
 }
 
-// Cargar facturas solo después de validar autenticación Firebase
+// Cargar facturas y suscribirse a cambios en tiempo real (Supabase).
 async function initInvoicesRealtime() {
     if (invoicesInitialized) return;
     invoicesInitialized = true;
@@ -246,20 +247,23 @@ async function initInvoicesRealtime() {
     }
 
 // Funcion: subscribe
-// Que hace: Gestiona la logica de subscribe.
+// Que hace: Se suscribe a cambios de la tabla invoices via Supabase Realtime.
     const subscribe = () => {
-        const invoicesRef = window.firebaseRef(window.firebaseDB, 'invoices');
-        stopInvoicesRealtime = window.firebaseOnValue(
-            invoicesRef,
-            (snapshot) => {
-                invoices = normalizeInvoices(snapshot.val());
-                updateInvoiceList();
-            },
-            (error) => {
-                console.error('Error en listener de facturas:', error);
-                setTimeout(subscribe, 500);
-            }
-        );
+        stopInvoicesRealtime = window.supabaseClient
+            .channel('invoices-changes')
+            .on('postgres_changes', { event: '*', schema: 'public', table: 'invoices' }, () => {
+                loadInvoices()
+                    .then((list) => {
+                        invoices = list;
+                        updateInvoiceList();
+                    })
+                    .catch((error) => console.error('Error refrescando facturas:', error));
+            })
+            .subscribe((status) => {
+                if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
+                    console.error('Canal de facturas con error:', status);
+                }
+            });
     };
 
     subscribe();

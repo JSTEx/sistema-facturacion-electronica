@@ -70,6 +70,59 @@ function normalizeInvoiceRecord(record) {
     };
 }
 
+// Funcion: invoiceToRow
+// Que hace: Convierte una factura (camelCase, app) a fila Postgres (snake_case).
+function invoiceToRow(inv) {
+    return {
+        id: Number(inv.id),
+        number: inv.number != null ? String(inv.number) : '',
+        client: inv.client != null ? String(inv.client) : '',
+        address: inv.address != null ? String(inv.address) : '',
+        date: inv.date != null ? String(inv.date) : '',
+        amount: Number(inv.amount) || 0,
+        status: inv.status != null ? String(inv.status) : 'pending',
+        abono: Number(inv.abono) || 0,
+        saldo_actual: Number(inv.saldoActual) || 0,
+        dispatch_detail: inv.dispatchDetail != null ? String(inv.dispatchDetail) : '',
+        due_date: inv.dueDate != null ? String(inv.dueDate) : '',
+        paid_date: inv.paidDate != null ? String(inv.paidDate) : '',
+        items: Array.isArray(inv.items) ? inv.items : [],
+        change_log: Array.isArray(inv.changeLog) ? inv.changeLog : [],
+        owner_id: inv.ownerId || (currentUser ? currentUser.uid : null) || null,
+        created_by_email: inv.createdByEmail != null ? String(inv.createdByEmail) : '',
+        created_at: inv.createdAt != null ? String(inv.createdAt) : '',
+        updated_by_email: inv.updatedByEmail != null ? String(inv.updatedByEmail) : '',
+        updated_at: inv.updatedAt != null ? String(inv.updatedAt) : ''
+    };
+}
+
+// Funcion: rowToInvoice
+// Que hace: Convierte una fila Postgres (snake_case) a factura (camelCase, app).
+function rowToInvoice(row) {
+    if (!row) return row;
+    return {
+        id: row.id,
+        number: row.number,
+        client: row.client,
+        address: row.address,
+        date: row.date,
+        amount: row.amount,
+        status: row.status,
+        abono: row.abono,
+        saldoActual: row.saldo_actual,
+        dispatchDetail: row.dispatch_detail,
+        dueDate: row.due_date,
+        paidDate: row.paid_date,
+        items: row.items,
+        changeLog: row.change_log,
+        ownerId: row.owner_id,
+        createdByEmail: row.created_by_email,
+        createdAt: row.created_at,
+        updatedByEmail: row.updated_by_email,
+        updatedAt: row.updated_at
+    };
+}
+
 // Funcion: toInvoicesMap
 // Que hace: Gestiona la logica de toInvoicesMap.
 function toInvoicesMap(invoiceList) {
@@ -104,8 +157,16 @@ function appendChangeLog(existingLog, entry) {
 }
 
 async function saveAdminAuditRecord(entry) {
-    const key = `${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
-    await setFirebaseData(`adminAudit/${key}`, entry);
+    const safeEntry = entry || {};
+    const { error } = await window.supabaseClient.from('admin_audit').insert({
+        time: safeEntry.at || safeEntry.time || new Date().toISOString(),
+        admin_email: safeEntry.byEmail || safeEntry.admin || (currentUser ? currentUser.email : null),
+        action: safeEntry.action || 'unknown',
+        target: safeEntry.invoiceNumber || safeEntry.target || (safeEntry.invoiceId != null ? String(safeEntry.invoiceId) : null)
+    });
+    if (error) {
+        console.error('Error guardando auditoría:', error);
+    }
 }
 
 // Funcion: getDateDiffFromToday
@@ -439,13 +500,14 @@ async function importInvoicesBackupFile(file) {
 
     if (!confirm.isConfirmed) return;
 
-    const invoicesMap = toInvoicesMap(normalizedIncoming);
-    const ok = await setFirebaseData('invoices', invoicesMap);
-    if (!ok) {
+    try {
+        await saveInvoices(normalizedIncoming);
+    } catch (error) {
+        console.error('Error importando respaldo:', error);
         Swal.fire({
             icon: 'error',
             title: 'No se pudo importar',
-            text: 'Firebase rechazó la importación del respaldo.',
+            text: 'La base de datos rechazó la importación del respaldo.',
             confirmButtonColor: '#1a1a1a'
         });
         return;
@@ -464,5 +526,5 @@ async function importInvoicesBackupFile(file) {
     localStorage.setItem(BACKUP_REMINDER_LAST_KEY, String(Date.now()));
 }
 
-// Verificar autenticación obligatoria con Firebase Auth
+// Verificar autenticación obligatoria con Supabase Auth
 // Mostrar loader hasta verificar sesion

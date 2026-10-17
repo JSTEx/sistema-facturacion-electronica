@@ -37,7 +37,7 @@ Usar nombres descriptivos con guiones:
 
 La carga debe respetar dependencias:
 
-1. librerías externas (`SweetAlert`, `jsPDF`, `Firebase`, etc.)
+1. librerías externas (`SweetAlert`, `jsPDF`, `Supabase`, etc.)
 2. `assets/js/core/*`
 3. módulos de página de menor a mayor dependencia
 

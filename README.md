@@ -1,14 +1,20 @@
 # Sistema de Facturación Electrónica / Electronic Billing System
 
-Aplicación web para gestión de facturas con autenticación en Firebase y panel de administración de usuarios.
+Aplicación web para gestión de facturas con autenticación en Supabase y panel de administración de usuarios.
 
-Web app for invoice management with Firebase authentication and an admin user panel.
+Web app for invoice management with Supabase authentication and an admin user panel.
 
-## URL pública / Public URL (GitHub Pages)
+## URL pública / Public URL
 
-- Sitio / Site: [https://jstex.github.io/sistema-facturacion-electronica/](https://jstex.github.io/sistema-facturacion-electronica/)
+- Despliegue principal recomendado / Recommended deploy: **Vercel**.
+- Vercel es necesario para la gestión de usuarios (función serverless `api/users.js`).
+- Vercel is required for user management (serverless function `api/users.js`).
+
+- Sitio / Site: [https://jstex.github.io/sistema-facturacion-electronica/](https://jstex.github.io/sistema-facturacion-electronica/) (solo lectura estática / static-only)
 - Login: [https://jstex.github.io/sistema-facturacion-electronica/pages/login.html](https://jstex.github.io/sistema-facturacion-electronica/pages/login.html)
 - Admin: [https://jstex.github.io/sistema-facturacion-electronica/pages/admin.html](https://jstex.github.io/sistema-facturacion-electronica/pages/admin.html)
+
+> En un despliegue puramente estático (GitHub Pages) la gestión de usuarios no funciona porque `api/` no se ejecuta.
 
 ## Licencia / License
 
@@ -24,8 +30,11 @@ Web app for invoice management with Firebase authentication and an admin user pa
 ├── index.html
 ├── LICENSE
 ├── README.md
+├── package.json
 ├── sw.js
 ├── vercel.json
+├── api/
+│   └── users.js
 ├── assets/
 │   ├── css/
 │   │   └── app.css
@@ -33,8 +42,9 @@ Web app for invoice management with Firebase authentication and an admin user pa
 │   │   ├── admin/
 │   │   │   └── main.js
 │   │   ├── core/
-│   │   │   ├── firebase-config.js
-│   │   │   ├── firebase-utils.js
+│   │   │   ├── supabase-config.js
+│   │   │   ├── supabase-client.js
+│   │   │   ├── supabase-utils.js
 │   │   │   ├── list-utils.js
 │   │   │   ├── loading-utils.js
 │   │   │   ├── password-utils.js
@@ -59,18 +69,19 @@ Web app for invoice management with Firebase authentication and an admin user pa
 │       ├── files/
 │       ├── images/
 │       └── videos/
-├── config/
-│   └── firebase-inicial.json
 ├── docs/
 │   ├── CHECKLIST_REFACTOR_ADMIN_SEGURO.md
 │   ├── CONVENCION_MODULOS_JS.md
-│   ├── INSTRUCCIONES_FIREBASE.md
+│   ├── INSTRUCCIONES_SUPABASE.md
 │   ├── LICENCIA_RESUMEN.md
 │   └── MEDIDAS_SEGURIDAD.md
 ├── pages/
 │   ├── admin.html
 │   ├── historial.html
 │   └── login.html
+├── supabase/
+│   └── migrations/
+│       └── 0001_init.sql
 └── templates/
     ├── plantilla-base.html
     └── plantilla-formulario.html
@@ -82,7 +93,7 @@ Web app for invoice management with Firebase authentication and an admin user pa
 - Use relative paths between `index.html`, `pages/`, and `assets/`.
 - Para recursos multimedia nuevos, usa `assets/external/`.
 - For new media resources, use `assets/external/`.
-- Documentación Firebase / Firebase docs: `docs/INSTRUCCIONES_FIREBASE.md`.
+- Documentación Supabase / Supabase docs: `docs/INSTRUCCIONES_SUPABASE.md`.
 - Convención de módulos JS / JS module conventions: `docs/CONVENCION_MODULOS_JS.md`.
 
 ## Reglas rápidas de módulos JS / Quick JS module rules
@@ -104,7 +115,7 @@ Web app for invoice management with Firebase authentication and an admin user pa
 
 ```mermaid
 flowchart TD
-    A[Librerías externas<br/>Tailwind / SweetAlert / Firebase] --> B[assets/js/core/*]
+    A[Librerías externas<br/>Tailwind / SweetAlert / Supabase] --> B[assets/js/core/*]
 
     B --> C[index.html]
     C --> C1[assets/js/invoices/backup-and-shared-utils.js]
@@ -144,9 +155,9 @@ python -m http.server 5500
 
 ## Instalar librerías (CDN) / Install libraries (CDN)
 
-Este proyecto es HTML/CSS/JS estático (sin `package.json`), así que la forma más simple es usar CDN.
+Este proyecto es HTML/CSS/JS estático (sin build en el frontend), así que la forma más simple es usar CDN.
 
-This project is static HTML/CSS/JS (no `package.json`), so the easiest approach is using a CDN.
+This project is static HTML/CSS/JS (no frontend build), so the easiest approach is using a CDN.
 
 - Agrega el script en el `<head>` de `index.html` (o en la página donde lo usarás).
 - Usa la librería desde `window` en tu JavaScript.
@@ -154,15 +165,13 @@ This project is static HTML/CSS/JS (no `package.json`), so the easiest approach 
 - Add the script in the `<head>` of `index.html` (or the specific page where it is used).
 - Use the library from `window` in your JavaScript.
 
-Ejemplo / Example (Firebase):
-
-```html
-<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js"></script>
-```
+Ejemplo / Example (Supabase, ya integrado como módulo ESM):
 
 ```js
-import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js';
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
 ```
+
+> El `package.json` de la raíz solo existe para la función serverless (`api/users.js`); el frontend no usa build.
 
 ### Librerías recomendadas (CDN) / Recommended libraries (CDN)
 
@@ -186,4 +195,4 @@ import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.8.0/firebas
 - Confirmar exportación/importación de respaldo manual.
 - Validar PDF (previsualización y descarga).
 - Revisar vista activa e historial pagadas.
-- Confirmar reglas de Firebase en `docs/INSTRUCCIONES_FIREBASE.md`.
+- Confirmar migración y políticas RLS aplicadas en Supabase (`docs/INSTRUCCIONES_SUPABASE.md`).

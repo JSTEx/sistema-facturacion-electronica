@@ -1,5 +1,5 @@
 // Service Worker: cachea recursos estaticos y provee fallback offline.
-const CACHE_VERSION = 'facturacion-cache-v3';
+const CACHE_VERSION = 'facturacion-cache-v4';
 
 // Lista base de recursos que se precargan durante la instalacion.
 const STATIC_ASSETS = [
@@ -8,10 +8,11 @@ const STATIC_ASSETS = [
     './pages/login.html',
     './pages/admin.html',
     './assets/css/app.css',
-    './assets/js/core/firebase-config.js',
+    './assets/js/core/supabase-config.js',
     './assets/js/core/password-utils.js',
     './assets/js/core/loading-utils.js',
-    './assets/js/core/firebase-utils.js',
+    './assets/js/core/supabase-utils.js',
+    './assets/js/core/supabase-client.js',
     './assets/js/core/theme-utils.js',
     './assets/js/core/session-utils.js',
     './assets/js/core/toast-utils.js',

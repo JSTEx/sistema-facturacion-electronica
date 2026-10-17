@@ -738,7 +738,14 @@ html.dark-mode .status-saldo { background: rgba(139, 92, 246, 0.18); color: #c4b
 #invoiceFormView label { color: var(--text-muted); font-weight: 600; font-size: 13px; }
 #invoiceFormView textarea { resize: vertical; min-height: 44px; }
 
-#estadoManualLock { width: auto; }
+#invoiceFormView input[type="checkbox"],
+#invoiceFormView input[type="radio"] {
+    width: auto;
+    height: auto;
+    padding: 0;
+    border-radius: 4px;
+}
+#invoiceFormView #estadoManualLock { width: auto; }
 
 /* Select de estado con colores */
 .status-select { font-weight: 600; }

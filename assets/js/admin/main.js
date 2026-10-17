@@ -1,175 +1,103 @@
-// Modulo principal del panel admin: gestion de usuarios y permisos.
+// Modulo principal del panel admin: gestion de usuarios y permisos (Supabase).
 window.toastTheme = {
     background: '#eff6ff',
     color: '#1e3a8a',
     iconColor: '#2563eb'
 };
 
-const ADMIN_USER_PATHS = ['users', 'usuarios', 'Users', 'Usuarios'];
-let adminUsersPath = 'users';
-
-// Funcion: normalizeList
-// Que hace: Gestiona la logica de normalizeList.
-function normalizeList(value) {
-    if (Array.isArray(value)) return value.filter(Boolean);
-    if (value && typeof value === 'object') return Object.values(value).filter(Boolean);
-    return [];
-}
-
-// Funcion: pickFirstString
-// Que hace: Gestiona la logica de pickFirstString.
-function pickFirstString(candidates, keys) {
-    for (const source of candidates) {
-        if (!source || typeof source !== 'object') continue;
-        for (const key of keys) {
-            const value = source[key];
-            if (value === null || value === undefined) continue;
-            const parsed = String(value).trim();
-            if (parsed) return parsed;
-        }
-    }
-    return '';
-}
-
-// Funcion: normalizeSingleUser
-// Que hace: Gestiona la logica de normalizeSingleUser.
-function normalizeSingleUser(record) {
-    if (!record) return null;
-
-    if (typeof record === 'string') {
-        const email = record.trim();
-        if (!email) return null;
-        return { email, role: 'user' };
+// Funcion: callAdminApi
+// Que hace: Llama a la funcion serverless /api/users con el token de sesion.
+async function callAdminApi(payload) {
+    const session = await getSupabaseSession();
+    const token = session ? session.access_token : null;
+    if (!token) {
+        throw new Error('Sesion no valida. Vuelve a iniciar sesion.');
     }
 
-    if (typeof record !== 'object') return null;
+    const response = await fetch('/api/users', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify(payload)
+    });
 
-    const candidates = [
-        record,
-        record.profile,
-        record.user,
-        record.data,
-        record.info,
-        record.usuario
-    ].filter(Boolean);
-
-    const email = pickFirstString(candidates, ['email', 'userEmail', 'mail', 'correo']);
-    if (!email) return null;
-
-    const rawRole = pickFirstString(candidates, ['role', 'rol', 'userRole']).toLowerCase();
-    const inferredRole = candidates.some((item) => item?.isAdmin === true || item?.admin === true) ? 'admin' : 'user';
-    const role = rawRole || inferredRole;
-    const uid = pickFirstString(candidates, ['uid', 'id', 'userId']);
-
-    return {
-        ...record,
-        email,
-        role,
-        uid
-    };
-}
-
-// Funcion: extractUserRecords
-// Que hace: Gestiona la logica de extractUserRecords.
-function extractUserRecords(rawUsers, depth = 0) {
-    if (depth > 4 || rawUsers === null || rawUsers === undefined) return [];
-
-    if (Array.isArray(rawUsers)) {
-        return rawUsers.flatMap((item) => extractUserRecords(item, depth + 1));
+    let data = {};
+    try {
+        data = await response.json();
+    } catch (_) {
+        data = {};
     }
 
-    if (typeof rawUsers !== 'object') {
+    if (!response.ok) {
+        throw new Error(data.error || `Error del servidor (${response.status})`);
+    }
+
+    return data;
+}
+
+// Funcion: loadUsers
+// Que hace: Carga los perfiles de usuario desde Supabase.
+async function loadUsers() {
+    const { data, error } = await window.supabaseClient
+        .from('profiles')
+        .select('id, email, role, description')
+        .order('email', { ascending: true });
+
+    if (error) {
+        console.error('Error cargando usuarios:', error);
         return [];
     }
 
-    const direct = normalizeSingleUser(rawUsers);
-    if (direct) return [rawUsers];
-
-    const containerKeys = ['users', 'usuarios', 'Users', 'Usuarios', 'items', 'list', 'data', 'records'];
-    const gathered = [];
-
-    containerKeys.forEach((key) => {
-        if (rawUsers[key] !== undefined) {
-            gathered.push(...extractUserRecords(rawUsers[key], depth + 1));
-        }
-    });
-
-    if (gathered.length > 0) return gathered;
-
-    return Object.values(rawUsers).flatMap((value) => extractUserRecords(value, depth + 1));
+    return (data || []).map((u) => ({ ...u, uid: u.id }));
 }
 
-async function readPath(path) {
-    const viaWrapper = await getFirebaseData(path);
-    if (viaWrapper !== null && viaWrapper !== undefined) return viaWrapper;
+// Funcion: updateProfile
+// Que hace: Actualiza rol/descripcion de un perfil.
+async function updateProfile(id, changes) {
+    const { error } = await window.supabaseClient
+        .from('profiles')
+        .update(changes)
+        .eq('id', id);
 
-    if (window.firebaseGet && window.firebaseRef && window.firebaseDB) {
-        try {
-            const snap = await window.firebaseGet(window.firebaseRef(window.firebaseDB, path));
-            return snap.exists() ? snap.val() : null;
-        } catch (error) {
-            console.error(`Error leyendo ${path}:`, error);
-        }
+    if (error) {
+        console.error('Error actualizando perfil:', error);
+        throw new Error('No se pudo actualizar el usuario');
     }
-
-    return null;
 }
 
-async function loadUsers() {
-    let bestPath = 'users';
-    let bestCount = -1;
-    let bestValue = null;
+// Funcion: deleteProfile
+// Que hace: Elimina solo el perfil (conserva el acceso de autenticacion).
+async function deleteProfile(id) {
+    const { error } = await window.supabaseClient
+        .from('profiles')
+        .delete()
+        .eq('id', id);
 
-    for (const path of ADMIN_USER_PATHS) {
-        const raw = await readPath(path);
-        if (raw === null || raw === undefined) continue;
-
-        const records = extractUserRecords(raw);
-        const count = records.length;
-
-        if (count > bestCount) {
-            bestCount = count;
-            bestPath = path;
-            bestValue = raw;
-        }
+    if (error) {
+        console.error('Error eliminando perfil:', error);
+        throw new Error('No se pudo eliminar el perfil');
     }
-
-    adminUsersPath = bestPath;
-
-    const source = bestValue ?? [];
-    const extracted = extractUserRecords(source);
-    const normalized = (extracted.length > 0 ? extracted : normalizeList(source))
-        .map((item) => normalizeSingleUser(item))
-        .filter(Boolean);
-
-    const dedup = new Map();
-    normalized.forEach((user) => dedup.set(String(user.email).toLowerCase(), user));
-    return Array.from(dedup.values());
 }
 
-async function saveUsers(list) {
-    await setFirebaseData(adminUsersPath || 'users', list);
-}
-
+// Funcion: logAction
+// Que hace: Registra una accion del administrador en la auditoria.
 async function logAction(action, target) {
     const admin = JSON.parse(localStorage.getItem('currentUser') || 'null');
-    const rawAudits = await getFirebaseData('adminAudit');
-    const audits = Array.isArray(rawAudits)
-        ? [...rawAudits]
-        : (rawAudits && typeof rawAudits === 'object' ? Object.values(rawAudits).filter(Boolean) : []);
-
-    audits.push({
-        time: new Date().toISOString(),
-        admin: admin ? admin.email : null,
+    const { error } = await window.supabaseClient.from('admin_audit').insert({
+        admin_email: admin ? admin.email : null,
         action,
         target
     });
 
-    await setFirebaseData('adminAudit', audits);
+    if (error) {
+        console.error('Error registrando auditoría:', error);
+    }
 }
 
 // Funcion: countAdmins
-// Que hace: Gestiona la logica de countAdmins.
+// Que hace: Cuenta cuantos administradores hay en la lista.
 function countAdmins(list) {
     return list.filter((u) => String(u?.role || '').toLowerCase() === 'admin').length;
 }
@@ -252,13 +180,11 @@ async function renderUsers() {
                 title: 'Eliminar usuario?',
                 html: `
                     <p>Eliminar <strong>${target.email}</strong> no se puede deshacer.</p>
-                    <p class="admin-delete-note">Para eliminarlo completamente, también se borrará de Firebase Authentication.</p>
+                    <p class="admin-delete-note">Se eliminará el acceso del usuario (autenticación) y su perfil.</p>
                     <div class="admin-delete-fields">
-                        <label for="deleteUserPassword" class="admin-delete-label">Contraseña actual del usuario</label>
-                        <input id="deleteUserPassword" type="password" class="swal2-input admin-delete-input" placeholder="Ingresa la contraseña del usuario">
                         <label class="admin-delete-warning">
-                            <input id="forceDeleteDbOnly" type="checkbox">
-                            Forzar eliminación solo en base de datos (no borrar en Firebase Authentication)
+                            <input id="forceProfileOnly" type="checkbox">
+                            Eliminar solo el perfil (no borrar el acceso de autenticación)
                         </label>
                     </div>
                 `,
@@ -268,58 +194,32 @@ async function renderUsers() {
                 cancelButtonColor: '#16a34a',
                 confirmButtonText: 'Sí, eliminar',
                 cancelButtonText: 'No, cancelar',
-                preConfirm: () => {
-                    const forceDbOnly = !!document.getElementById('forceDeleteDbOnly')?.checked;
-                    const password = (document.getElementById('deleteUserPassword')?.value || '').trim();
-                    if (!forceDbOnly && !password) {
-                        Swal.showValidationMessage('Debes ingresar la contraseña actual del usuario para eliminarlo de Firebase Authentication.');
-                        return false;
-                    }
-                    return { password, forceDbOnly };
-                }
+                preConfirm: () => ({
+                    forceProfileOnly: !!document.getElementById('forceProfileOnly')?.checked
+                })
             });
 
             if (!result.isConfirmed) return;
 
-            const forceDbOnly = !!result.value?.forceDbOnly;
-
-            if (forceDbOnly) {
-                users.splice(idx, 1);
-                await saveUsers(users);
-                await logAction('delete-db-only', target.email);
-                showToast('Usuario eliminado solo en base de datos', 'success', 1700);
-                await renderUsers();
-                return;
-            }
+            const forceProfileOnly = !!result.value?.forceProfileOnly;
 
             try {
-                const targetPassword = result.value.password;
-                const authCredential = await window.firebaseSignIn(window.firebaseProvisionAuth, target.email, targetPassword);
-                await window.firebaseDeleteUser(authCredential.user);
-                await window.firebaseProvisionAuth.signOut();
-
-                users.splice(idx, 1);
-                await saveUsers(users);
-                await logAction('delete', target.email);
-                showToast('Usuario eliminado de Firebase Auth y base de datos', 'success', 1700);
+                if (forceProfileOnly) {
+                    await deleteProfile(target.id);
+                    await logAction('delete-profile-only', target.email);
+                    showToast('Perfil eliminado (acceso de autenticación conservado)', 'success', 1900);
+                } else {
+                    await callAdminApi({ action: 'delete', userId: target.id });
+                    await logAction('delete', target.email);
+                    showToast('Usuario eliminado de autenticación y perfiles', 'success', 1700);
+                }
                 await renderUsers();
             } catch (error) {
-                console.error('Error eliminando usuario en Firebase Auth:', error);
-                try { await window.firebaseProvisionAuth.signOut(); } catch (_) {}
-
-                let message = 'No se pudo eliminar el usuario en Firebase Authentication.';
-                if (error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
-                    message = 'La contraseña ingresada no es correcta.';
-                } else if (error.code === 'auth/user-not-found') {
-                    message = 'El usuario no existe en Firebase Authentication.';
-                } else if (error.code === 'auth/too-many-requests') {
-                    message = 'Demasiados intentos. Intenta de nuevo más tarde.';
-                }
-
+                console.error('Error eliminando usuario:', error);
                 Swal.fire({
                     icon: 'error',
                     title: 'No se eliminó',
-                    text: `${message} La cuenta no fue borrada de la base de datos para mantener consistencia.`,
+                    text: error.message || 'No se pudo eliminar el usuario.',
                     confirmButtonColor: '#dc2626'
                 });
             }
@@ -346,7 +246,7 @@ async function openEditDialog(index) {
         title: `Editar ${target.email}`,
         html:
             `<div class="edit-user-form">` +
-            `<p class="edit-user-note">Las contraseñas se gestionan mediante Firebase Authentication. Los usuarios pueden cambiarlas desde su perfil.</p>` +
+            `<p class="edit-user-note">Las contraseñas se gestionan mediante Supabase Auth. Los usuarios pueden cambiarlas desde su perfil.</p>` +
             `<div class="edit-user-group">` +
             `<label class="edit-user-field-label">Rol del usuario</label>` +
             `<select id="swal-role" class="edit-user-select"><option value="user">Usuario</option><option value="admin">Administrador</option></select>` +
@@ -387,12 +287,15 @@ async function openEditDialog(index) {
         return;
     }
 
-    target.role = formValues.newRole;
-    target.description = formValues.newDescription;
-    await saveUsers(users);
-    await logAction('edit', target.email);
-    showToast('Usuario actualizado', 'success', 1200);
-    await renderUsers();
+    try {
+        await updateProfile(target.id, { role: formValues.newRole, description: formValues.newDescription });
+        await logAction('edit', target.email);
+        showToast('Usuario actualizado', 'success', 1200);
+        await renderUsers();
+    } catch (error) {
+        console.error('Error actualizando usuario:', error);
+        Swal.fire({ icon: 'error', title: 'Error', text: error.message || 'No se pudo actualizar el usuario' });
+    }
 }
 
 // Funcion: bindAdminEvents
@@ -417,30 +320,19 @@ function bindAdminEvents() {
             return;
         }
 
-        const users = await loadUsers();
-        if (users.find((u) => String(u?.email || '').toLowerCase() === email.toLowerCase())) {
-            Swal.fire({ icon: 'error', title: 'Error', text: 'El usuario ya existe', confirmButtonColor: '#1f2937' });
-            return;
-        }
-
         try {
-            const userCredential = await window.firebaseCreateUser(window.firebaseProvisionAuth, email, pass);
-            await window.firebaseProvisionAuth.signOut();
-
-            users.push({ email, role, uid: userCredential.user.uid });
-            await saveUsers(users);
+            await callAdminApi({ action: 'create', email, password: pass, role });
             this.reset();
             await logAction('create', email);
-            showToast('Usuario creado en Firebase Auth', 'success', 1400);
+            showToast('Usuario creado', 'success', 1400);
             await renderUsers();
         } catch (error) {
             console.error('Error creando usuario:', error);
-            if (error.code === 'auth/email-already-in-use') {
-                Swal.fire({ icon: 'error', title: 'Error', text: 'El email ya está registrado en Firebase', confirmButtonColor: '#dc2626' });
-            } else if (error.code === 'auth/weak-password') {
-                Swal.fire({ icon: 'error', title: 'Error', text: 'La contraseña debe tener al menos 6 caracteres', confirmButtonColor: '#dc2626' });
+            const message = error.message || 'Error al crear usuario';
+            if (message.toLowerCase().includes('already')) {
+                Swal.fire({ icon: 'error', title: 'Error', text: 'El email ya está registrado', confirmButtonColor: '#dc2626' });
             } else {
-                Swal.fire({ icon: 'error', title: 'Error', text: 'Error al crear usuario: ' + error.message, confirmButtonColor: '#dc2626' });
+                Swal.fire({ icon: 'error', title: 'Error', text: message, confirmButtonColor: '#dc2626' });
             }
         }
     });
@@ -470,9 +362,24 @@ function bindAdminEvents() {
             try {
                 const imported = JSON.parse(reader.result);
                 if (!Array.isArray(imported)) throw new Error('Formato incorrecto');
-                const valid = imported.every((u) => u && u.email && u.role);
-                if (!valid) throw new Error('Formato incorrecto');
-                await setFirebaseData(adminUsersPath || 'users', imported);
+
+                const rows = imported
+                    .filter((u) => u && u.email)
+                    .map((u) => ({
+                        id: u.id || u.uid || null,
+                        email: String(u.email).trim(),
+                        role: String(u.role || '').toLowerCase() === 'admin' ? 'admin' : 'user',
+                        description: u.description || ''
+                    }))
+                    .filter((u) => u.id);
+
+                if (!rows.length) throw new Error('No hay usuarios válidos (falta id/uid)');
+
+                const { error } = await window.supabaseClient
+                    .from('profiles')
+                    .upsert(rows, { onConflict: 'id' });
+                if (error) throw error;
+
                 showToast('Usuarios importados', 'success', 1200);
                 await renderUsers();
             } catch (err) {
@@ -508,17 +415,16 @@ function bindAdminEvents() {
 }
 
 // Funcion: bindRealtimeUsers
-// Que hace: Gestiona la logica de bindRealtimeUsers.
+// Que hace: Se suscribe a cambios de la tabla profiles via Supabase Realtime.
 function bindRealtimeUsers() {
     if (window.__adminUsersRealtimeBound) return;
-    if (!window.firebaseRef || !window.firebaseDB || !window.firebaseOnValue) return;
 
-    ADMIN_USER_PATHS.forEach((path) => {
-        const refPath = window.firebaseRef(window.firebaseDB, path);
-        window.firebaseOnValue(refPath, () => {
+    window.supabaseClient
+        .channel('profiles-changes')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'profiles' }, () => {
             renderUsers();
-        });
-    });
+        })
+        .subscribe();
 
     window.__adminUsersRealtimeBound = true;
 }

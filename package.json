@@ -1,0 +1,9 @@
+{
+  "name": "sistema-facturacion-electronica",
+  "version": "1.0.0",
+  "private": true,
+  "description": "App de facturacion electronica (estatica) con backend serverless para gestion de usuarios.",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.45.0"
+  }
+}

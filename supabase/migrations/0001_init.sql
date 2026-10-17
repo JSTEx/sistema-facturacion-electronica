@@ -117,6 +117,16 @@ create policy profiles_update on public.profiles
     using (public.is_admin())
     with check (public.is_admin());
 
+drop policy if exists profiles_insert on public.profiles;
+create policy profiles_insert on public.profiles
+    for insert to authenticated
+    with check (public.is_admin());
+
+drop policy if exists profiles_delete on public.profiles;
+create policy profiles_delete on public.profiles
+    for delete to authenticated
+    using (public.is_admin());
+
 -- Facturas: dueño o admin.
 drop policy if exists invoices_select on public.invoices;
 create policy invoices_select on public.invoices
@@ -155,7 +165,7 @@ create policy admin_audit_insert on public.admin_audit
 -- -----------------------------------------------------------------------------
 grant usage on schema public to anon, authenticated, service_role;
 
-grant select, update on public.profiles to authenticated;
+grant select, insert, update, delete on public.profiles to authenticated;
 grant select, insert, update, delete on public.invoices to authenticated;
 grant select, insert on public.admin_audit to authenticated;
 grant usage on sequence public.admin_audit_id_seq to authenticated;

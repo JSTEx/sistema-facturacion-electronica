@@ -25,6 +25,7 @@ Web app for invoice management with Firebase authentication and an admin user pa
 ├── LICENSE
 ├── README.md
 ├── sw.js
+├── vercel.json
 ├── assets/
 │   ├── css/
 │   │   └── app.css
@@ -32,17 +33,19 @@ Web app for invoice management with Firebase authentication and an admin user pa
 │   │   ├── admin/
 │   │   │   └── main.js
 │   │   ├── core/
+│   │   │   ├── firebase-config.js
 │   │   │   ├── firebase-utils.js
 │   │   │   ├── list-utils.js
 │   │   │   ├── loading-utils.js
 │   │   │   ├── password-utils.js
 │   │   │   ├── performance-utils.js
+│   │   │   ├── security.js
 │   │   │   ├── session-utils.js
 │   │   │   ├── status-utils.js
 │   │   │   ├── sw-register.js
 │   │   │   ├── theme-utils.js
 │   │   │   └── toast-utils.js
-│   │   ├── index/
+│   │   ├── invoices/
 │   │   │   ├── access-control-auth.js
 │   │   │   ├── backup-and-shared-utils.js
 │   │   │   ├── invoices-actions-and-events.js
@@ -59,10 +62,14 @@ Web app for invoice management with Firebase authentication and an admin user pa
 ├── config/
 │   └── firebase-inicial.json
 ├── docs/
+│   ├── CHECKLIST_REFACTOR_ADMIN_SEGURO.md
 │   ├── CONVENCION_MODULOS_JS.md
-│   └── INSTRUCCIONES_FIREBASE.md
+│   ├── INSTRUCCIONES_FIREBASE.md
+│   ├── LICENCIA_RESUMEN.md
+│   └── MEDIDAS_SEGURIDAD.md
 ├── pages/
 │   ├── admin.html
+│   ├── historial.html
 │   └── login.html
 └── templates/
     ├── plantilla-base.html
@@ -100,12 +107,12 @@ flowchart TD
     A[Librerías externas<br/>Tailwind / SweetAlert / Firebase] --> B[assets/js/core/*]
 
     B --> C[index.html]
-    C --> C1[assets/js/index/backup-and-shared-utils.js]
-    C1 --> C2[assets/js/index/invoices-store-and-draft.js]
-    C2 --> C3[assets/js/index/invoices-form-and-validation.js]
-    C3 --> C4[assets/js/index/access-control-auth.js]
-    C4 --> C5[assets/js/index/invoices-list-and-pagination.js]
-    C5 --> C6[assets/js/index/invoices-actions-and-events.js]
+    C --> C1[assets/js/invoices/backup-and-shared-utils.js]
+    C1 --> C2[assets/js/invoices/invoices-store-and-draft.js]
+    C2 --> C3[assets/js/invoices/invoices-form-and-validation.js]
+    C3 --> C4[assets/js/invoices/access-control-auth.js]
+    C4 --> C5[assets/js/invoices/invoices-list-and-pagination.js]
+    C5 --> C6[assets/js/invoices/invoices-actions-and-events.js]
 
     B --> D[pages/admin.html]
     D --> D1[assets/js/admin/main.js]

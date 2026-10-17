@@ -1,5 +1,5 @@
 // Service Worker: cachea recursos estaticos y provee fallback offline.
-const CACHE_VERSION = 'facturacion-cache-v2';
+const CACHE_VERSION = 'facturacion-cache-v3';
 
 // Lista base de recursos que se precargan durante la instalacion.
 const STATIC_ASSETS = [
@@ -23,12 +23,12 @@ const STATIC_ASSETS = [
     './assets/js/admin/main.js',
     './assets/js/login/config.js',
     './assets/js/login/auth.js',
-    './assets/js/index/backup-and-shared-utils.js',
-    './assets/js/index/invoices-store-and-draft.js',
-    './assets/js/index/invoices-form-and-validation.js',
-    './assets/js/index/access-control-auth.js',
-    './assets/js/index/invoices-list-and-pagination.js',
-    './assets/js/index/invoices-actions-and-events.js'
+    './assets/js/invoices/backup-and-shared-utils.js',
+    './assets/js/invoices/invoices-store-and-draft.js',
+    './assets/js/invoices/invoices-form-and-validation.js',
+    './assets/js/invoices/access-control-auth.js',
+    './assets/js/invoices/invoices-list-and-pagination.js',
+    './assets/js/invoices/invoices-actions-and-events.js'
 ];
 
 // Instalacion: precache de assets criticos y activacion inmediata del nuevo SW.

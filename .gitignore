@@ -1,1 +1,30 @@
+# Editores / IDE
 .vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Logs y temporales
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+*.tmp
+
+# Entorno / secretos locales (no subir credenciales reales)
+.env
+.env.*
+*.local
+
+# Dependencias (si algún día se agrega build)
+node_modules/
+
+# Archivos generados del Service Worker
+.vercel/

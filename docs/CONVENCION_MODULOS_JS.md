@@ -5,7 +5,7 @@ Este documento define cómo organizar el JavaScript del proyecto para mantener u
 ## 1) Estructura base
 
 - `assets/js/core/` → utilidades globales reutilizables en varias páginas.
-- `assets/js/index/` → lógica específica de `index.html`.
+- `assets/js/invoices/` → lógica específica de `index.html`.
 - `assets/js/admin/` → lógica específica de `pages/admin.html` (actualmente estable en `main.js`).
 - `assets/js/login/` → lógica específica de `pages/login.html`.
 
@@ -37,7 +37,7 @@ Usar nombres descriptivos con guiones:
 
 La carga debe respetar dependencias:
 
-1. librerías externas (`SweetAlert`, `anime`, `Firebase`, etc.)
+1. librerías externas (`SweetAlert`, `jsPDF`, `Firebase`, etc.)
 2. `assets/js/core/*`
 3. módulos de página de menor a mayor dependencia
 

@@ -22,5 +22,5 @@
 
 ## 5) Cierre del refactor
 - [ ] Confirmar que no aparece el error de "módulos de administración".
-- [ ] Confirmar que no hay errores en `core.js`, `ui.js`, `app.js` y `pages/admin.html`.
+- [ ] Confirmar que no hay errores en `assets/js/admin/main.js` ni en `pages/admin.html`.
 - [ ] Solo después de pasar todo, integrar cambios a la rama estable.

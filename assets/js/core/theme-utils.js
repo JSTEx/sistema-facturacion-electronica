@@ -81,3 +81,5 @@ function toggleDarkMode(storageKey = 'darkMode') {
 window.initDarkMode = initDarkMode;
 window.toggleDarkMode = toggleDarkMode;
 window.syncThemeSwitch = syncThemeSwitch;
+
+document.addEventListener('DOMContentLoaded', syncThemeSwitch);

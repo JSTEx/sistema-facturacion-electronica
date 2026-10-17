@@ -1,4 +1,13 @@
 // Tema visual: alternancia claro/oscuro y persistencia de preferencia.
+// Funcion: syncThemeSwitch
+// Que hace: Sincroniza el estado visual (aria-checked) del switch de tema con la clase html.dark-mode.
+function syncThemeSwitch() {
+    const isDark = document.documentElement.classList.contains('dark-mode');
+    document.querySelectorAll('.theme-switch').forEach((el) => {
+        el.setAttribute('aria-checked', isDark ? 'true' : 'false');
+    });
+}
+
 // Funcion: initDarkMode
 // Que hace: Gestiona la logica de initDarkMode.
 function initDarkMode(options = {}) {
@@ -13,6 +22,7 @@ function initDarkMode(options = {}) {
         } else {
             document.documentElement.classList.remove('dark-mode');
         }
+        syncThemeSwitch();
         return;
     }
 
@@ -28,6 +38,7 @@ function initDarkMode(options = {}) {
         document.documentElement.classList.remove('dark-mode');
         localStorage.setItem(storageKey, '0');
     }
+    syncThemeSwitch();
 }
 
 // Funcion: toggleDarkMode
@@ -43,6 +54,7 @@ function toggleDarkMode(storageKey = 'darkMode') {
     const applyTheme = () => {
         html.classList.toggle('dark-mode', nextIsDarkMode);
         localStorage.setItem(storageKey, nextIsDarkMode ? '1' : '0');
+        syncThemeSwitch();
     };
 
     if (prefersReducedMotion || hasActiveToastTimer) {
@@ -68,3 +80,4 @@ function toggleDarkMode(storageKey = 'darkMode') {
 
 window.initDarkMode = initDarkMode;
 window.toggleDarkMode = toggleDarkMode;
+window.syncThemeSwitch = syncThemeSwitch;

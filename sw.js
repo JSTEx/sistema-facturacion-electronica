@@ -1,5 +1,5 @@
 // Service Worker: cachea recursos estaticos y provee fallback offline.
-const CACHE_VERSION = 'facturacion-cache-v5';
+const CACHE_VERSION = 'facturacion-cache-v6';
 
 // Lista base de recursos que se precargan durante la instalacion.
 const STATIC_ASSETS = [

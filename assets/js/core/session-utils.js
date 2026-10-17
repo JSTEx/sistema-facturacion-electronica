@@ -15,7 +15,11 @@ async function confirmLogout(options = {}) {
 // Que hace: Gestiona la logica de runLogout.
     const runLogout = async () => {
         const darkModeSetting = localStorage.getItem('darkMode');
-        await window.firebaseAuth.signOut();
+        try {
+            await window.supabaseAuth.signOut();
+        } catch (error) {
+            console.error('Error al cerrar sesión en Supabase:', error);
+        }
         localStorage.clear();
         if (darkModeSetting) localStorage.setItem('darkMode', darkModeSetting);
         setTimeout(() => { window.location.href = redirectUrl; }, successDelay);

@@ -1,35 +1,32 @@
-// Logica de inicio de sesion, validaciones y manejo de estado de auth.
+// Logica de inicio de sesion, validaciones y manejo de estado de auth (Supabase).
 async function initAuthFlow() {
     showAppLoading('Verificando sesion...');
-    const ready = await waitForFirebaseReady({
-        required: ['firebaseAuth', 'firebaseAuthStateChanged', 'firebaseSignIn', 'firebaseDB']
-    });
+    const ready = await waitForSupabaseReady();
     if (!ready) {
         hideAppLoading();
-        showToast('Firebase no se pudo inicializar. Recarga la pagina.', 'error', 2800);
+        showToast('Supabase no se pudo inicializar. Revisa la configuracion y recarga la pagina.', 'error', 2800);
         return;
+    }
+
+    // Si ya existe una sesion valida, redirigir directamente.
+    const existingUser = await getSupabaseUser();
+    if (existingUser?.email) {
+        const existingProfile = await getProfileByEmail(existingUser.email);
+        if (existingProfile) {
+            localStorage.setItem('currentUser', JSON.stringify({
+                email: existingProfile.email,
+                role: existingProfile.role,
+                uid: existingProfile.id
+            }));
+            window.location.replace('../index.html');
+            return;
+        }
     }
 
     hideAppLoading();
 
-    let isLoggingIn = false;
-
-    window.firebaseAuthStateChanged(window.firebaseAuth, async (user) => {
-        if (isLoggingIn) return;
-
-        if (user) {
-            const users = normalizeUsers(await getFirebaseData('users'));
-            const userData = users.find(u => u.email && u.email.toLowerCase() === user.email.toLowerCase());
-            if (userData) {
-                localStorage.setItem('currentUser', JSON.stringify({ email: userData.email, role: userData.role }));
-                window.location.replace('../index.html');
-            }
-        }
-    });
-
     document.getElementById('loginForm').addEventListener('submit', async function (e) {
         e.preventDefault();
-        isLoggingIn = true;
 
         showAppLoading('Iniciando sesion...');
 
@@ -47,23 +44,26 @@ async function initAuthFlow() {
         const password = document.getElementById('password').value;
 
         try {
-            await window.firebaseSignIn(window.firebaseAuth, email, password);
+            const { data, error } = await window.supabaseAuth.signInWithPassword({ email, password });
+            if (error) throw error;
 
-            const users = normalizeUsers(await getFirebaseData('users'));
-            const userData = users.find(u => u.email && u.email.toLowerCase() === email.toLowerCase());
+            const profile = await getProfileByEmail(data?.user?.email || email);
 
-            if (userData) {
-                localStorage.setItem('currentUser', JSON.stringify({ email: userData.email, role: userData.role }));
+            if (profile) {
+                localStorage.setItem('currentUser', JSON.stringify({
+                    email: profile.email,
+                    role: profile.role,
+                    uid: profile.id
+                }));
                 showToast('Inicio de sesion exitoso.', 'success', 1400);
                 setTimeout(() => {
                     window.location.replace('../index.html');
                 }, 350);
             } else {
-                errorMessage.textContent = 'Usuario autenticado, pero sin rol asignado en la base de datos.';
-                showToast('Usuario autenticado, pero sin rol asignado.', 'error', 2600);
+                errorMessage.textContent = 'Usuario autenticado, pero sin perfil asignado en la base de datos.';
+                showToast('Usuario autenticado, pero sin perfil asignado.', 'error', 2600);
                 errorMessage.classList.remove('hidden');
-                await window.firebaseAuth.signOut();
-                isLoggingIn = false;
+                await window.supabaseAuth.signOut();
                 hideAppLoading();
                 submitBtn.disabled = false;
                 btnText.classList.remove('hidden');
@@ -71,23 +71,27 @@ async function initAuthFlow() {
             }
         } catch (error) {
             console.error('Error de autenticación:', error);
-            isLoggingIn = false;
             hideAppLoading();
             submitBtn.disabled = false;
             btnText.classList.remove('hidden');
             btnLoading.classList.add('hidden');
 
-            if (error.code === 'auth/invalid-credential' || error.code === 'auth/wrong-password' || error.code === 'auth/user-not-found') {
+            const rawMessage = String(error?.message || '').toLowerCase();
+
+            if (rawMessage.includes('invalid login credentials')) {
                 errorMessage.textContent = 'Email o contraseña incorrectos. Verifica tus credenciales.';
                 showToast('Email o contrasena incorrectos.', 'error', 2400);
-            } else if (error.code === 'auth/too-many-requests') {
+            } else if (rawMessage.includes('email not confirmed')) {
+                errorMessage.textContent = 'Debes confirmar tu correo antes de iniciar sesión.';
+                showToast('Correo no confirmado.', 'error', 2600);
+            } else if (error?.status === 429 || rawMessage.includes('too many')) {
                 errorMessage.textContent = 'Demasiados intentos fallidos. Intenta más tarde.';
                 showToast('Demasiados intentos fallidos. Intenta mas tarde.', 'error', 2600);
-            } else if (error.code === 'auth/network-request-failed') {
+            } else if (rawMessage.includes('failed to fetch') || error instanceof TypeError) {
                 errorMessage.textContent = 'Error de red. Verifica tu conexión a internet.';
                 showToast('Error de red. Verifica tu conexion a internet.', 'error', 2600);
             } else {
-                errorMessage.textContent = 'Error de autenticación: ' + error.message;
+                errorMessage.textContent = 'Error de autenticación: ' + (error?.message || 'intenta de nuevo.');
                 showToast('Error de autenticacion. Intenta de nuevo.', 'error', 2600);
             }
             errorMessage.classList.remove('hidden');

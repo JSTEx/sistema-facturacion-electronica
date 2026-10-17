@@ -20,10 +20,10 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="../assets/css/app.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="../assets/js/core/firebase-config.js"></script>
+    <script src="../assets/js/core/supabase-config.js"></script>
     <script src="../assets/js/core/password-utils.js"></script>
     <script src="../assets/js/core/loading-utils.js"></script>
-    <script src="../assets/js/core/firebase-utils.js"></script>
+    <script src="../assets/js/core/supabase-utils.js"></script>
     <script src="../assets/js/core/theme-utils.js"></script>
     <script src="../assets/js/core/session-utils.js"></script>
     <script src="../assets/js/core/toast-utils.js"></script>
@@ -33,33 +33,8 @@
     <script src="../assets/js/core/sw-register.js"></script>
     <script src="../assets/js/core/security.js"></script>
     
-    <!-- Firebase SDK -->
-    <script type="module">
-        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js';
-        import { getDatabase, ref, set, get, child, onValue } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js';
-        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, deleteUser, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
-        
-        const firebaseConfig = window.FIREBASE_CONFIG;
-        
-        const app = initializeApp(firebaseConfig);
-        const userProvisionApp = initializeApp(firebaseConfig, 'userProvisionApp');
-        const database = getDatabase(app);
-        const auth = getAuth(app);
-        const userProvisionAuth = getAuth(userProvisionApp);
-        
-        window.firebaseDB = database;
-        window.firebaseAuth = auth;
-        window.firebaseRef = ref;
-        window.firebaseGet = get;
-        window.firebaseSet = set;
-        window.firebaseChild = child;
-        window.firebaseOnValue = onValue;
-        window.firebaseAuthStateChanged = onAuthStateChanged;
-        window.firebaseCreateUser = createUserWithEmailAndPassword;
-        window.firebaseSignIn = signInWithEmailAndPassword;
-        window.firebaseDeleteUser = deleteUser;
-        window.firebaseProvisionAuth = userProvisionAuth;
-    </script>
+    <!-- Supabase SDK (cliente ESM via CDN) -->
+    <script type="module" src="../assets/js/core/supabase-client.js"></script>
     
     <!-- Styles moved to ../assets/css/app.css -->
 </head>

@@ -1,33 +1,31 @@
 // Control de acceso y modo de vista (activas/historial) en index.
 showAppLoading('Verificando sesion...');
 (async function enforceAuthGuard() {
-    const ready = await waitForFirebaseReady();
+    const ready = await waitForSupabaseReady();
     if (!ready) {
         hideAppLoading();
         window.location.replace('pages/login.html');
         return;
     }
 
-    window.firebaseAuthStateChanged(window.firebaseAuth, async (user) => {
-        if (!user) {
-            window.location.replace('pages/login.html');
-            return;
-        }
+    const user = await getSupabaseUser();
+    if (!user) {
+        window.location.replace('pages/login.html');
+        return;
+    }
 
-        const users = normalizeUsers(await getFirebaseData('users'));
-        const userData = users.find(u => u.email && u.email.toLowerCase() === user.email.toLowerCase());
+    const profile = await getProfileByEmail(user.email);
 
-        if (!userData) {
-            await window.firebaseAuth.signOut();
-            hideAppLoading();
-            window.location.replace('pages/login.html');
-            return;
-        }
+    if (!profile) {
+        await window.supabaseAuth.signOut();
+        hideAppLoading();
+        window.location.replace('pages/login.html');
+        return;
+    }
 
-        localStorage.setItem('currentUser', JSON.stringify({ email: userData.email, role: userData.role, uid: user.uid || '' }));
-        currentUser = { email: userData.email, role: userData.role, uid: user.uid || '' };
-        initInvoicesRealtime();
-    });
+    localStorage.setItem('currentUser', JSON.stringify({ email: profile.email, role: profile.role, uid: profile.id }));
+    currentUser = { email: profile.email, role: profile.role, uid: profile.id };
+    initInvoicesRealtime();
 })();
 
 let currentUser = null;

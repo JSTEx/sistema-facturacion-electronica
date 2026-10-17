@@ -543,38 +543,36 @@ window.logout = logout;
 showAppLoading('Verificando sesion...');
 
 (async function enforceAdminAuthGuard() {
-    const ready = await waitForFirebaseReady({ required: ['firebaseAuth', 'firebaseAuthStateChanged', 'firebaseDB', 'firebaseRef', 'firebaseGet', 'firebaseChild'] });
+    const ready = await waitForSupabaseReady();
     if (!ready) {
         hideAppLoading();
         window.location.replace('login.html');
         return;
     }
 
-    window.firebaseAuthStateChanged(window.firebaseAuth, async (user) => {
-        if (!user) {
-            window.location.replace('login.html');
-            return;
-        }
+    const user = await getSupabaseUser();
+    if (!user) {
+        window.location.replace('login.html');
+        return;
+    }
 
-        const users = await loadUsers();
-        const userData = users.find((u) => String(u?.email || '').toLowerCase() === String(user.email || '').toLowerCase());
+    const profile = await getProfileByEmail(user.email);
 
-        if (!userData || String(userData.role || '').toLowerCase() !== 'admin') {
-            await window.firebaseAuth.signOut();
-            hideAppLoading();
-            window.location.replace('login.html');
-            return;
-        }
-
-        localStorage.setItem('currentUser', JSON.stringify({ email: userData.email, role: userData.role }));
-
-        const currentEmail = document.getElementById('currentUserEmail');
-        if (currentEmail) currentEmail.textContent = userData.email;
-
+    if (!profile || String(profile.role || '').toLowerCase() !== 'admin') {
+        await window.supabaseAuth.signOut();
         hideAppLoading();
-        await renderUsers();
-        bindRealtimeUsers();
-    });
+        window.location.replace('login.html');
+        return;
+    }
+
+    localStorage.setItem('currentUser', JSON.stringify({ email: profile.email, role: profile.role, uid: profile.id }));
+
+    const currentEmail = document.getElementById('currentUserEmail');
+    if (currentEmail) currentEmail.textContent = profile.email;
+
+    hideAppLoading();
+    await renderUsers();
+    bindRealtimeUsers();
 })();
 
 document.addEventListener('DOMContentLoaded', function () {

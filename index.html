@@ -55,10 +55,10 @@
         }
         </style>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="assets/js/core/firebase-config.js"></script>
+    <script src="assets/js/core/supabase-config.js"></script>
     <script src="assets/js/core/password-utils.js"></script>
     <script src="assets/js/core/loading-utils.js"></script>
-    <script src="assets/js/core/firebase-utils.js"></script>
+    <script src="assets/js/core/supabase-utils.js"></script>
     <script src="assets/js/core/theme-utils.js"></script>
     <script src="assets/js/core/session-utils.js"></script>
     <script src="assets/js/core/toast-utils.js"></script>
@@ -70,27 +70,8 @@
     <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.2/dist/jspdf.plugin.autotable.min.js"></script>
     
-    <!-- Firebase SDK -->
-    <script type="module">
-        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js';
-        import { getDatabase, ref, set, get, child, onValue } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js';
-        import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
-        
-        const firebaseConfig = window.FIREBASE_CONFIG;
-        
-        const app = initializeApp(firebaseConfig);
-        const database = getDatabase(app);
-        const auth = getAuth(app);
-        
-        window.firebaseDB = database;
-        window.firebaseAuth = auth;
-        window.firebaseRef = ref;
-        window.firebaseGet = get;
-        window.firebaseSet = set;
-        window.firebaseChild = child;
-        window.firebaseOnValue = onValue;
-        window.firebaseAuthStateChanged = onAuthStateChanged;
-    </script>
+    <!-- Supabase SDK (cliente ESM via CDN) -->
+    <script type="module" src="assets/js/core/supabase-client.js"></script>
     
     <!-- Styles moved to assets/css/app.css -->
 </head>

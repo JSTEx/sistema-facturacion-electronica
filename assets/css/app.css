@@ -240,6 +240,14 @@ body.page-admin .admin-nav { justify-content: space-between; flex-wrap: wrap; }
 }
 
 /* Grupo derecho del nav */
+#navCollapsible {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    min-width: 0;
+}
 .nav-right-group {
     display: flex;
     align-items: center;

@@ -4,13 +4,13 @@ showAppLoading('Verificando sesion...');
     const ready = await waitForSupabaseReady();
     if (!ready) {
         hideAppLoading();
-        window.location.replace('pages/login.html');
+        window.location.replace('/login');
         return;
     }
 
     const user = await getSupabaseUser();
     if (!user) {
-        window.location.replace('pages/login.html');
+        window.location.replace('/login');
         return;
     }
 
@@ -19,7 +19,7 @@ showAppLoading('Verificando sesion...');
     if (!profile) {
         await window.supabaseAuth.signOut();
         hideAppLoading();
-        window.location.replace('pages/login.html');
+        window.location.replace('/login');
         return;
     }
 
@@ -75,7 +75,7 @@ function configurePageModeUI() {
         if (!newInvoiceBtn) return;
         newInvoiceBtn.classList.remove('hidden');
         newInvoiceBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>Volver a activas';
-        newInvoiceBtn.setAttribute('onclick', "window.location.href='index.html'");
+        newInvoiceBtn.setAttribute('onclick', "window.location.href='/';");
     };
 
     if (historyBtn) {
@@ -85,7 +85,7 @@ function configurePageModeUI() {
             if (historyBtnIcon) {
                 historyBtnIcon.innerHTML = '<line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline>';
             }
-            historyBtn.href = 'index.html';
+            historyBtn.href = '/';
             historyBtn.classList.add('hidden');
         } else {
             if (historyBtnLabel) historyBtnLabel.textContent = 'Historial pagadas';
@@ -93,7 +93,7 @@ function configurePageModeUI() {
             if (historyBtnIcon) {
                 historyBtnIcon.innerHTML = '<path d="M12 8v4l3 3"></path><circle cx="12" cy="12" r="10"></circle>';
             }
-            historyBtn.href = 'pages/historial.html';
+            historyBtn.href = '/historial';
             historyBtn.classList.remove('hidden');
         }
     }
@@ -244,7 +244,7 @@ function ensureAdminAction(actionName = 'esta acción') {
     try {
         const current = loadCurrentUser();
         if (!current) {
-            window.location.href = 'pages/login.html';
+            window.location.href = '/login';
             return;
         }
         currentUser = current;
@@ -276,7 +276,7 @@ function ensureAdminAction(actionName = 'esta acción') {
                         btn.className = 'admin-users-btn px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md text-sm font-medium transition-colors flex items-center gap-2';
                         btn.style.marginRight = '6px';
                         btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><line x1="20" y1="8" x2="20" y2="14"></line><line x1="23" y1="11" x2="17" y2="11"></line></svg><span>Usuarios</span>';
-                        btn.onclick = () => { window.location.href = 'pages/admin.html'; };
+                        btn.onclick = () => { window.location.href = '/admin'; };
                         adminContainer.appendChild(btn);
                     }
                 }

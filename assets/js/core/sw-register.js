@@ -6,10 +6,7 @@
     if (!isSecure) return;
 
     window.addEventListener('load', function () {
-        const inPagesFolder = window.location.pathname.includes('/pages/');
-        const swPath = inPagesFolder ? '../sw.js' : 'sw.js';
-
-        navigator.serviceWorker.register(swPath).catch((error) => {
+        navigator.serviceWorker.register('/sw.js').catch((error) => {
             console.warn('No se pudo registrar Service Worker:', error);
         });
     });

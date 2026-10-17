@@ -18,7 +18,7 @@ async function initAuthFlow() {
                 role: existingProfile.role,
                 uid: existingProfile.id
             }));
-            window.location.replace('../index.html');
+                    window.location.replace('/');
             return;
         }
     }
@@ -57,7 +57,7 @@ async function initAuthFlow() {
                 }));
                 showToast('Inicio de sesion exitoso.', 'success', 1400);
                 setTimeout(() => {
-                    window.location.replace('../index.html');
+            window.location.replace('/');
                 }, 350);
             } else {
                 errorMessage.textContent = 'Usuario autenticado, pero sin perfil asignado en la base de datos.';

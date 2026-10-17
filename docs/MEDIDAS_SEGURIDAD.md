@@ -71,8 +71,8 @@ Este documento describe las medidas de seguridad implementadas en el sistema de 
 ### Archivos Principales
 - `assets/js/core/security.js` - Módulo principal de seguridad
 - `index.html` - Página principal
-- `pages/admin.html` - Panel de administración
-- `pages/login.html` - Página de inicio de sesión
+- `/admin` - Panel de administración
+- `/login` - Página de inicio de sesión
 - `templates/plantilla-base.html` - Plantilla base
 - `templates/plantilla-formulario.html` - Plantilla de formularios
 - `sw.js` - Service Worker (incluye security.js en cache)

@@ -1,7 +1,7 @@
 # Checklist corto - Refactor seguro de Admin
 
 ## 1) Carga inicial
-- [ ] Abrir `pages/admin.html` y confirmar que no aparece loader infinito.
+- [ ] Abrir `/admin` y confirmar que no aparece loader infinito.
 - [ ] Confirmar que muestra el usuario actual en la barra superior.
 - [ ] Confirmar que lista usuarios existentes en la tabla.
 
@@ -22,5 +22,5 @@
 
 ## 5) Cierre del refactor
 - [ ] Confirmar que no aparece el error de "módulos de administración".
-- [ ] Confirmar que no hay errores en `assets/js/admin/main.js` ni en `pages/admin.html`.
+- [ ] Confirmar que no hay errores en `assets/js/admin/main.js` ni en `/admin`.
 - [ ] Solo después de pasar todo, integrar cambios a la rama estable.

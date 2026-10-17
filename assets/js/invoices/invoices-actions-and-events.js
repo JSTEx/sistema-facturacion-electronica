@@ -809,7 +809,7 @@ document.getElementById('backupImportInput').addEventListener('change', async fu
 // Que hace: Gestiona la logica de logout.
 function logout() {
     return confirmLogout({
-        redirectUrl: 'pages/login.html',
+        redirectUrl: '/login',
         confirmTitle: 'Cerrar sesion',
         confirmText: 'Estas seguro de que deseas salir?',
         confirmButtonText: 'Si, salir',

@@ -6,8 +6,8 @@ Este documento define cómo organizar el JavaScript del proyecto para mantener u
 
 - `assets/js/core/` → utilidades globales reutilizables en varias páginas.
 - `assets/js/invoices/` → lógica específica de `index.html`.
-- `assets/js/admin/` → lógica específica de `pages/admin.html` (actualmente estable en `main.js`).
-- `assets/js/login/` → lógica específica de `pages/login.html`.
+- `assets/js/admin/` → lógica específica de `/admin` (actualmente estable en `main.js`).
+- `assets/js/login/` → lógica específica de `/login`.
 
 ## 2) Regla principal
 
@@ -43,7 +43,7 @@ La carga debe respetar dependencias:
 
 Si un módulo usa funciones/variables globales de otro, debe cargarse después.
 
-Nota: en el panel de administración (`pages/admin.html`) se mantiene `assets/js/admin/main.js` como fuente única estable para evitar regresiones de carga.
+Nota: en el panel de administración (`/admin`) se mantiene `assets/js/admin/main.js` como fuente única estable para evitar regresiones de carga.
 
 ## 5) Estado global (window)
 

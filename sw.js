@@ -1,12 +1,13 @@
 // Service Worker: cachea recursos estaticos y provee fallback offline.
-const CACHE_VERSION = 'facturacion-cache-v4';
+const CACHE_VERSION = 'facturacion-cache-v5';
 
 // Lista base de recursos que se precargan durante la instalacion.
 const STATIC_ASSETS = [
     './',
     './index.html',
-    './pages/login.html',
-    './pages/admin.html',
+    './login.html',
+    './admin.html',
+    './historial.html',
     './assets/css/app.css',
     './assets/js/core/supabase-config.js',
     './assets/js/core/password-utils.js',
@@ -69,7 +70,7 @@ self.addEventListener('fetch', (event) => {
                     caches.open(CACHE_VERSION).then((cache) => cache.put(event.request, clone));
                     return response;
                 })
-                .catch(() => caches.match(event.request).then((cached) => cached || caches.match('./index.html')))
+                .catch(() => caches.match(event.request).then((cached) => cached || caches.match('./')))
         );
         return;
     }

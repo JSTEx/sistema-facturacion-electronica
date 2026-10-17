@@ -452,13 +452,13 @@ showAppLoading('Verificando sesion...');
     const ready = await waitForSupabaseReady();
     if (!ready) {
         hideAppLoading();
-        window.location.replace('login.html');
+        window.location.replace('/login');
         return;
     }
 
     const user = await getSupabaseUser();
     if (!user) {
-        window.location.replace('login.html');
+        window.location.replace('/login');
         return;
     }
 
@@ -467,7 +467,7 @@ showAppLoading('Verificando sesion...');
     if (!profile || String(profile.role || '').toLowerCase() !== 'admin') {
         await window.supabaseAuth.signOut();
         hideAppLoading();
-        window.location.replace('login.html');
+        window.location.replace('/login');
         return;
     }
 

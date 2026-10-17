@@ -94,9 +94,9 @@ La función valida el token de sesión del administrador antes de ejecutar cualq
 
 ## 🔐 Flujo actual
 
-- `pages/login.html`: autentica con Supabase Auth (`signInWithPassword`).
+- `/login`: autentica con Supabase Auth (`signInWithPassword`).
 - `index.html`: requiere sesión válida y un perfil en `profiles` para gestionar facturas.
-- `pages/admin.html`: requiere sesión y rol `admin`.
+- `/admin`: requiere sesión y rol `admin`.
 
 ## 🗂️ Modelo de datos
 
@@ -108,16 +108,16 @@ La función valida el token de sesión del administrador antes de ejecutar cualq
 
 1. En la versión anterior, usa **Exportar** para descargar el respaldo cifrado de facturas.
 2. Ya migrado a Supabase, usa **Importar** para restaurar ese respaldo (reemplaza el dataset actual).
-3. Vuelve a crear los usuarios desde `pages/admin.html` o desde el dashboard de Supabase.
+3. Vuelve a crear los usuarios desde `/admin` o desde el dashboard de Supabase.
 
 ## 🧪 Pruebas rápidas
 
 1. Inicia sesión con el admin.
-2. Crea un usuario nuevo desde `pages/admin.html`.
+2. Crea un usuario nuevo desde `/admin`.
 3. Verifica acceso:
    - Usuario normal → `index.html`
-   - Admin → `pages/admin.html`
-4. Confirma que sin sesión redirige a `pages/login.html`.
+   - Admin → `/admin`
+4. Confirma que sin sesión redirige a `/login`.
 5. Crea una factura y verifica que aparece en `invoices` (Table Editor).
 
 ## 🆘 Errores comunes

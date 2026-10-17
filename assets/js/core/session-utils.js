@@ -1,6 +1,6 @@
 // Gestion de sesion local: usuario actual, persistencia y cierre.
 async function confirmLogout(options = {}) {
-    const redirectUrl = options.redirectUrl || 'login.html';
+    const redirectUrl = options.redirectUrl || '/login';
     const confirmTitle = options.confirmTitle || 'Cerrar sesión';
     const confirmText = options.confirmText || '¿Estás seguro de que deseas salir?';
     const confirmButtonText = options.confirmButtonText || 'Sí, salir';

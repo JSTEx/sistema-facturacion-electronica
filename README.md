@@ -6,15 +6,18 @@ Web app for invoice management with Supabase authentication and an admin user pa
 
 ## URL pública / Public URL
 
-- Despliegue principal recomendado / Recommended deploy: **Vercel**.
+- Despliegue principal / Main deploy: **Vercel**.
 - Vercel es necesario para la gestión de usuarios (función serverless `api/users.js`).
 - Vercel is required for user management (serverless function `api/users.js`).
 
-- Sitio / Site: [https://jstex.github.io/sistema-facturacion-electronica/](https://jstex.github.io/sistema-facturacion-electronica/) (solo lectura estática / static-only)
-- Login: [https://jstex.github.io/sistema-facturacion-electronica/pages/login.html](https://jstex.github.io/sistema-facturacion-electronica/pages/login.html)
-- Admin: [https://jstex.github.io/sistema-facturacion-electronica/pages/admin.html](https://jstex.github.io/sistema-facturacion-electronica/pages/admin.html)
+Rutas limpias (gracias a `cleanUrls` en `vercel.json`):
 
-> En un despliegue puramente estático (GitHub Pages) la gestión de usuarios no funciona porque `api/` no se ejecuta.
+- Sitio / Site: `/`
+- Login: `/login`
+- Admin: `/admin`
+- Historial: `/historial`
+
+> Las rutas limpias (`/login`, `/admin`, `/historial`) funcionan en Vercel. Un hosting puramente estático como GitHub Pages no las resuelve ni ejecuta `api/`.
 
 ## Licencia / License
 
@@ -28,6 +31,9 @@ Web app for invoice management with Supabase authentication and an admin user pa
 ```text
 .
 ├── index.html
+├── login.html
+├── admin.html
+├── historial.html
 ├── LICENSE
 ├── README.md
 ├── package.json
@@ -75,10 +81,6 @@ Web app for invoice management with Supabase authentication and an admin user pa
 │   ├── INSTRUCCIONES_SUPABASE.md
 │   ├── LICENCIA_RESUMEN.md
 │   └── MEDIDAS_SEGURIDAD.md
-├── pages/
-│   ├── admin.html
-│   ├── historial.html
-│   └── login.html
 ├── supabase/
 │   └── migrations/
 │       └── 0001_init.sql
@@ -89,8 +91,9 @@ Web app for invoice management with Supabase authentication and an admin user pa
 
 ## Notas / Notes
 
-- Usa rutas relativas entre `index.html`, `pages/` y `assets/`.
-- Use relative paths between `index.html`, `pages/`, and `assets/`.
+- Las páginas viven en la raíz (`index.html`, `login.html`, `admin.html`, `historial.html`) y se sirven con rutas limpias (`/`, `/login`, `/admin`, `/historial`).
+- The pages live at the project root and are served with clean URLs.
+- Los assets se referencian de forma relativa a la raíz (`assets/...`).
 - Para recursos multimedia nuevos, usa `assets/external/`.
 - For new media resources, use `assets/external/`.
 - Documentación Supabase / Supabase docs: `docs/INSTRUCCIONES_SUPABASE.md`.
@@ -125,10 +128,10 @@ flowchart TD
     C4 --> C5[assets/js/invoices/invoices-list-and-pagination.js]
     C5 --> C6[assets/js/invoices/invoices-actions-and-events.js]
 
-    B --> D[pages/admin.html]
+    B --> D[admin.html]
     D --> D1[assets/js/admin/main.js]
 
-    B --> E[pages/login.html]
+    B --> E[login.html]
     E --> E1[assets/js/login/config.js]
     E1 --> E2[assets/js/login/auth.js]
 ```
@@ -151,7 +154,10 @@ python -m http.server 5500
 1. Abre en el navegador / Open in your browser:
 
 - `http://localhost:5500/`
-- `http://localhost:5500/pages/login.html`
+- `http://localhost:5500/login.html`
+- `http://localhost:5500/admin.html`
+
+> Nota: las rutas limpias (`/login`, `/admin`) solo las resuelve Vercel (`cleanUrls`). En local usa los `.html`.
 
 ## Instalar librerías (CDN) / Install libraries (CDN)
 
@@ -190,7 +196,7 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
 
 ## Checklist de publicación / Pre-release checklist
 
-- Verificar login y redirección sin sesión (`pages/login.html`).
+- Verificar login y redirección sin sesión (`/login`).
 - Probar crear, editar, eliminar y deshacer eliminación de facturas.
 - Confirmar exportación/importación de respaldo manual.
 - Validar PDF (previsualización y descarga).

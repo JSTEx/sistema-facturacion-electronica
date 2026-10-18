@@ -63,39 +63,39 @@
 }
 
 html.dark-mode {
-    --bg: #0b1220;
-    --surface: #111a2b;
-    --surface-2: #172236;
-    --surface-3: #1e2b44;
-    --overlay: rgba(2, 6, 14, 0.62);
+    --bg: #0a0f1a;
+    --surface: #131c2e;
+    --surface-2: #1a253b;
+    --surface-3: #223150;
+    --overlay: rgba(2, 6, 14, 0.66);
 
-    --text: #e6edf6;
-    --text-muted: #93a3b8;
-    --text-faint: #6b7c93;
+    --text: #eaf1fb;
+    --text-muted: #a7b8cd;
+    --text-faint: #8698b0;
 
-    --border: #23324b;
-    --border-strong: #33455f;
+    --border: #263450;
+    --border-strong: #384966;
 
     --primary: #10b981;
     --primary-hover: #34d399;
-    --primary-soft: rgba(16, 185, 129, 0.14);
+    --primary-soft: rgba(16, 185, 129, 0.15);
     --on-primary: #04120c;
 
     --danger: #f87171;
-    --danger-soft: rgba(248, 113, 113, 0.14);
+    --danger-soft: rgba(248, 113, 113, 0.15);
     --warning: #fbbf24;
-    --warning-soft: rgba(251, 191, 36, 0.14);
+    --warning-soft: rgba(251, 191, 36, 0.15);
     --info: #60a5fa;
-    --info-soft: rgba(96, 165, 250, 0.14);
+    --info-soft: rgba(96, 165, 250, 0.15);
     --success: #34d399;
-    --success-soft: rgba(52, 211, 153, 0.14);
+    --success-soft: rgba(52, 211, 153, 0.15);
 
-    --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.4);
-    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.5);
+    --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.45);
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.55);
     --shadow-md: 0 8px 24px -6px rgba(0, 0, 0, 0.6);
     --shadow-lg: 0 20px 48px -14px rgba(0, 0, 0, 0.7);
 
-    --ring: rgba(16, 185, 129, 0.4);
+    --ring: rgba(16, 185, 129, 0.42);
 }
 
 /* -----------------------------------------------------------------------------
@@ -232,11 +232,35 @@ html.dark-mode .theme-switch .knob-moon { display: flex; }
 body.page-admin .admin-nav { justify-content: space-between; flex-wrap: wrap; }
 
 .nav-title {
-    font-size: 16px;
+    font-size: 15px;
     font-weight: 700;
     color: var(--text);
     white-space: nowrap;
     letter-spacing: -0.01em;
+}
+
+.nav-brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    flex: 0 0 auto;
+    text-decoration: none;
+    color: var(--text);
+}
+.nav-brand:hover { text-decoration: none; }
+.nav-brand-mark {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    border-radius: 9px;
+    background: linear-gradient(135deg, var(--primary), var(--primary-hover));
+    color: #fff;
+    font-size: 16px;
+    font-weight: 800;
+    flex: 0 0 auto;
+    box-shadow: 0 4px 12px -4px rgba(5, 150, 105, 0.6);
 }
 
 /* Grupo derecho del nav */
@@ -281,27 +305,35 @@ body.page-admin .admin-nav { justify-content: space-between; flex-wrap: wrap; }
     align-items: center;
     gap: 8px;
     height: 38px;
-    padding: 0 14px;
+    padding: 0 12px;
     font-size: 13px;
     font-weight: 600;
     border-radius: var(--radius-sm);
-    border: 1px solid var(--border);
-    background: var(--surface);
-    color: var(--text);
+    border: 1px solid transparent;
+    background: transparent;
+    color: var(--text-muted);
     cursor: pointer;
     text-decoration: none;
     transition: background-color var(--t-fast), border-color var(--t-fast), color var(--t-fast), transform var(--t-fast);
 }
 .app-nav .nav-btn:hover,
-.admin-nav .nav-btn:hover { background: var(--surface-2); text-decoration: none; }
+.admin-nav .nav-btn:hover { background: var(--surface-2); border-color: transparent; color: var(--text); text-decoration: none; }
 .app-nav .nav-btn:active { transform: translateY(1px); }
 
-.nav-btn-primary {
+.nav-btn-primary,
+.app-nav .nav-btn-primary,
+.admin-nav .nav-btn-primary {
     background: var(--primary);
     border-color: var(--primary);
     color: var(--on-primary);
 }
-.nav-btn-primary:hover { background: var(--primary-hover); border-color: var(--primary-hover); color: var(--on-primary); }
+.nav-btn-primary:hover,
+.app-nav .nav-btn-primary:hover,
+.admin-nav .nav-btn-primary:hover {
+    background: var(--primary-hover);
+    border-color: var(--primary-hover);
+    color: var(--on-primary);
+}
 
 /* Barra de busqueda + acciones (admin) reutiliza nav-actions */
 
@@ -1218,7 +1250,8 @@ body.page-admin .edit-user-confirm { background: var(--primary) !important; }
     .admin-nav .nav-btn { height: 36px; padding: 0 12px; font-size: 12.5px; }
     #navCollapsible { padding: 12px 14px; gap: 8px; }
     .nav-right-group { gap: 10px; }
-    #currentUserEmail { font-size: 12px; }
+    #currentUserEmail { display: none; }
+    .admin-nav .nav-title { display: none; }
 
     /* --- Alertas y filtros --- */
     .operational-alerts { gap: 8px; margin-bottom: 14px; }

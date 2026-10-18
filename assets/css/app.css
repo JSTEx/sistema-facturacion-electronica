@@ -726,26 +726,72 @@ html.dark-mode .status-saldo { background: rgba(139, 92, 246, 0.18); color: #c4b
 /* -----------------------------------------------------------------------------
    13) Formulario de factura
    ----------------------------------------------------------------------------- */
-.invoice-form-card {
+.invoice-editor {
+    max-width: 1060px;
+    margin: 0 auto;
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: var(--radius-lg);
     box-shadow: var(--shadow-sm);
     padding: 28px;
 }
+.editor-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 24px;
+}
 .invoice-form-title { font-size: 22px; font-weight: 800; color: var(--text); }
-.invoice-form-subtitle { color: var(--text-muted); font-size: 14px; margin-top: 6px; }
+.invoice-form-subtitle { color: var(--text-muted); font-size: 13.5px; margin-top: 4px; }
 
-.invoice-form-section { margin-top: 26px; }
-.invoice-form-section-header {
+/* Layout de dos columnas (editor) */
+.editor-grid { display: grid; grid-template-columns: 1fr; gap: 26px; }
+.editor-main,
+.editor-side { display: flex; flex-direction: column; gap: 26px; min-width: 0; }
+.editor-section { min-width: 0; }
+.editor-section-head {
     display: flex;
     align-items: center;
     gap: 10px;
     padding-bottom: 10px;
+    margin-bottom: 16px;
     border-bottom: 1px solid var(--border);
 }
-.invoice-form-section-header svg { width: 18px; height: 18px; color: var(--primary); flex: 0 0 auto; }
-.invoice-form-section-title { font-size: 15px; font-weight: 700; color: var(--text); }
+.editor-section-head h3 {
+    margin: 0;
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text);
+}
+.editor-step {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: var(--primary-soft);
+    color: var(--primary);
+    font-size: 12px;
+    font-weight: 800;
+}
+.editor-fields { display: grid; grid-template-columns: 1fr; gap: 16px; }
+.editor-field { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.editor-check {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 2px;
+    color: var(--text-muted);
+    font-size: 12.5px;
+    font-weight: 600;
+    cursor: pointer;
+}
+.editor-check input { width: auto; }
 
 /* Inputs del formulario */
 #invoiceFormView input,
@@ -828,14 +874,19 @@ html.dark-mode .status-saldo { background: rgba(139, 92, 246, 0.18); color: #c4b
 
 /* Boton agregar item */
 .add-item-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
     width: 100%;
     padding: 13px;
     font-size: 13px;
     font-weight: 600;
+    font-family: inherit;
     color: var(--primary);
-    background: var(--surface);
+    background: transparent;
     border: none;
-    border-top: 1px solid var(--border);
+    border-top: 1px dashed var(--border-strong);
     cursor: pointer;
     transition: background-color var(--t-fast);
 }
@@ -862,12 +913,45 @@ html.dark-mode .status-saldo { background: rgba(139, 92, 246, 0.18); color: #c4b
 .input-error { border-color: var(--danger) !important; box-shadow: 0 0 0 3px var(--danger-soft) !important; }
 
 /* Total */
-.invoice-total-row { display: flex; justify-content: flex-end; padding-top: 16px; margin-top: 16px; border-top: 1px solid var(--border); }
-.invoice-total-label { font-size: 14px; font-weight: 600; color: var(--text-muted); margin-right: 8px; }
+.invoice-total-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 18px;
+    padding: 16px 18px;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+}
+.invoice-total-label {
+    font-size: 12.5px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-muted);
+}
 .invoice-total-amount { font-size: 26px; font-weight: 800; color: var(--text); }
 
 /* Acciones del formulario */
-.invoice-form-actions { display: flex; justify-content: flex-end; gap: 12px; margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--border); }
+.invoice-form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 28px;
+    padding-top: 22px;
+    border-top: 1px solid var(--border);
+}
+
+/* Editor en dos columnas (desktop) */
+@media (min-width: 1000px) {
+    .editor-grid { grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); gap: 32px; }
+    .editor-fields.two { grid-template-columns: 1fr 1fr; }
+    .editor-side .editor-section-boxed {
+        position: sticky;
+        top: 88px;
+    }
+}
 
 .btn {
     display: inline-flex;
@@ -1272,17 +1356,20 @@ body.page-admin .edit-user-confirm { background: var(--primary) !important; }
     .pagination { flex-wrap: wrap; gap: 8px; margin-top: 20px; }
 
     /* --- Formulario de factura --- */
-    .invoice-form-card { padding: 18px 15px; border-radius: var(--radius); }
+    .invoice-editor { padding: 18px 15px; border-radius: var(--radius); }
+    .editor-head { margin-bottom: 18px; }
     .invoice-form-title { font-size: 19px; }
     .invoice-form-subtitle { font-size: 13px; }
-    .invoice-form-section { margin-top: 20px; }
-    .invoice-form-section-header { padding-bottom: 8px; }
-    #invoiceFormView .grid { grid-template-columns: 1fr !important; }
+    .editor-grid { gap: 22px; }
+    .editor-main,
+    .editor-side { gap: 22px; }
+    .editor-section-head { padding-bottom: 8px; margin-bottom: 14px; }
+    .editor-fields.two { grid-template-columns: 1fr; }
     .invoice-form-actions { flex-direction: column-reverse; gap: 10px; margin-top: 20px; padding-top: 16px; }
     .invoice-form-actions .btn,
     #submitBtn,
     #cancelBtn { width: 100%; }
-    .invoice-total-row { padding-top: 12px; margin-top: 12px; }
+    .invoice-total-row { padding: 14px; margin-top: 14px; }
     .invoice-total-amount { font-size: 22px; }
 
     /* --- Tabla de items: convertir en tarjetas apiladas --- */
@@ -1360,7 +1447,7 @@ body.page-admin .edit-user-confirm { background: var(--primary) !important; }
 @media (max-width: 400px) {
     .page-main { padding: 16px 12px 40px; }
     .section-title { font-size: 18px; }
-    .invoice-form-card { padding: 16px 13px; }
+    .invoice-editor { padding: 16px 13px; }
     .admin-panel-card { padding: 16px 13px; }
     .app-nav,
     .admin-nav { padding: 9px 12px; }

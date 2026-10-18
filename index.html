@@ -144,163 +144,152 @@
 
         <!-- Formulario de Factura (Oculto por defecto) -->
         <div id="invoiceFormView" class="hidden">
-            <div class="invoice-form-card" style="max-width: 760px; margin: 0 auto;">
-                <h2 class="invoice-form-title invoiceFormTitle">Nueva Factura</h2>
-                <p class="invoice-form-subtitle">Completa la información para generar la factura</p>
+            <div class="invoice-editor">
+                <div class="editor-head">
+                    <div>
+                        <h2 class="invoice-form-title invoiceFormTitle">Nueva Factura</h2>
+                        <p class="invoice-form-subtitle">Completa los datos del cliente, los productos y el estado del pago.</p>
+                    </div>
+                </div>
 
                 <form id="invoiceForm" onsubmit="handleSubmit(event)">
-                    <!-- Información Básica -->
-                    <div class="invoice-form-section">
-                        <div class="invoice-form-section-header">
-                            <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-                            <span class="invoice-form-section-title">Información de la Factura</span>
-                        </div>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
-                            <div>
-                                <label class="block mb-1">Fecha</label>
-                                <input type="date" id="fecha">
-                            </div>
-                            <div>
-                                <label class="block mb-1">Número de Factura</label>
-                                <input type="text" id="numero" placeholder="Ej: 8420" readonly>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Datos del Cliente -->
-                    <div class="invoice-form-section">
-                        <div class="invoice-form-section-header">
-                            <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-                            <span class="invoice-form-section-title">Datos del Cliente</span>
-                        </div>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
-                            <div class="sm:col-span-2">
-                                <label class="block mb-1">Nombre del Cliente</label>
-                                <input type="text" id="cliente" placeholder="Ej: Juan Pérez">
-                            </div>
-                            <div class="sm:col-span-2">
-                                <label class="block mb-1">Dirección</label>
-                                <input type="text" id="direccion" placeholder="Ej: Calle Principal #123">
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Estado y Pago -->
-                    <div class="invoice-form-section">
-                        <div class="invoice-form-section-header">
-                            <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
-                            <span class="invoice-form-section-title">Estado y Pago</span>
-                        </div>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
-                            <div>
-                                <label class="block mb-1">Estado de la Factura</label>
-                                <select id="estado" class="status-select">
-                                    <option value="pending">Pendiente de pago</option>
-                                    <option value="paid">Pagada</option>
-                                    <option value="late">Vencida</option>
-                                    <option value="dispatch">En despacho</option>
-                                    <option value="abono">Con abono</option>
-                                    <option value="saldo_actual">Saldo actual</option>
-                                </select>
-                                <label class="mt-2 inline-flex items-center gap-2 text-xs cursor-pointer">
-                                    <input type="checkbox" id="estadoManualLock">
-                                    <span>Mantener estado manual</span>
-                                </label>
-                            </div>
-                            <div>
-                                <label class="block mb-1">Monto de Abono (opcional)</label>
-                                <input type="number" id="abono" min="0" step="0.01" value="0" placeholder="0.00" oninput="calculateTotals()">
-                            </div>
-                            <div id="saldoActualWrapper" class="hidden sm:col-span-2">
-                                <label class="block mb-1">Saldo Actual</label>
-                                <div class="invoice-saldo-box w-full">
-                                    <span class="invoice-saldo-currency">$</span> <span id="saldoActualAmount">0.00</span>
+                    <div class="editor-grid">
+                        <!-- Columna principal -->
+                        <div class="editor-main">
+                            <section class="editor-section">
+                                <header class="editor-section-head">
+                                    <span class="editor-step">1</span>
+                                    <h3>Datos del cliente</h3>
+                                </header>
+                                <div class="editor-fields two">
+                                    <div class="editor-field">
+                                        <label for="cliente">Nombre del cliente</label>
+                                        <input type="text" id="cliente" placeholder="Ej: Juan Pérez">
+                                    </div>
+                                    <div class="editor-field">
+                                        <label for="direccion">Dirección</label>
+                                        <input type="text" id="direccion" placeholder="Ej: Calle Principal #123">
+                                    </div>
                                 </div>
-                            </div>
+                            </section>
+
+                            <section class="editor-section">
+                                <header class="editor-section-head">
+                                    <span class="editor-step">2</span>
+                                    <h3>Productos o servicios</h3>
+                                </header>
+                                <div class="items-table-wrapper">
+                                    <table>
+                                        <thead class="items-table-head">
+                                            <tr>
+                                                <th style="width:44px;">#</th>
+                                                <th style="width:110px;">Cantidad</th>
+                                                <th>Descripción</th>
+                                                <th style="width:130px;">Precio Unit.</th>
+                                                <th style="width:120px; text-align:right;">Subtotal</th>
+                                                <th style="width:40px;"></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="itemsTableBody">
+                                            <tr>
+                                                <td class="text-center" data-label="#">
+                                                    <span class="item-index">1</span>
+                                                </td>
+                                                <td data-label="Cant.">
+                                                    <input type="number" min="0" step="0.01" value="1" class="item-cant" oninput="calculateTotals()">
+                                                </td>
+                                                <td data-label="Descripcion">
+                                                    <textarea class="item-desc item-desc-area" placeholder="Ej: Consultoría, Producto X, Servicio de instalación" rows="2"></textarea>
+                                                </td>
+                                                <td data-label="Precio">
+                                                    <input type="number" min="0" step="0.01" class="item-precio" placeholder="0.00" oninput="calculateTotals()">
+                                                </td>
+                                                <td class="text-right" data-label="Valor">
+                                                    <span class="item-valor">$0.00</span>
+                                                </td>
+                                                <td class="text-center remove-cell" data-label="Eliminar">
+                                                    <button type="button" class="removeItemBtn" onclick="removeItem(this)" title="Eliminar">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                                                        <span class="remove-label">Eliminar item</span>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <button type="button" id="addItemBtn" onclick="addItem()" class="add-item-btn">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                                        Agregar otro producto o servicio
+                                    </button>
+                                </div>
+
+                                <div class="invoice-total-row">
+                                    <span class="invoice-total-label">Total a pagar</span>
+                                    <span class="invoice-total-amount">$ <span id="totalAmount">0.00</span></span>
+                                </div>
+                            </section>
                         </div>
+
+                        <!-- Columna lateral -->
+                        <aside class="editor-side">
+                            <section class="editor-section editor-section-boxed">
+                                <header class="editor-section-head">
+                                    <span class="editor-step">3</span>
+                                    <h3>Detalles de factura</h3>
+                                </header>
+                                <div class="editor-fields">
+                                    <div class="editor-field">
+                                        <label for="fecha">Fecha</label>
+                                        <input type="date" id="fecha">
+                                    </div>
+                                    <div class="editor-field">
+                                        <label for="numero">Número de factura</label>
+                                        <input type="text" id="numero" placeholder="Ej: 8420" readonly>
+                                    </div>
+                                    <div class="editor-field">
+                                        <label for="estado">Estado de la factura</label>
+                                        <select id="estado" class="status-select">
+                                            <option value="pending">Pendiente de pago</option>
+                                            <option value="paid">Pagada</option>
+                                            <option value="late">Vencida</option>
+                                            <option value="dispatch">En despacho</option>
+                                            <option value="abono">Con abono</option>
+                                            <option value="saldo_actual">Saldo actual</option>
+                                        </select>
+                                        <label class="editor-check">
+                                            <input type="checkbox" id="estadoManualLock">
+                                            <span>Mantener estado manual</span>
+                                        </label>
+                                    </div>
+                                    <div class="editor-field">
+                                        <label for="abono">Monto de abono (opcional)</label>
+                                        <input type="number" id="abono" min="0" step="0.01" value="0" placeholder="0.00" oninput="calculateTotals()">
+                                    </div>
+                                    <div id="saldoActualWrapper" class="editor-field hidden">
+                                        <label for="saldoActualAmount">Saldo actual</label>
+                                        <div class="invoice-saldo-box w-full">
+                                            <span class="invoice-saldo-currency">$</span> <span id="saldoActualAmount">0.00</span>
+                                        </div>
+                                    </div>
+                                    <div id="dispatchWrapper" class="editor-field">
+                                        <label for="detalleDespacho">Detalle de despacho (opcional)</label>
+                                        <textarea id="detalleDespacho" rows="2" placeholder="Ej: Entrega en bodega central, horario de 9am a 5pm"></textarea>
+                                    </div>
+                                    <div id="dueDateWrapper" class="editor-field">
+                                        <label for="fechaVencimiento">Fecha de vencimiento</label>
+                                        <input type="date" id="fechaVencimiento">
+                                        <p class="date-format-hint">Formato mostrado: dd-mm-aaaa</p>
+                                    </div>
+                                    <div id="paidDateWrapper" class="editor-field hidden">
+                                        <label for="fechaPago">Fecha de pago</label>
+                                        <input type="date" id="fechaPago">
+                                        <p class="date-format-hint">Formato mostrado: dd-mm-aaaa</p>
+                                    </div>
+                                </div>
+                            </section>
+                        </aside>
                     </div>
 
-                    <!-- Fechas y Detalles -->
-                    <div class="invoice-form-section">
-                        <div class="invoice-form-section-header">
-                            <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-                            <span class="invoice-form-section-title">Fechas y Detalles</span>
-                        </div>
-                        <div id="statusExtras" class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
-                            <div id="dispatchWrapper" class="sm:col-span-2">
-                                <label class="block mb-1">Detalle de Despacho (opcional)</label>
-                                <textarea id="detalleDespacho" rows="2" placeholder="Ej: Entrega en bodega central, horario de 9am a 5pm"></textarea>
-                            </div>
-                            <div id="dueDateWrapper">
-                                <label class="block mb-1">Fecha de Vencimiento</label>
-                                <input type="date" id="fechaVencimiento">
-                                <p class="date-format-hint">Formato mostrado: dd-mm-aaaa</p>
-                            </div>
-                            <div id="paidDateWrapper" class="hidden">
-                                <label class="block mb-1">Fecha de Pago</label>
-                                <input type="date" id="fechaPago">
-                                <p class="date-format-hint">Formato mostrado: dd-mm-aaaa</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Productos/Servicios -->
-                    <div class="invoice-form-section">
-                        <div class="invoice-form-section-header">
-                            <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
-                            <span class="invoice-form-section-title">Productos o Servicios</span>
-                        </div>
-                        <div class="items-table-wrapper">
-                            <table>
-                                <thead class="items-table-head">
-                                    <tr>
-                                        <th style="width:44px;">#</th>
-                                        <th style="width:110px;">Cantidad</th>
-                                        <th>Descripción</th>
-                                        <th style="width:130px;">Precio Unit.</th>
-                                        <th style="width:120px; text-align:right;">Subtotal</th>
-                                        <th style="width:40px;"></th>
-                                    </tr>
-                                </thead>
-                                <tbody id="itemsTableBody">
-                                    <tr>
-                                        <td class="text-center">
-                                            <span class="item-index">1</span>
-                                        </td>
-                                        <td>
-                                            <input type="number" min="0" step="0.01" value="1" class="item-cant" oninput="calculateTotals()">
-                                        </td>
-                                        <td>
-                                            <textarea class="item-desc item-desc-area" placeholder="Ej: Consultoría, Producto X, Servicio de instalación" rows="2"></textarea>
-                                        </td>
-                                        <td>
-                                            <input type="number" min="0" step="0.01" class="item-precio" placeholder="0.00" oninput="calculateTotals()">
-                                        </td>
-                                        <td class="text-right">
-                                            <span class="item-valor">$0.00</span>
-                                        </td>
-                                        <td class="text-center remove-cell">
-                                            <button type="button" class="removeItemBtn" onclick="removeItem(this)" title="Eliminar">
-                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-                                            </button>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                            <button type="button" id="addItemBtn" onclick="addItem()" class="add-item-btn">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                                Agregar otro producto o servicio
-                            </button>
-                        </div>
-
-                        <!-- Total -->
-                        <div class="invoice-total-row">
-                            <span class="invoice-total-label">Total a Pagar:</span>
-                            <span class="invoice-total-amount">$ <span id="totalAmount">0.00</span></span>
-                        </div>
-                    </div>
-
-                    <!-- Botones -->
+                    <!-- Acciones -->
                     <div class="invoice-form-actions">
                         <button id="cancelBtn" type="button" onclick="cancelInvoice()" class="btn btn-ghost">Cancelar</button>
                         <button type="submit" id="submitBtn" class="btn btn-primary">Crear Factura</button>

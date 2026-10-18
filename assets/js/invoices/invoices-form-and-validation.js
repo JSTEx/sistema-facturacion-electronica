@@ -690,16 +690,21 @@ async function handleSubmit(e) {
     if (!fechaInput) {
         addError('fecha', 'Fecha de factura requerida');
     } else {
-        const invoiceDateIso = fechaInput;
-        const todayIso = getTodayISODate();
-
-        if (!isValidIsoDate(invoiceDateIso)) {
+        if (!isValidIsoDate(fechaInput)) {
             addError('fecha', 'La fecha de factura no es válida');
         }
     }
 
     if (!numero) {
         addError('numero', 'Número requerido');
+    } else {
+        const numeroNorm = String(numero).trim();
+        const numeroDuplicado = (Array.isArray(invoices) ? invoices : []).some(inv =>
+            String(inv?.number || '').trim() === numeroNorm && Number(inv?.id) !== Number(editingId)
+        );
+        if (numeroDuplicado) {
+            addError('numero', `Ya existe una factura con el número ${numeroNorm}`);
+        }
     }
 
     if (!cliente) {

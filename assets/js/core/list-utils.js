@@ -24,16 +24,22 @@ function sortInvoicesDescById(invoices) {
     return list.sort((a, b) => Number(b?.id || 0) - Number(a?.id || 0));
 }
 
+// Funcion: stripAccents
+// Funcion: Elimina tildes/diacriticos para busqueda insensible a acentos.
+function stripAccents(value) {
+    return String(value == null ? '' : value).normalize('NFD').replace(/[̀-ͯ]/g, '');
+}
+
 // Funcion: searchInvoices
-// Que hace: Gestiona la logica de searchInvoices.
+// Que hace: Gestiona la logica de searchInvoices (insensible a mayusculas y acentos).
 function searchInvoices(invoices, term) {
     const list = Array.isArray(invoices) ? invoices : [];
-    const normalizedTerm = String(term || '').toLowerCase().trim();
+    const normalizedTerm = stripAccents(String(term || '')).toLowerCase().trim();
     if (!normalizedTerm) return [...list];
 
     return list.filter((inv) => {
-        const numberText = String(inv?.number || '').toLowerCase();
-        const clientText = String(inv?.client || '').toLowerCase();
+        const numberText = stripAccents(String(inv?.number || '')).toLowerCase();
+        const clientText = stripAccents(String(inv?.client || '')).toLowerCase();
         return numberText.includes(normalizedTerm) || clientText.includes(normalizedTerm);
     });
 }
@@ -61,3 +67,4 @@ window.filterInvoicesByStatus = filterInvoicesByStatus;
 window.sortInvoicesDescById = sortInvoicesDescById;
 window.searchInvoices = searchInvoices;
 window.paginateList = paginateList;
+window.stripAccents = stripAccents;

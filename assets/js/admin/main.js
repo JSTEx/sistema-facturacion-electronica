@@ -146,10 +146,10 @@ async function renderUsers() {
             const userRole = String(u?.role || 'user');
             const isCurrent = current && current.email && userEmail.toLowerCase() === String(current.email).toLowerCase();
             const rowNumber = start + idx + 1;
-            const descriptionIndicator = u.description ? ` <span class="admin-description-indicator text-xs" title="${u.description}">📝</span>` : '';
+            const descriptionIndicator = u.description ? ` <span class="admin-description-indicator text-xs" title="${escapeHtml(u.description)}">📝</span>` : '';
 
             const tr = document.createElement('tr');
-            tr.innerHTML = `<td class="admin-row-number p-2 text-center font-semibold">${rowNumber}</td><td class="p-2">${userEmail}${descriptionIndicator}${isCurrent ? ' <span class="text-xs muted-text">(Cuenta actual)</span>' : ''}</td><td class="p-2 text-center">${userRole}</td><td class="p-2 text-center">${isCurrent ? '<span class="text-xs muted-text">-</span>' : `<button data-index="${globalIndex}" class="editBtn px-2 py-1 bg-blue-500 text-white rounded mr-2">Editar</button><button data-index="${globalIndex}" class="delBtn px-2 py-1 bg-red-500 text-white rounded">Eliminar</button>`}</td>`;
+            tr.innerHTML = `<td class="admin-row-number p-2 text-center font-semibold">${rowNumber}</td><td class="p-2">${escapeHtml(userEmail)}${descriptionIndicator}${isCurrent ? ' <span class="text-xs muted-text">(Cuenta actual)</span>' : ''}</td><td class="p-2 text-center">${escapeHtml(userRole)}</td><td class="p-2 text-center">${isCurrent ? '<span class="text-xs muted-text">-</span>' : `<button data-index="${globalIndex}" class="editBtn px-2 py-1 bg-blue-500 text-white rounded mr-2">Editar</button><button data-index="${globalIndex}" class="delBtn px-2 py-1 bg-red-500 text-white rounded">Eliminar</button>`}</td>`;
             tbody.appendChild(tr);
         });
 
@@ -179,7 +179,7 @@ async function renderUsers() {
             const result = await Swal.fire({
                 title: 'Eliminar usuario?',
                 html: `
-                    <p>Eliminar <strong>${target.email}</strong> no se puede deshacer.</p>
+                    <p>Eliminar <strong>${escapeHtml(target.email)}</strong> no se puede deshacer.</p>
                     <p class="admin-delete-note">Se eliminará el acceso del usuario (autenticación) y su perfil.</p>
                     <div class="admin-delete-fields">
                         <label class="admin-delete-warning">
@@ -243,7 +243,7 @@ async function openEditDialog(index) {
     const current = JSON.parse(localStorage.getItem('currentUser') || 'null');
 
     const { value: formValues } = await Swal.fire({
-        title: `Editar ${target.email}`,
+        title: `Editar ${escapeHtml(target.email)}`,
         html:
             `<div class="edit-user-form">` +
             `<p class="edit-user-note">Las contraseñas se gestionan mediante Supabase Auth. Los usuarios pueden cambiarlas desde su perfil.</p>` +

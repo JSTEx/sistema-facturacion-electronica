@@ -116,7 +116,7 @@ function renderInvoiceCard(inv, canDelete, withTitle = false) {
         ? `<p class="mt-1 invoice-meta-row"><span class="invoice-meta-badge ${dueIsLate ? 'invoice-meta-badge-due-late' : 'invoice-meta-badge-due'}">VENCE:</span><span class="invoice-meta-value ${dueIsLate ? 'invoice-meta-value-due-late' : 'invoice-meta-value-due'}">${formatDateSV(inv.dueDate)}</span></p>`
         : '';
     const paidDateHtml = inv.paidDate ? `<p class="text-xs text-gray-500 mt-1">FECHA DE PAGO: ${formatDateSV(inv.paidDate)}</p>` : '';
-    const dispatchHtml = inv.dispatchDetail ? `<p class="text-xs text-gray-500 mt-1">DESPACHO: ${inv.dispatchDetail}</p>` : '';
+    const dispatchHtml = inv.dispatchDetail ? `<p class="text-xs text-gray-500 mt-1">DESPACHO: ${escapeHtml(inv.dispatchDetail)}</p>` : '';
     const manualStatusClass = isOverdue ? 'manual-status-with-alert' : '';
     const manualStatusHtml = inv.manualStatusLocked
         ? `<p class="text-xs italic text-gray-500 mb-2 ${manualStatusClass}">Estado manual</p>`
@@ -153,8 +153,8 @@ function renderInvoiceCard(inv, canDelete, withTitle = false) {
             ` : ''}
         </div>
         <div class="mb-3">
-            <h3 class="text-lg font-semibold text-gray-900 leading-tight">${inv.client}</h3>
-            <p class="text-sm text-gray-500 mt-0">Factura #${inv.number}</p>
+            <h3 class="text-lg font-semibold text-gray-900 leading-tight">${escapeHtml(inv.client)}</h3>
+            <p class="text-sm text-gray-500 mt-0">Factura #${escapeHtml(inv.number)}</p>
             ${getInvoiceOwnershipBadge(inv)}
         </div>
         <div class="flex justify-between items-end">

@@ -158,7 +158,7 @@ function getInvoiceOwnershipBadge(invoice) {
     }
 
     if (currentUser && currentUser.role === 'admin') {
-        return `<p class="mt-1"><span class="creator-info-badge">${getInvoiceCreatorText(invoice)}</span></p>`;
+        return `<p class="mt-1"><span class="creator-info-badge">${escapeHtml(getInvoiceCreatorText(invoice))}</span></p>`;
     }
 
     if (currentUser && currentUser.role === 'user' && !isInvoiceOwner(invoice)) {

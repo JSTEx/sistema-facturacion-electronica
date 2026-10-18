@@ -191,13 +191,13 @@ function restoreDraftIfExists() {
                         <span class="item-index text-gray-700 font-semibold">${idx + 1}</span>
                     </td>
                     <td class="py-2 px-2" data-label="Cant.">
-                        <input type="number" min="0" step="0.01" value="${item.cant || 1}" class="item-cant w-full px-2 py-1.5 border border-gray-200 rounded text-center text-sm focus:outline-none focus:border-gray-900" oninput="calculateTotals()">
+                        <input type="number" min="0" step="0.01" value="${escapeHtml(item.cant || 1)}" class="item-cant w-full px-2 py-1.5 border border-gray-200 rounded text-center text-sm focus:outline-none focus:border-gray-900" oninput="calculateTotals()">
                     </td>
                     <td class="py-2 px-2" data-label="Descripcion">
-                        <textarea class="item-desc item-desc-area w-full px-2 py-1.5 border border-gray-200 rounded text-sm focus:outline-none focus:border-gray-900" placeholder="Descripción del item" rows="2">${item.desc || ''}</textarea>
+                        <textarea class="item-desc item-desc-area w-full px-2 py-1.5 border border-gray-200 rounded text-sm focus:outline-none focus:border-gray-900" placeholder="Descripción del item" rows="2">${escapeHtml(item.desc || '')}</textarea>
                     </td>
                     <td class="py-2 px-2" data-label="Precio">
-                        <input type="number" min="0" step="0.01" value="${item.precio || ''}" class="item-precio w-full px-2 py-1.5 border border-gray-200 rounded text-sm focus:outline-none focus:border-gray-900" placeholder="0.00" oninput="calculateTotals()">
+                        <input type="number" min="0" step="0.01" value="${escapeHtml(item.precio || '')}" class="item-precio w-full px-2 py-1.5 border border-gray-200 rounded text-sm focus:outline-none focus:border-gray-900" placeholder="0.00" oninput="calculateTotals()">
                     </td>
                     <td class="py-2 px-2 text-right" data-label="Valor">
                         <span class="item-valor text-gray-900 font-medium">0.00</span>

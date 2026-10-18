@@ -241,7 +241,7 @@ function previewInvoicePdf(inv, canViewAmount) {
         ? `<span class="pdf-meta-badge pdf-meta-badge-paid-date">FECHA DE PAGO: ${formatDateSV(inv.paidDate)}</span>`
         : '';
     const dispatchBadgeHtml = inv.dispatchDetail
-        ? `<span class="pdf-meta-badge pdf-meta-badge-dispatch">DESPACHO: ${inv.dispatchDetail}</span>`
+        ? `<span class="pdf-meta-badge pdf-meta-badge-dispatch">DESPACHO: ${escapeHtml(inv.dispatchDetail)}</span>`
         : '';
     const metaBadgesHtml = [paidBadgeHtml, saldoBadgeHtml, dueBadgeHtml, paidDateBadgeHtml, dispatchBadgeHtml]
         .filter(Boolean)
@@ -265,7 +265,7 @@ function previewInvoicePdf(inv, canViewAmount) {
         return `
             <tr>
                 <td class="pdf-legacy-cell-center">${qty || ''}</td>
-                <td>${item.desc || ''}</td>
+                <td>${escapeHtml(item.desc || '')}</td>
                 <td class="pdf-legacy-cell-right">${priceText}</td>
                 <td class="pdf-legacy-cell-right"></td>
                 <td class="pdf-legacy-cell-right"></td>
@@ -301,16 +301,16 @@ function previewInvoicePdf(inv, canViewAmount) {
                         <div class="pdf-legacy-docbox">
                             <div class="pdf-legacy-doc-title">COMPROBANTE DE CREDITO FISCAL</div>
                             <div class="pdf-legacy-doc-sub">19UN000C</div>
-                            <div class="pdf-legacy-doc-number-row"><span>N°</span><strong>${invoiceNumber}</strong></div>
+                            <div class="pdf-legacy-doc-number-row"><span>N°</span><strong>${escapeHtml(invoiceNumber)}</strong></div>
                             <div>REGISTRO N°: 238069-7</div>
                             <div>NIT: 1115-051273-102-7</div>
                         </div>
                     </div>
 
                     <div class="pdf-legacy-fields">
-                        <div class="pdf-legacy-field"><span>Señor:</span> <strong>${inv.client || 'N/A'}</strong></div>
+                        <div class="pdf-legacy-field"><span>Señor:</span> <strong>${escapeHtml(inv.client || 'N/A')}</strong></div>
                         <div class="pdf-legacy-field"><span>Fecha:</span> <strong>${formatDateSV(inv.date) || ''}</strong></div>
-                        <div class="pdf-legacy-field"><span>Dirección:</span> <strong>${addressText}</strong></div>
+                        <div class="pdf-legacy-field"><span>Dirección:</span> <strong>${escapeHtml(addressText)}</strong></div>
                         <div class="pdf-legacy-field"><span>NIT:</span> <strong></strong></div>
                         <div class="pdf-legacy-field"><span>Dept.:</span> <strong></strong></div>
                         <div class="pdf-legacy-field"><span>Registro No.:</span> <strong></strong></div>
@@ -376,7 +376,7 @@ function previewInvoicePdf(inv, canViewAmount) {
         <head>
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Factura #${inv.number}</title>
+            <title>Factura #${escapeHtml(inv.number)}</title>
             <base href="${baseHref}">
             <link rel="stylesheet" href="assets/css/app.css">
         </head>
@@ -453,7 +453,7 @@ function viewInvoice(id) {
         ? `<p class="mt-1 invoice-meta-row"><span class="invoice-meta-badge invoice-meta-badge-paid-date">FECHA DE PAGO:</span><span class="invoice-meta-value invoice-meta-value-paid-date">${formatDateSV(inv.paidDate)}</span></p>`
         : '';
     const dispatchMeta = inv.dispatchDetail
-        ? `<p class="mt-1 invoice-meta-row"><span class="invoice-meta-badge invoice-meta-badge-dispatch">DESPACHO:</span><span class="invoice-meta-value invoice-meta-value-dispatch">${inv.dispatchDetail}</span></p>`
+        ? `<p class="mt-1 invoice-meta-row"><span class="invoice-meta-badge invoice-meta-badge-dispatch">DESPACHO:</span><span class="invoice-meta-value invoice-meta-value-dispatch">${escapeHtml(inv.dispatchDetail)}</span></p>`
         : '';
     const changeLogButton = '<button type="button" class="mt-2 text-xs font-semibold text-blue-600 hover:text-blue-700 underline" onclick="showInvoiceChangeLog(' + inv.id + ')">Ver historial de cambios</button>';
 
@@ -462,7 +462,7 @@ function viewInvoice(id) {
     inv.items.forEach(item => {
         const itemPrice = canViewAmount ? `$${item.precio.toFixed(2)}` : 'Oculto';
         const itemTotal = canViewAmount ? `$${item.total.toFixed(2)}` : 'Oculto';
-        itemsHtml += `<tr class="border-b"><td class="p-2">${item.cant}</td><td class="p-2">${item.desc}</td><td class="p-2">${itemPrice}</td><td class="text-right p-2">${itemTotal}</td></tr>`;
+        itemsHtml += `<tr class="border-b"><td class="p-2">${item.cant}</td><td class="p-2">${escapeHtml(item.desc)}</td><td class="p-2">${itemPrice}</td><td class="text-right p-2">${itemTotal}</td></tr>`;
     });
     
     itemsHtml += '</table>';
@@ -471,12 +471,12 @@ function viewInvoice(id) {
         : '<div class="invoice-modal-total-box"><span class="invoice-modal-total-label">Total</span><span class="invoice-modal-total-value is-hidden">Oculto</span></div>';
 
     Swal.fire({
-        title: `Factura #${inv.number}`,
+        title: `Factura #${escapeHtml(inv.number)}`,
         html: `
             <div class="invoice-modal-content text-left">
                 <div class="invoice-modal-meta">
-                    <p><strong>Cliente:</strong> ${inv.client}</p>
-                    <p><strong>Dirección:</strong> ${addressText}</p>
+                    <p><strong>Cliente:</strong> ${escapeHtml(inv.client)}</p>
+                    <p><strong>Dirección:</strong> ${escapeHtml(addressText)}</p>
                     <p><strong>Fecha:</strong> ${formatDateSV(inv.date)}</p>
                     <p><strong>Estado:</strong> ${statusText}</p>
                     ${changeLogButton}
@@ -573,7 +573,7 @@ function editInvoice(id) {
                     <input type="number" min="0" step="0.01" value="${item.cant}" class="item-cant w-full px-2 py-1.5 border border-gray-200 rounded text-center text-sm focus:outline-none focus:border-gray-900" oninput="calculateTotals()">
                 </td>
                 <td class="py-2 px-2" data-label="Descripcion">
-                    <textarea class="item-desc item-desc-area w-full px-2 py-1.5 border border-gray-200 rounded text-sm focus:outline-none focus:border-gray-900" placeholder="Descripción del item" rows="2">${item.desc}</textarea>
+                    <textarea class="item-desc item-desc-area w-full px-2 py-1.5 border border-gray-200 rounded text-sm focus:outline-none focus:border-gray-900" placeholder="Descripción del item" rows="2">${escapeHtml(item.desc)}</textarea>
                 </td>
                 <td class="py-2 px-2" data-label="Precio">
                     <input type="number" min="0" step="0.01" value="${item.precio}" class="item-precio w-full px-2 py-1.5 border border-gray-200 rounded text-sm focus:outline-none focus:border-gray-900" placeholder="0.00" oninput="calculateTotals()">
@@ -637,7 +637,7 @@ function deleteInvoice(id) {
                     toast: true,
                     position: 'bottom-end',
                     icon: 'warning',
-                    title: `Factura #${deletedInvoice.number} eliminada`,
+                    title: `Factura #${escapeHtml(deletedInvoice.number)} eliminada`,
                     showConfirmButton: true,
                     confirmButtonText: 'Deshacer',
                     confirmButtonColor: '#10b981',

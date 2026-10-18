@@ -39,6 +39,14 @@ function generateInvoiceNumber() {
     document.getElementById('numero').value = nextNumber;
 }
 
+// Funcion: generateInvoiceId
+// Que hace: Genera un id numerico unico y ordenable por tiempo para la factura.
+let __invoiceIdSequence = Math.floor(Math.random() * 1024);
+function generateInvoiceId() {
+    __invoiceIdSequence = (__invoiceIdSequence + 1) % 1024;
+    return Date.now() * 1024 + __invoiceIdSequence;
+}
+
 // Funcion: cancelInvoice
 // Que hace: Gestiona la logica de cancelInvoice.
 function cancelInvoice() {
@@ -381,7 +389,7 @@ function showInvoiceChangeLog(invoiceId) {
     if (!entries.length) {
         Swal.fire({
             icon: 'info',
-            title: `Sin historial #${invoice.number}`,
+            title: `Sin historial #${escapeHtml(invoice.number)}`,
             text: 'Esta factura aún no tiene eventos registrados.',
             confirmButtonColor: '#1a1a1a'
         });
@@ -403,7 +411,7 @@ function showInvoiceChangeLog(invoiceId) {
         const byText = entry.byEmail || 'desconocido';
         const statusText = entry.invoiceStatus ? ` · Estado: ${getStatusText(entry.invoiceStatus)}` : '';
 
-        return `<li class="border rounded-lg px-3 py-2 mb-2" style="${itemStyle}"><p><span class="audit-log-badge inline-flex items-center px-2 py-0.5 rounded-full border font-semibold" style="${actionBadgeStyle}">${actionLabel}</span></p><p class="audit-log-meta mt-1" style="${metaTextStyle}">${whenText} · ${byText}${statusText}</p></li>`;
+        return `<li class="border rounded-lg px-3 py-2 mb-2" style="${itemStyle}"><p><span class="audit-log-badge inline-flex items-center px-2 py-0.5 rounded-full border font-semibold" style="${actionBadgeStyle}">${actionLabel}</span></p><p class="audit-log-meta mt-1" style="${metaTextStyle}">${whenText} · ${escapeHtml(byText)}${statusText}</p></li>`;
     };
 
     const grouped = { today: [], yesterday: [], older: [] };
@@ -427,7 +435,7 @@ function showInvoiceChangeLog(invoiceId) {
         .join('');
 
     Swal.fire({
-        title: `Historial #${invoice.number}`,
+        title: `Historial #${escapeHtml(invoice.number)}`,
         html: `<div class="text-left max-h-[360px] overflow-y-auto">${sectionsHtml}</div>`,
         confirmButtonText: 'Cerrar',
         confirmButtonColor: '#1a1a1a',
@@ -935,7 +943,7 @@ async function saveInvoice(fechaInput) {
     } else {
         const createAudit = createAuditEntry('created');
         const newInvoice = {
-            id: Date.now(),
+            id: generateInvoiceId(),
             number: document.getElementById('numero').value,
             client: document.getElementById('cliente').value,
             date: invoiceDate,

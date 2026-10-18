@@ -52,10 +52,10 @@ Rutas limpias (gracias a `cleanUrls` en `vercel.json`):
 │   │   │   ├── supabase-client.js
 │   │   │   ├── supabase-utils.js
 │   │   │   ├── list-utils.js
+│   │   │   ├── html-utils.js
 │   │   │   ├── loading-utils.js
 │   │   │   ├── password-utils.js
 │   │   │   ├── performance-utils.js
-│   │   │   ├── security.js
 │   │   │   ├── session-utils.js
 │   │   │   ├── status-utils.js
 │   │   │   ├── sw-register.js
@@ -79,8 +79,7 @@ Rutas limpias (gracias a `cleanUrls` en `vercel.json`):
 │   ├── CHECKLIST_REFACTOR_ADMIN_SEGURO.md
 │   ├── CONVENCION_MODULOS_JS.md
 │   ├── INSTRUCCIONES_SUPABASE.md
-│   ├── LICENCIA_RESUMEN.md
-│   └── MEDIDAS_SEGURIDAD.md
+│   └── LICENCIA_RESUMEN.md
 ├── supabase/
 │   └── migrations/
 │       └── 0001_init.sql

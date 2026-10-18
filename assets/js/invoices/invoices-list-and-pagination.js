@@ -127,7 +127,7 @@ function renderInvoiceCard(inv, canDelete, withTitle = false) {
     const overdueNotificationHtml = isOverdue
         ? `<div class="overdue-notification-icon" title="Factura vencida" aria-label="Factura vencida"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg><i class="overdue-notification-dot" aria-hidden="true"></i></div>`
         : '';
-    const actionRowClass = isOverdue ? 'flex justify-end gap-3 mb-2 pl-9' : 'flex justify-end gap-3 mb-2';
+    const actionRowClass = isOverdue ? 'invoice-actions-row is-overdue flex justify-end gap-3 mb-2' : 'invoice-actions-row flex justify-end gap-3 mb-2';
     const cardStateClass = isOverdue ? 'invoice-card-overdue' : '';
     const viewTitle = withTitle ? ' title="Ver"' : '';
     const editTitle = withTitle ? ' title="Editar"' : '';

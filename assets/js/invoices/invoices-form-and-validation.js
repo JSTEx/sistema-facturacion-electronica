@@ -214,6 +214,15 @@ function getTodayISODate() {
     return `${y}-${m}-${d}`;
 }
 
+// Funcion: isValidIsoDate
+// Que hace: Valida que un string sea una fecha ISO valida (YYYY-MM-DD).
+function isValidIsoDate(isoDate) {
+    if (!isoDate) return false;
+    const parsed = new Date(`${isoDate}T00:00:00`);
+    if (Number.isNaN(parsed.getTime())) return false;
+    return parsed.toISOString().slice(0, 10) === isoDate;
+}
+
 // Funcion: formatDateSV
 // Que hace: Gestiona la logica de formatDateSV.
 function formatDateSV(dateValue) {
@@ -672,15 +681,6 @@ async function handleSubmit(e) {
     } else {
         const invoiceDateIso = fechaInput;
         const todayIso = getTodayISODate();
-
-// Funcion: isValidIsoDate
-// Que hace: Gestiona la logica de isValidIsoDate.
-        const isValidIsoDate = (isoDate) => {
-            if (!isoDate) return false;
-            const parsed = new Date(`${isoDate}T00:00:00`);
-            if (Number.isNaN(parsed.getTime())) return false;
-            return parsed.toISOString().slice(0, 10) === isoDate;
-        };
 
         if (!isValidIsoDate(invoiceDateIso)) {
             addError('fecha', 'La fecha de factura no es válida');

@@ -339,6 +339,20 @@ body.page-admin .admin-nav { justify-content: space-between; flex-wrap: wrap; }
     color: var(--on-primary);
 }
 
+/* Boton Panel de Usuarios (admin): misma forma pildora, acento azul */
+.app-nav .admin-users-btn,
+.admin-nav .admin-users-btn {
+    background: #2563eb;
+    border-color: #2563eb;
+    color: #ffffff;
+}
+.app-nav .admin-users-btn:hover,
+.admin-nav .admin-users-btn:hover {
+    background: #1d4ed8;
+    border-color: #1d4ed8;
+    color: #ffffff;
+}
+
 /* Barra de busqueda + acciones (admin) reutiliza nav-actions */
 
 /* -------- Menu movil -------- */

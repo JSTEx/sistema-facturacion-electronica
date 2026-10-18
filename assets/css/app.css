@@ -1,21 +1,21 @@
 /* Rediseño completo: limpio, ordenado, minimalista, con vida */
 :root {
-    --bg: #f6f7fb;
+    --bg: #f5f7f6;
     --surface: #ffffff;
-    --surface-2: #f8f9fc;
-    --surface-3: #eef1f8;
+    --surface-2: #f8faf9;
+    --surface-3: #eef5f2;
     --overlay: rgba(15, 23, 42, 0.5);
 
     --text: #0f172a;
     --text-muted: #475569;
     --text-faint: #94a3b8;
 
-    --border: #e5e7ec;
-    --border-strong: #d7dbe6;
+    --border: #e6e9e7;
+    --border-strong: #d9e2dc;
 
-    --primary: #4f46e5;
-    --primary-hover: #4338ca;
-    --primary-soft: #eef2ff;
+    --primary: #059669;
+    --primary-hover: #047857;
+    --primary-soft: #f0fdf7;
     --on-primary: #ffffff;
 
     --danger: #dc2626;
@@ -34,32 +34,32 @@
 
     --shadow-xs: 0 1px 2px rgba(15, 23, 42, 0.02);
     --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.04);
-    --shadow-md: 0 8px 24px -8px rgba(79, 70, 229, 0.18);
+    --shadow-md: 0 8px 24px -8px rgba(5, 150, 105, 0.18);
     --shadow-lg: 0 16px 40px -10px rgba(15, 23, 42, 0.18);
 
-    --ring: rgba(79, 70, 229, 0.25);
+    --ring: rgba(5, 150, 105, 0.28);
     --t-fast: 0.15s ease;
     --t: 0.2s ease;
 }
 
 html.dark-mode {
-    --bg: #0b1026;
-    --surface: #101626;
-    --surface-2: #161b2f;
-    --surface-3: #1f253b;
-    --overlay: rgba(3, 7, 18, 0.72);
+    --bg: #07120f;
+    --surface: #101b17;
+    --surface-2: #15221d;
+    --surface-3: #1a2b24;
+    --overlay: rgba(3, 7, 6, 0.72);
 
-    --text: #eef2ff;
-    --text-muted: #c7d2fe;
-    --text-faint: #818cf8;
+    --text: #f0fdf4;
+    --text-muted: #bbf7d0;
+    --text-faint: #86efac;
 
-    --border: #232840;
-    --border-strong: #2f3658;
+    --border: #1f332b;
+    --border-strong: #28463a;
 
-    --primary: #a5b4fc;
-    --primary-hover: #c7d2fe;
-    --primary-soft: rgba(165, 180, 252, 0.12);
-    --on-primary: #0f172a;
+    --primary: #6ee7b7;
+    --primary-hover: #a7f3d0;
+    --primary-soft: rgba(110, 231, 183, 0.14);
+    --on-primary: #052e16;
 
     --danger: #f87171;
     --danger-soft: rgba(248, 113, 113, 0.12);
@@ -72,10 +72,10 @@ html.dark-mode {
 
     --shadow-xs: 0 1px 1px rgba(0, 0, 0, 0.4);
     --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.5);
-    --shadow-md: 0 10px 30px -10px rgba(129, 140, 248, 0.25);
-    --shadow-lg: 0 18px 44px -14px rgba(129, 140, 248, 0.28);
+    --shadow-md: 0 10px 30px -10px rgba(16, 185, 129, 0.25);
+    --shadow-lg: 0 18px 44px -14px rgba(16, 185, 129, 0.28);
 
-    --ring: rgba(165, 180, 252, 0.25);
+    --ring: rgba(110, 231, 183, 0.28);
 }
 
 * { box-sizing: border-box; }

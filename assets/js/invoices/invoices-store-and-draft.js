@@ -51,26 +51,36 @@ async function deleteInvoiceRecord(id) {
 }
 
 // Funcion: saveInvoices
-// Que hace: Reemplaza todas las facturas por la lista dada (usado al importar respaldos).
+// Que hace: Reemplaza las facturas visibles por la lista dada (usado al importar respaldos).
 async function saveInvoices(invoicesList) {
     const rows = normalizeInvoices(invoicesList).map((inv) => invoiceToRow(inv));
-    const ids = rows.map((row) => row.id);
+    const incomingIds = new Set(rows.map((row) => String(row.id)));
 
-    let deleteQuery = window.supabaseClient.from('invoices').delete();
-    deleteQuery = ids.length > 0
-        ? deleteQuery.not('id', 'in', `(${ids.join(',')})`)
-        : deleteQuery.neq('id', -1);
+    // Solo eliminar facturas que el usuario ve actualmente y que no esten en el respaldo.
+    // Asi nunca se borran facturas ajenas (multi-usuario).
+    const idsToDelete = (Array.isArray(invoices) ? invoices : [])
+        .map((inv) => Number(inv?.id))
+        .filter((id) => Number.isFinite(id) && !incomingIds.has(String(id)));
 
-    const { error: deleteError } = await deleteQuery;
-    if (deleteError) {
-        console.error('Error limpiando facturas antes de importar:', deleteError);
-        throw new Error('No se pudo actualizar la base de datos al importar');
+    const CHUNK_SIZE = 200;
+
+    for (let i = 0; i < idsToDelete.length; i += CHUNK_SIZE) {
+        const chunk = idsToDelete.slice(i, i + CHUNK_SIZE);
+        const { error: deleteError } = await window.supabaseClient
+            .from('invoices')
+            .delete()
+            .in('id', chunk);
+        if (deleteError) {
+            console.error('Error limpiando facturas antes de importar:', deleteError);
+            throw new Error('No se pudo actualizar la base de datos al importar');
+        }
     }
 
-    if (rows.length > 0) {
+    for (let i = 0; i < rows.length; i += CHUNK_SIZE) {
+        const chunk = rows.slice(i, i + CHUNK_SIZE);
         const { error: upsertError } = await window.supabaseClient
             .from('invoices')
-            .upsert(rows, { onConflict: 'id' });
+            .upsert(chunk, { onConflict: 'id' });
         if (upsertError) {
             console.error('Error importando facturas:', upsertError);
             throw new Error('No se pudo guardar el respaldo en la base de datos');
@@ -80,6 +90,7 @@ async function saveInvoices(invoicesList) {
 
 let invoices = [];
 let currentFilter = 'all';
+let currentSearchTerm = '';
 let editingId = null;
 let currentPage = 1;
 const invoicesPerPage = 30;

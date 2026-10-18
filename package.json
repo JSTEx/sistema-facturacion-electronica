@@ -3,7 +3,13 @@
   "version": "1.0.0",
   "private": true,
   "description": "App de facturacion electronica (estatica) con backend serverless para gestion de usuarios.",
+  "scripts": {
+    "build:css": "tailwindcss -c tailwind.config.js -i assets/css/tailwind.src.css -o assets/css/tailwind.css --minify"
+  },
   "dependencies": {
     "@supabase/supabase-js": "^2.45.0"
+  },
+  "devDependencies": {
+    "tailwindcss": "^3.4.17"
   }
 }

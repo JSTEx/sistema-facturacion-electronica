@@ -666,20 +666,23 @@ function deleteInvoice(id) {
 
 document.getElementById('searchInput').addEventListener('input', function(e) {
     const term = e.target.value.toLowerCase();
+    currentSearchTerm = term.trim();
     const listContainer = document.getElementById('invoiceList');
     const emptyState = document.getElementById('emptyState');
     const paginationContainer = document.getElementById('paginationContainer');
-    
+    const totalCount = document.getElementById('totalCount');
+
     const visible = filterInvoicesByVisibility(invoices);
     const baseFiltered = filterInvoicesByStatus(visible, currentFilter);
     let filtered = searchInvoices(baseFiltered, term);
     filtered = prioritizeOverdueInvoices(filtered);
-    
+
     if (term && filtered.length === 0) {
         listContainer.classList.add('hidden');
         emptyState.classList.remove('hidden');
         paginationContainer.classList.add('hidden');
         emptyState.innerHTML = '<p class="text-gray-500 text-base">No se encontraron resultados</p>';
+        if (totalCount) totalCount.textContent = IS_HISTORY_VIEW ? '0 pagadas' : '0 activas';
     } else if (term) {
         emptyState.classList.add('hidden');
         listContainer.classList.remove('hidden');
@@ -740,8 +743,10 @@ document.getElementById('detalleDespacho').addEventListener('input', function() 
 function renderSearchResults(filtered) {
     const listContainer = document.getElementById('invoiceList');
     const paginationContainer = document.getElementById('paginationContainer');
-    
+    const totalCount = document.getElementById('totalCount');
+
     filtered = prioritizeOverdueInvoices(filtered);
+    if (totalCount) totalCount.textContent = IS_HISTORY_VIEW ? `${filtered.length} pagadas` : `${filtered.length} activas`;
     const paginationData = paginateList(filtered, currentPage, invoicesPerPage);
     const totalPages = paginationData.totalPages;
     currentPage = paginationData.currentPage;
@@ -762,6 +767,7 @@ function renderSearchResults(filtered) {
 document.getElementById('filterSelect').addEventListener('change', function(e) {
     currentFilter = e.target.value;
     currentPage = 1;
+    currentSearchTerm = '';
     document.getElementById('searchInput').value = '';
     updateInvoiceList();
 });

@@ -34,9 +34,12 @@ function showInvoiceForm() {
 // Funcion: generateInvoiceNumber
 // Que hace: Gestiona la logica de generateInvoiceNumber.
 function generateInvoiceNumber() {
-    // El número de factura es basado en la cantidad actual de facturas + 1
-    const nextNumber = invoices.length + 1;
-    document.getElementById('numero').value = nextNumber;
+    // Siguiente numero = mayor numero existente + 1 (evita duplicados al borrar facturas)
+    const maxNumber = (Array.isArray(invoices) ? invoices : []).reduce((max, inv) => {
+        const parsed = parseInt(String(inv?.number ?? '').replace(/\D/g, ''), 10);
+        return Number.isFinite(parsed) && parsed > max ? parsed : max;
+    }, 0);
+    document.getElementById('numero').value = maxNumber + 1;
 }
 
 // Funcion: generateInvoiceId

@@ -38,12 +38,15 @@ Rutas limpias (gracias a `cleanUrls` en `vercel.json`):
 ├── README.md
 ├── package.json
 ├── sw.js
+├── tailwind.config.js
 ├── vercel.json
 ├── api/
 │   └── users.js
 ├── assets/
 │   ├── css/
-│   │   └── app.css
+│   │   ├── app.css
+│   │   ├── tailwind.css
+│   │   └── tailwind.src.css
 │   ├── js/
 │   │   ├── admin/
 │   │   │   └── main.js
@@ -192,6 +195,15 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
 - La app muestra un recordatorio para hacer respaldo manual; no crea copias automáticamente.
 - Los respaldos se exportan **cifrados con clave** para proteger datos sensibles.
 - **No pierdas la clave del respaldo**: sin esa clave no se puede descifrar ni importar la copia.
+
+## Estilos (Tailwind) / Styles (Tailwind)
+
+- El CSS utilitario de Tailwind **ya no se carga desde CDN** (que en producción genera aviso y ejecuta un compilador en el navegador).
+- Se genera un archivo estático `assets/css/tailwind.css` y las páginas lo cargan con `<link>`.
+- Si agregas o cambias clases utilitarias de Tailwind en HTML/JS, **vuelve a generar el CSS**:
+  - `npm run build:css`
+  - Las clases se detectan automáticamente desde `tailwind.config.js` (`*.html`, `templates/*.html`, `assets/js/**/*.js`).
+- Los estilos propios viven en `assets/css/app.css` (tokens, modo oscuro, PDF). `tailwind.css` se carga **después** de `app.css` para mantener el mismo orden de cascada que antes.
 
 ## Checklist de publicación / Pre-release checklist
 

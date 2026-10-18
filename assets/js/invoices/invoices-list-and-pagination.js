@@ -202,17 +202,26 @@ function goToPage(page) {
     updateInvoiceList();
 }
 
+// Funcion: getFilteredForPagination
+// Que hace: Devuelve las facturas visibles filtradas por estado y búsqueda.
+function getFilteredForPagination() {
+    const visible = filterInvoicesByVisibility(invoices);
+    let filtered = filterInvoicesByStatus(visible, currentFilter);
+    if (currentSearchTerm) filtered = searchInvoices(filtered, currentSearchTerm);
+    return prioritizeOverdueInvoices(filtered);
+}
+
 // Funcion: nextPage
 // Que hace: Gestiona la logica de nextPage.
 function nextPage() {
     const listContainer = document.getElementById('invoiceList');
     if (!listContainer.classList.contains('hidden')) {
-        const visible = filterInvoicesByVisibility(invoices);
-        const filtered = filterInvoicesByStatus(visible, currentFilter);
+        const filtered = getFilteredForPagination();
         const totalPages = paginateList(filtered, currentPage, invoicesPerPage).totalPages;
         if (currentPage < totalPages) {
             currentPage++;
-            updateInvoiceList();
+            if (currentSearchTerm) renderSearchResults(filtered);
+            else updateInvoiceList();
         }
     }
 }
@@ -222,6 +231,7 @@ function nextPage() {
 function previousPage() {
     if (currentPage > 1) {
         currentPage--;
-        updateInvoiceList();
+        if (currentSearchTerm) renderSearchResults(getFilteredForPagination());
+        else updateInvoiceList();
     }
 }

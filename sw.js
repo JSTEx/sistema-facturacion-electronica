@@ -1,5 +1,5 @@
 // Service Worker: cachea recursos estaticos y provee fallback offline.
-const CACHE_VERSION = 'facturacion-cache-v10';
+const CACHE_VERSION = 'facturacion-cache-v11';
 
 // Lista base de recursos que se precargan durante la instalacion.
 const STATIC_ASSETS = [
@@ -9,6 +9,7 @@ const STATIC_ASSETS = [
     './admin.html',
     './historial.html',
     './assets/css/app.css',
+    './assets/css/tailwind.css',
     './assets/js/core/supabase-config.js',
     './assets/js/core/password-utils.js',
     './assets/js/core/loading-utils.js',

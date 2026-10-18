@@ -10,92 +10,92 @@
    1) Tokens de diseno
    ----------------------------------------------------------------------------- */
 :root {
-    /* Superficies */
-    --bg: #f4f6f8;
+    /* Superficies - Minimalista */
+    --bg: #f7f8fa;
     --surface: #ffffff;
-    --surface-2: #f1f5f3;
-    --surface-3: #e8eeeb;
-    --overlay: rgba(15, 23, 42, 0.45);
+    --surface-2: #f8fafc;
+    --surface-3: #eef2f7;
+    --overlay: rgba(17, 24, 39, 0.4);
 
     /* Texto */
-    --text: #0f172a;
-    --text-muted: #64748b;
-    --text-faint: #94a3b8;
+    --text: #111827;
+    --text-muted: #4b5563;
+    --text-faint: #9ca3af;
 
-    /* Bordes */
-    --border: #e2e8f0;
-    --border-strong: #cbd5e1;
+    /* Bordes - más finos */
+    --border: #e5e7eb;
+    --border-strong: #d1d5db;
 
-    /* Marca */
-    --primary: #059669;
-    --primary-hover: #047857;
-    --primary-soft: #ecfdf5;
+    /* Marca - neutra/minimal */
+    --primary: #111827;
+    --primary-hover: #0f172a;
+    --primary-soft: #f2f4f7;
     --on-primary: #ffffff;
 
     /* Estados */
-    --danger: #dc2626;
+    --danger: #b91c1c;
     --danger-soft: #fef2f2;
-    --warning: #d97706;
-    --warning-soft: #fffbeb;
-    --info: #2563eb;
+    --warning: #b45309;
+    --warning-soft: #fff7ed;
+    --info: #1d4ed8;
     --info-soft: #eff6ff;
-    --success: #059669;
-    --success-soft: #ecfdf5;
+    --success: #047857;
+    --success-soft: #f0fdf4;
 
-    /* Radius */
-    --radius-sm: 8px;
-    --radius: 12px;
-    --radius-lg: 16px;
+    /* Radius - más minimalista */
+    --radius-sm: 6px;
+    --radius: 10px;
+    --radius-lg: 14px;
     --radius-full: 999px;
 
-    /* Sombras */
-    --shadow-xs: 0 1px 2px rgba(16, 24, 40, 0.05);
-    --shadow-sm: 0 1px 3px rgba(16, 24, 40, 0.08), 0 1px 2px rgba(16, 24, 40, 0.05);
-    --shadow-md: 0 6px 16px -4px rgba(16, 24, 40, 0.12), 0 2px 6px -2px rgba(16, 24, 40, 0.06);
-    --shadow-lg: 0 16px 40px -12px rgba(16, 24, 40, 0.22);
+    /* Sombras - muy sutiles */
+    --shadow-xs: 0 1px 1px rgba(15, 23, 42, 0.03);
+    --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.05);
+    --shadow-md: 0 4px 6px -1px rgba(15, 23, 42, 0.08), 0 2px 4px -2px rgba(15, 23, 42, 0.05);
+    --shadow-lg: 0 10px 15px -3px rgba(15, 23, 42, 0.08), 0 4px 6px -4px rgba(15, 23, 42, 0.05);
 
     /* Foco */
-    --ring: rgba(5, 150, 105, 0.28);
+    --ring: rgba(17, 24, 39, 0.12);
 
     /* Transiciones */
     --t-fast: 0.15s ease;
-    --t: 0.22s ease;
+    --t: 0.2s ease;
 }
 
 html.dark-mode {
-    --bg: #0a0f1a;
-    --surface: #131c2e;
-    --surface-2: #1a253b;
-    --surface-3: #223150;
-    --overlay: rgba(2, 6, 14, 0.66);
+    --bg: #0b1020;
+    --surface: #121826;
+    --surface-2: #162030;
+    --surface-3: #1c2640;
+    --overlay: rgba(3, 7, 18, 0.72);
 
-    --text: #eaf1fb;
-    --text-muted: #a7b8cd;
-    --text-faint: #8698b0;
+    --text: #e8ecf3;
+    --text-muted: #b8c1d6;
+    --text-faint: #8b93a7;
 
-    --border: #263450;
-    --border-strong: #384966;
+    --border: #1f273a;
+    --border-strong: #2a334c;
 
-    --primary: #10b981;
-    --primary-hover: #34d399;
-    --primary-soft: rgba(16, 185, 129, 0.15);
-    --on-primary: #04120c;
+    --primary: #e5e7eb;
+    --primary-hover: #ffffff;
+    --primary-soft: rgba(229, 231, 235, 0.08);
+    --on-primary: #090b12;
 
     --danger: #f87171;
-    --danger-soft: rgba(248, 113, 113, 0.15);
+    --danger-soft: rgba(248, 113, 113, 0.12);
     --warning: #fbbf24;
-    --warning-soft: rgba(251, 191, 36, 0.15);
+    --warning-soft: rgba(251, 191, 36, 0.12);
     --info: #60a5fa;
-    --info-soft: rgba(96, 165, 250, 0.15);
+    --info-soft: rgba(96, 165, 250, 0.12);
     --success: #34d399;
-    --success-soft: rgba(52, 211, 153, 0.15);
+    --success-soft: rgba(52, 211, 153, 0.12);
 
-    --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.45);
-    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.55);
-    --shadow-md: 0 8px 24px -6px rgba(0, 0, 0, 0.6);
-    --shadow-lg: 0 20px 48px -14px rgba(0, 0, 0, 0.7);
+    --shadow-xs: 0 1px 1px rgba(0, 0, 0, 0.4);
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.5);
+    --shadow-md: 0 8px 20px -10px rgba(0, 0, 0, 0.6);
+    --shadow-lg: 0 14px 30px -12px rgba(0, 0, 0, 0.7);
 
-    --ring: rgba(16, 185, 129, 0.42);
+    --ring: rgba(229, 231, 235, 0.18);
 }
 
 /* -----------------------------------------------------------------------------
@@ -252,15 +252,15 @@ body.page-admin .admin-nav { justify-content: space-between; flex-wrap: wrap; }
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 30px;
-    height: 30px;
-    border-radius: 9px;
-    background: linear-gradient(135deg, var(--primary), var(--primary-hover));
-    color: #fff;
-    font-size: 16px;
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    background: var(--text);
+    color: var(--surface);
+    font-size: 14px;
     font-weight: 800;
     flex: 0 0 auto;
-    box-shadow: 0 4px 12px -4px rgba(5, 150, 105, 0.6);
+    box-shadow: none;
 }
 
 /* Grupo derecho del nav */
@@ -499,9 +499,9 @@ body.page-admin .admin-nav { justify-content: space-between; flex-wrap: wrap; }
     border: 1px solid var(--border);
     border-radius: var(--radius);
     box-shadow: var(--shadow-xs);
-    transition: transform var(--t), box-shadow var(--t), border-color var(--t);
+    transition: transform var(--t-fast), box-shadow var(--t-fast), border-color var(--t-fast);
 }
-.invoice-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); border-color: var(--border-strong); }
+.invoice-card:hover { transform: translateY(-1px); box-shadow: var(--shadow-sm); border-color: var(--border-strong); }
 
 /* Overrides robustos sobre las utilidades Tailwind que emite el JS */
 body.page-index .invoice-card { background: var(--surface) !important; border-color: var(--border) !important; }
@@ -732,7 +732,7 @@ html.dark-mode .status-saldo { background: rgba(139, 92, 246, 0.18); color: #c4b
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: var(--radius-lg);
-    box-shadow: var(--shadow-sm);
+    box-shadow: var(--shadow-xs);
     padding: 28px;
 }
 .editor-head {

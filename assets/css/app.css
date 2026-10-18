@@ -904,6 +904,7 @@ body.page-login {
     padding: 24px;
 }
 .theme-switch-floating { position: fixed; top: 20px; right: 20px; z-index: 50; }
+body.page-login main { width: 100%; max-width: 400px; }
 .login-card {
     width: 100%;
     max-width: 400px;

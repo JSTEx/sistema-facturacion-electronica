@@ -134,7 +134,7 @@ function renderInvoiceCard(inv, canDelete, withTitle = false) {
     const deleteTitle = withTitle ? ' title="Eliminar"' : '';
 
     return `
-    <div class="invoice-card ${cardStateClass} bg-white border border-gray-200 rounded-lg p-5 relative">
+    <div class="invoice-card ${cardStateClass} bg-white border border-gray-200 rounded-md p-5 relative">
         ${manualStatusHtml}
         ${overdueNotificationHtml}
         <div class="${actionRowClass}">
@@ -183,7 +183,7 @@ function renderPaginationButtons(totalPages) {
     
     for (let i = startPage; i <= endPage; i++) {
         const btn = document.createElement('button');
-        btn.className = `px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+        btn.className = `px-3 py-2 rounded-md text-sm font-medium transition-colors ${
             i === currentPage 
                 ? 'bg-gray-900 text-white' 
                 : 'border border-gray-200 text-gray-700 hover:bg-gray-50'

@@ -414,7 +414,7 @@ function showInvoiceChangeLog(invoiceId) {
         const byText = entry.byEmail || 'desconocido';
         const statusText = entry.invoiceStatus ? ` · Estado: ${getStatusText(entry.invoiceStatus)}` : '';
 
-        return `<li class="border rounded-lg px-3 py-2 mb-2" style="${itemStyle}"><p><span class="audit-log-badge inline-flex items-center px-2 py-0.5 rounded-full border font-semibold" style="${actionBadgeStyle}">${actionLabel}</span></p><p class="audit-log-meta mt-1" style="${metaTextStyle}">${whenText} · ${escapeHtml(byText)}${statusText}</p></li>`;
+        return `<li class="border rounded-md px-3 py-2 mb-2" style="${itemStyle}"><p><span class="audit-log-badge inline-flex items-center px-2 py-0.5 rounded-full border font-semibold" style="${actionBadgeStyle}">${actionLabel}</span></p><p class="audit-log-meta mt-1" style="${metaTextStyle}">${whenText} · ${escapeHtml(byText)}${statusText}</p></li>`;
     };
 
     const grouped = { today: [], yesterday: [], older: [] };

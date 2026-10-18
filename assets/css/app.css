@@ -312,7 +312,7 @@ body.page-admin .admin-nav { justify-content: space-between; flex-wrap: wrap; }
     padding: 0 9px;
     font-size: 13px;
     font-weight: 600;
-    border-radius: var(--radius-sm);
+    border-radius: var(--radius);
     border: 1px solid transparent;
     background: transparent;
     color: var(--text-muted);
@@ -546,14 +546,16 @@ body.page-index #emptyState p { color: var(--text-muted); }
 /* Icono de vencida */
 .overdue-notification-icon {
     position: absolute;
-    top: 14px;
-    right: 14px;
+    top: 10px;
+    right: 10px;
     width: 26px;
     height: 26px;
     display: flex;
     align-items: center;
     justify-content: center;
     color: var(--danger);
+    z-index: 2;
+    pointer-events: none;
 }
 .overdue-notification-icon .overdue-notification-dot {
     position: absolute;
@@ -963,15 +965,15 @@ html.dark-mode .status-saldo { background: rgba(139, 92, 246, 0.18); color: #c4b
     align-items: center;
     justify-content: center;
     gap: 8px;
-    height: 42px;
-    padding: 0 20px;
+    height: 40px;
+    padding: 0 18px;
     font-size: 14px;
     font-weight: 600;
     font-family: inherit;
-    border-radius: var(--radius-sm);
+    border-radius: var(--radius);
     border: 1px solid transparent;
     cursor: pointer;
-    transition: background-color var(--t-fast), border-color var(--t-fast), color var(--t-fast), transform var(--t-fast);
+    transition: background-color var(--t-fast), color var(--t-fast), transform var(--t-fast);
 }
 .btn:active { transform: translateY(1px); }
 .btn-primary { background: var(--primary); border-color: var(--primary); color: var(--on-primary); }

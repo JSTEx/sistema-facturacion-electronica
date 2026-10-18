@@ -1202,7 +1202,140 @@ body.page-admin .edit-user-title { color: var(--text) !important; }
 body.page-admin .edit-user-confirm { background: var(--primary) !important; }
 
 /* -----------------------------------------------------------------------------
-   18) Impresion de la pagina principal (fallback)
+   18) Responsive: diseno compacto para telefono
+   ----------------------------------------------------------------------------- */
+@media (max-width: 640px) {
+    /* --- Layout general --- */
+    .page-main { padding: 18px 14px 44px; }
+    .section-head { margin-bottom: 14px; }
+    .section-title { font-size: 19px; }
+    .section-count { font-size: 12px; }
+
+    /* --- Navbar --- */
+    .app-nav,
+    .admin-nav { padding: 10px 14px; gap: 10px; }
+    .app-nav .nav-btn,
+    .admin-nav .nav-btn { height: 36px; padding: 0 12px; font-size: 12.5px; }
+    #navCollapsible { padding: 12px 14px; gap: 8px; }
+    .nav-right-group { gap: 10px; }
+    #currentUserEmail { font-size: 12px; }
+
+    /* --- Alertas y filtros --- */
+    .operational-alerts { gap: 8px; margin-bottom: 14px; }
+    .op-alert-chip { font-size: 11px; padding: 4px 9px; }
+    .filters { flex-direction: column; gap: 10px; margin-bottom: 18px; }
+    .field-search,
+    .field-select { width: 100%; flex: 0 0 auto; min-width: 0; height: 42px; }
+
+    /* --- Tarjetas de factura --- */
+    .invoice-grid { gap: 12px; }
+    .invoice-card { padding: 14px; }
+    #invoiceList.invoice-grid,
+    #invoiceList.grid { grid-template-columns: 1fr !important; }
+    .invoice-card h3 { font-size: 1rem; line-height: 1.3; }
+
+    /* --- Estado vacio / paginacion --- */
+    #emptyState { padding: 44px 12px; }
+    .pagination { flex-wrap: wrap; gap: 8px; margin-top: 20px; }
+
+    /* --- Formulario de factura --- */
+    .invoice-form-card { padding: 18px 15px; border-radius: var(--radius); }
+    .invoice-form-title { font-size: 19px; }
+    .invoice-form-subtitle { font-size: 13px; }
+    .invoice-form-section { margin-top: 20px; }
+    .invoice-form-section-header { padding-bottom: 8px; }
+    #invoiceFormView .grid { grid-template-columns: 1fr !important; }
+    .invoice-form-actions { flex-direction: column-reverse; gap: 10px; margin-top: 20px; padding-top: 16px; }
+    .invoice-form-actions .btn,
+    #submitBtn,
+    #cancelBtn { width: 100%; }
+    .invoice-total-row { padding-top: 12px; margin-top: 12px; }
+    .invoice-total-amount { font-size: 22px; }
+
+    /* --- Tabla de items: convertir en tarjetas apiladas --- */
+    #invoiceFormView .items-table-wrapper { overflow: visible; border: none; border-radius: 0; margin-top: 12px; }
+    #invoiceFormView .items-table-head { display: none; }
+    #invoiceFormView tbody { display: block; }
+    #invoiceFormView tbody tr {
+        display: block;
+        padding: 12px;
+        margin-bottom: 10px;
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        background: var(--surface-2);
+    }
+    #invoiceFormView tbody td { display: block; padding: 6px 0; border: none; text-align: left !important; }
+    #invoiceFormView tbody td::before {
+        display: block;
+        content: attr(data-label);
+        font-size: 10.5px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        color: var(--text-muted);
+        margin-bottom: 4px;
+    }
+    #invoiceFormView tbody td.remove-cell {
+        display: flex;
+        align-items: center;
+        padding-top: 12px;
+        margin-top: 8px;
+        border-top: 1px solid var(--border);
+    }
+    #invoiceFormView tbody td.remove-cell::before { display: none; }
+    #invoiceFormView .remove-cell .removeItemBtn {
+        width: 100%;
+        height: 38px;
+        gap: 6px;
+        border: 1px solid var(--border-strong);
+        background: var(--surface);
+        color: var(--danger);
+    }
+    #invoiceFormView .remove-label { display: inline; font-size: 13px; }
+    #invoiceFormView .item-desc-area { min-height: 56px; }
+    #invoiceFormView .items-table-wrapper .add-item-btn {
+        margin-top: 10px;
+        border: 1px dashed var(--border-strong);
+        border-radius: var(--radius);
+    }
+
+    /* --- Login --- */
+    body.page-login { padding: 16px; }
+    body.page-login main { max-width: 100%; }
+    .login-card { padding: 26px 20px; border-radius: var(--radius); }
+    .login-brand { width: 50px; height: 50px; font-size: 24px; }
+    .login-title { font-size: 22px; }
+    .theme-switch-floating { top: 14px; right: 14px; }
+
+    /* --- Admin --- */
+    .admin-panel-card { padding: 18px 14px; border-radius: var(--radius); }
+    .admin-panel-title { font-size: 19px; }
+    .admin-header { margin-bottom: 20px; }
+    .admin-toolbar { gap: 10px; }
+    .admin-toolbar .soft-btn { width: 100%; }
+    .admin-search-bar { width: 100%; }
+    .admin-footer { flex-direction: column; align-items: stretch; }
+    .admin-footer .nav-actions { display: grid; grid-template-columns: 1fr 1fr; }
+    .admin-footer .soft-btn { width: 100%; }
+    .users-table th,
+    .users-table td { padding: 10px; }
+
+    /* --- Toasts SweetAlert --- */
+    .swal2-container.swal2-top-end { padding: 66px 12px 0 !important; }
+}
+
+@media (max-width: 400px) {
+    .page-main { padding: 16px 12px 40px; }
+    .section-title { font-size: 18px; }
+    .invoice-form-card { padding: 16px 13px; }
+    .admin-panel-card { padding: 16px 13px; }
+    .app-nav,
+    .admin-nav { padding: 9px 12px; }
+    .admin-panel-title { font-size: 18px; }
+}
+
+/* -----------------------------------------------------------------------------
+   19) Impresion de la pagina principal (fallback)
    ----------------------------------------------------------------------------- */
 @media print {
     body.page-index .app-nav,

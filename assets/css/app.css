@@ -180,8 +180,8 @@ html.theme-transitioning *::after {
    ----------------------------------------------------------------------------- */
 .theme-switch {
     position: relative;
-    width: 58px;
-    height: 30px;
+    width: 46px;
+    height: 26px;
     flex: 0 0 auto;
     padding: 0;
     border: 1px solid var(--border-strong);
@@ -195,8 +195,8 @@ html.theme-transitioning *::after {
     position: absolute;
     top: 2px;
     left: 2px;
-    width: 24px;
-    height: 24px;
+    width: 20px;
+    height: 20px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -206,10 +206,10 @@ html.theme-transitioning *::after {
     box-shadow: var(--shadow-sm);
     transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1), color var(--t);
 }
-.theme-switch .theme-switch-knob svg { width: 15px; height: 15px; }
+.theme-switch .theme-switch-knob svg { width: 13px; height: 13px; }
 .theme-switch .knob-moon { display: none; }
 html.dark-mode .theme-switch { background: var(--primary-soft); border-color: var(--border-strong); }
-html.dark-mode .theme-switch .theme-switch-knob { transform: translateX(28px); color: #a5b4fc; }
+html.dark-mode .theme-switch .theme-switch-knob { transform: translateX(20px); color: var(--primary); }
 html.dark-mode .theme-switch .knob-sun { display: none; }
 html.dark-mode .theme-switch .knob-moon { display: flex; }
 
@@ -219,20 +219,24 @@ html.dark-mode .theme-switch .knob-moon { display: flex; }
 .app-nav,
 .admin-nav {
     position: sticky;
-    top: 0;
+    top: 12px;
     z-index: 100;
     display: flex;
     align-items: center;
-    gap: 12px;
-    padding: 12px 20px;
-    background: color-mix(in srgb, var(--surface) 88%, transparent);
+    gap: 6px;
+    width: min(1120px, calc(100% - 32px));
+    margin: 12px auto 0;
+    padding: 6px 12px;
+    background: color-mix(in srgb, var(--surface) 96%, transparent);
     backdrop-filter: saturate(1.2) blur(10px);
-    border-bottom: 1px solid var(--border);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
 }
 body.page-admin .admin-nav { justify-content: space-between; flex-wrap: wrap; }
 
 .nav-title {
-    font-size: 15px;
+    font-size: 14px;
     font-weight: 700;
     color: var(--text);
     white-space: nowrap;
@@ -242,7 +246,7 @@ body.page-admin .admin-nav { justify-content: space-between; flex-wrap: wrap; }
 .nav-brand {
     display: inline-flex;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
     flex: 0 0 auto;
     text-decoration: none;
     color: var(--text);
@@ -252,12 +256,12 @@ body.page-admin .admin-nav { justify-content: space-between; flex-wrap: wrap; }
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 30px;
-    height: 30px;
-    border-radius: 9px;
+    width: 26px;
+    height: 26px;
+    border-radius: 8px;
     background: linear-gradient(135deg, var(--primary), var(--primary-hover));
     color: #fff;
-    font-size: 16px;
+    font-size: 14px;
     font-weight: 800;
     flex: 0 0 auto;
     box-shadow: 0 4px 12px -4px rgba(5, 150, 105, 0.6);
@@ -269,16 +273,16 @@ body.page-admin .admin-nav { justify-content: space-between; flex-wrap: wrap; }
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 12px;
+    gap: 10px;
     min-width: 0;
 }
 .nav-right-group {
     display: flex;
     align-items: center;
-    gap: 14px;
+    gap: 10px;
     margin-left: auto;
 }
-#currentUserEmail { color: var(--text-muted); font-size: 13px; font-weight: 500; }
+#currentUserEmail { color: var(--text-muted); font-size: 12.5px; font-weight: 500; }
 
 .nav-link-btn {
     display: inline-flex;
@@ -290,22 +294,22 @@ body.page-admin .admin-nav { justify-content: space-between; flex-wrap: wrap; }
     background: none;
     border: none;
     cursor: pointer;
-    padding: 6px 8px;
+    padding: 5px 8px;
     border-radius: var(--radius-sm);
     transition: color var(--t-fast), background-color var(--t-fast);
 }
 .nav-link-btn:hover { color: var(--danger); background: var(--danger-soft); }
 
 /* Botones del navbar (Nueva factura, Historial, Exportar/Importar, Usuarios) */
-.nav-actions { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.nav-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 
 .app-nav .nav-btn,
 .admin-nav .nav-btn {
     display: inline-flex;
     align-items: center;
-    gap: 8px;
-    height: 38px;
-    padding: 0 12px;
+    gap: 7px;
+    height: 30px;
+    padding: 0 9px;
     font-size: 13px;
     font-weight: 600;
     border-radius: var(--radius-sm);
@@ -343,9 +347,9 @@ body.page-admin .admin-nav { justify-content: space-between; flex-wrap: wrap; }
     flex-direction: column;
     justify-content: center;
     gap: 4px;
-    width: 40px;
-    height: 40px;
-    padding: 0 9px;
+    width: 34px;
+    height: 34px;
+    padding: 0 8px;
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: var(--radius-sm);
@@ -369,21 +373,22 @@ body.page-admin .admin-nav { justify-content: space-between; flex-wrap: wrap; }
     #navCollapsible {
         display: none;
         position: absolute;
-        top: 100%;
+        top: calc(100% + 6px);
         left: 0;
         right: 0;
         flex-direction: column;
         align-items: stretch;
-        gap: 10px;
-        padding: 14px 16px;
+        gap: 8px;
+        padding: 12px;
         background: var(--surface);
-        border-bottom: 1px solid var(--border);
-        box-shadow: var(--shadow-md);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        box-shadow: var(--shadow-lg);
     }
     #navCollapsible.is-open { display: flex; }
     #navCollapsible .nav-btn { width: 100%; justify-content: flex-start; }
-    .nav-right-group { margin-left: 0; flex-direction: column; align-items: stretch; gap: 10px; }
-    .nav-right-group .theme-switch { align-self: flex-start; }
+    #navCollapsible .nav-right-group { margin-left: 0; gap: 8px; }
+    #navCollapsible .nav-right-group .theme-switch { align-self: flex-start; }
 }
 
 /* -----------------------------------------------------------------------------
@@ -1260,8 +1265,8 @@ body.page-login main { width: 100%; max-width: 400px; }
 .admin-description-indicator { margin-left: 6px; }
 .admin-page-meta { color: var(--text-muted); font-size: 13px; }
 .back-invoices-btn {
-    height: 38px;
-    padding: 0 14px;
+    height: 32px;
+    padding: 0 12px;
     font-size: 13px;
     font-weight: 600;
     color: var(--text);
@@ -1329,11 +1334,11 @@ body.page-admin .edit-user-confirm { background: var(--primary) !important; }
 
     /* --- Navbar --- */
     .app-nav,
-    .admin-nav { padding: 10px 14px; gap: 10px; }
+    .admin-nav { padding: 7px 11px; gap: 6px; width: calc(100% - 20px); top: 10px; margin-top: 10px; }
     .app-nav .nav-btn,
-    .admin-nav .nav-btn { height: 36px; padding: 0 12px; font-size: 12.5px; }
-    #navCollapsible { padding: 12px 14px; gap: 8px; }
-    .nav-right-group { gap: 10px; }
+    .admin-nav .nav-btn { height: 30px; padding: 0 9px; font-size: 12.5px; }
+    #navCollapsible { padding: 10px 12px; gap: 7px; }
+    .nav-right-group { gap: 8px; }
     #currentUserEmail { display: none; }
     .admin-nav .nav-title { display: none; }
 
@@ -1450,7 +1455,7 @@ body.page-admin .edit-user-confirm { background: var(--primary) !important; }
     .invoice-editor { padding: 16px 13px; }
     .admin-panel-card { padding: 16px 13px; }
     .app-nav,
-    .admin-nav { padding: 9px 12px; }
+    .admin-nav { padding: 6px 10px; width: calc(100% - 16px); }
     .admin-panel-title { font-size: 18px; }
 }
 

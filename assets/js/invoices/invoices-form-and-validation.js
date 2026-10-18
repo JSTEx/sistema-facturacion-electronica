@@ -53,7 +53,7 @@ function generateInvoiceId() {
 // Funcion: cancelInvoice
 // Que hace: Gestiona la logica de cancelInvoice.
 function cancelInvoice() {
-    Swal.fire({
+    showDialog({
         title: '¿Cancelar?',
         text: "Se perderán los datos ingresados",
         icon: 'warning',
@@ -167,7 +167,7 @@ async function removeItem(btn) {
     if (!ensureCanCreateInvoices()) return;
     const rows = document.querySelectorAll('#itemsTableBody tr');
     if (rows.length <= 1) {
-        Swal.fire({
+        showDialog({
             icon: 'warning',
             title: 'No se puede eliminar',
             text: 'Debe haber al menos un item en la factura',
@@ -176,22 +176,18 @@ async function removeItem(btn) {
         return;
     }
 
-    if (window.Swal) {
-        const result = await Swal.fire({
-            icon: 'warning',
-            title: '¿Eliminar item?',
-            text: 'Esta acción quitará el item de la factura.',
-            showCancelButton: true,
-            confirmButtonText: 'Sí, eliminar',
-            cancelButtonText: 'Cancelar',
-            confirmButtonColor: '#dc2626',
-            cancelButtonColor: '#334155'
-        });
+    const result = await showDialog({
+        icon: 'warning',
+        title: '¿Eliminar item?',
+        text: 'Esta acción quitará el item de la factura.',
+        showCancelButton: true,
+        confirmButtonText: 'Sí, eliminar',
+        cancelButtonText: 'Cancelar',
+        confirmButtonColor: '#dc2626',
+        cancelButtonColor: '#334155'
+    });
 
-        if (!result.isConfirmed) return;
-    } else if (!window.confirm('¿Eliminar este item de la factura?')) {
-        return;
-    }
+    if (!result.isConfirmed) return;
 
     btn.closest('tr').remove();
     renumberItemRows();
@@ -390,7 +386,7 @@ function showInvoiceChangeLog(invoiceId) {
         : [];
 
     if (!entries.length) {
-        Swal.fire({
+        showDialog({
             icon: 'info',
             title: `Sin historial #${escapeHtml(invoice.number)}`,
             text: 'Esta factura aún no tiene eventos registrados.',
@@ -437,7 +433,7 @@ function showInvoiceChangeLog(invoiceId) {
         })
         .join('');
 
-    Swal.fire({
+    showDialog({
         title: `Historial #${escapeHtml(invoice.number)}`,
         html: `<div class="text-left max-h-[360px] overflow-y-auto">${sectionsHtml}</div>`,
         confirmButtonText: 'Cerrar',
@@ -837,7 +833,7 @@ async function handleSubmit(e) {
     }
 
     if (errors.length) {
-        Swal.fire({
+        showDialog({
             icon: 'error',
             title: 'Corrige los campos',
             html: buildValidationErrorsHtml(errors),
@@ -940,7 +936,7 @@ async function saveInvoice(fechaInput) {
                 });
             } catch (error) {
                 console.error('Error guardando factura:', error);
-                Swal.fire({
+                showDialog({
                     icon: 'error',
                     title: 'No se pudo guardar',
                     text: 'La base de datos rechazó el guardado. Verifica tu sesión e intenta de nuevo.',
@@ -987,7 +983,7 @@ async function saveInvoice(fechaInput) {
             });
         } catch (error) {
             console.error('Error creando factura:', error);
-            Swal.fire({
+            showDialog({
                 icon: 'error',
                 title: 'No se pudo crear la factura',
                 text: 'La base de datos rechazó el guardado. Verifica tu sesión e intenta de nuevo.',

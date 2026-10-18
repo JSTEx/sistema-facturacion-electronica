@@ -25,12 +25,7 @@ async function confirmLogout(options = {}) {
         setTimeout(() => { window.location.href = redirectUrl; }, successDelay);
     };
 
-    if (!window.Swal) {
-        await runLogout();
-        return;
-    }
-
-    const result = await Swal.fire({
+    const result = await showDialog({
         title: confirmTitle,
         text: confirmText,
         icon: 'question',
@@ -42,7 +37,7 @@ async function confirmLogout(options = {}) {
     });
 
     if (result.isConfirmed) {
-        await Swal.fire({
+        await showDialog({
             icon: 'success',
             title: successTitle,
             text: successText,

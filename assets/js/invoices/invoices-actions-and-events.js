@@ -6,7 +6,7 @@ function downloadInvoicePdf(inv, canViewAmount) {
 
     showToast('Generando PDF...', 'info', 3000, 'top-end', { toastType: 'info' });
     if (!window.jspdf || !window.jspdf.jsPDF) {
-        Swal.fire({
+        showDialog({
             icon: 'error',
             title: 'PDF no disponible',
             text: 'No se pudo cargar la librería de PDF.',
@@ -406,7 +406,7 @@ function previewInvoicePdf(inv, canViewAmount) {
 
         if (!opened) {
             URL.revokeObjectURL(previewUrl);
-            Swal.fire({
+            showDialog({
                 icon: 'warning',
                 title: 'Ventana bloqueada',
                 text: 'Permite ventanas emergentes para previsualizar el PDF.',
@@ -470,7 +470,7 @@ function viewInvoice(id) {
         ? `<div class="invoice-modal-total-box has-total"><span class="invoice-modal-total-label">Total</span><span class="invoice-modal-total-value">$${inv.amount.toFixed(2)}</span></div>`
         : '<div class="invoice-modal-total-box"><span class="invoice-modal-total-label">Total</span><span class="invoice-modal-total-value is-hidden">Oculto</span></div>';
 
-    Swal.fire({
+    showDialog({
         title: `Factura #${escapeHtml(inv.number)}`,
         html: `
             <div class="invoice-modal-content text-left">
@@ -505,12 +505,12 @@ function viewInvoice(id) {
         if (result.isDenied) {
             previewInvoicePdf(inv, canViewAmount);
         }
-        if (result.dismiss === Swal.DismissReason.cancel) {
+        if (result.dismiss === DialogDismiss.cancel) {
             try {
                 downloadInvoicePdf(inv, canViewAmount);
             } catch (error) {
                 console.error('Error descargando PDF:', error);
-                Swal.fire({
+                showDialog({
                     icon: 'error',
                     title: 'No se pudo descargar',
                     text: 'Ocurrio un error al generar el PDF.',
@@ -605,7 +605,7 @@ function editInvoice(id) {
 // Que hace: Gestiona la logica de deleteInvoice.
 function deleteInvoice(id) {
     if (!(currentUser && currentUser.role === 'admin')) {
-        Swal.fire({
+        showDialog({
             icon: 'error',
             title: 'Sin permisos',
             text: 'Solo los administradores pueden eliminar facturas.',
@@ -613,7 +613,7 @@ function deleteInvoice(id) {
         });
         return;
     }
-    Swal.fire({
+    showDialog({
         title: '¿Eliminar factura?',
         text: "Esta acción no se puede deshacer",
         icon: 'warning',
@@ -633,7 +633,7 @@ function deleteInvoice(id) {
                 invoices = updatedInvoices;
                 updateInvoiceList();
 
-                const undoResult = await Swal.fire({
+                const undoResult = await showDialog({
                     toast: true,
                     position: 'bottom-end',
                     icon: 'warning',
@@ -653,7 +653,7 @@ function deleteInvoice(id) {
                 }
             } catch (error) {
                 console.error('Error eliminando factura:', error);
-                Swal.fire({
+                showDialog({
                     icon: 'error',
                     title: 'No se pudo eliminar',
                     text: 'La base de datos rechazó la operación. Verifica tu sesión e intenta de nuevo.',
@@ -780,13 +780,8 @@ document.getElementById('btnBackupImport').addEventListener('click', async funct
     const input = document.getElementById('backupImportInput');
     if (!input) return;
 
-    if (!window.Swal) {
-        input.click();
-        return;
-    }
-
     const lastBackupText = getLastBackupExportLabel();
-    const result = await Swal.fire({
+    const result = await showDialog({
         icon: 'warning',
         title: 'Importar copia de seguridad',
         html: `<p class="mb-2">Selecciona un archivo <strong>.json</strong> exportado desde este sistema.</p><p class="text-sm text-gray-500">La importación reemplaza las facturas actuales.</p><p class="text-xs text-gray-500 mt-2">${lastBackupText}</p>`,

@@ -197,7 +197,7 @@ function filterInvoicesByVisibility(list) {
 
 function ensureCanCreateInvoices() {
     if (canCreateInvoices()) return true;
-    Swal.fire({
+    showDialog({
         icon: 'error',
         title: 'Sin permisos',
         text: 'Tu usuario no tiene permisos para crear facturas.',
@@ -208,7 +208,7 @@ function ensureCanCreateInvoices() {
 
 function ensureCanEditInvoice(invoice) {
     if (canEditInvoice(invoice)) return true;
-    Swal.fire({
+    showDialog({
         icon: 'error',
         title: 'Sin permisos',
         text: 'Solo puedes editar las facturas creadas por tu usuario.',
@@ -219,7 +219,7 @@ function ensureCanEditInvoice(invoice) {
 
 function ensureCanViewInvoice(invoice) {
     if (canViewInvoice(invoice)) return true;
-    Swal.fire({
+    showDialog({
         icon: 'error',
         title: 'Sin permisos',
         text: 'Solo puedes ver las facturas creadas por tu usuario.',
@@ -230,7 +230,7 @@ function ensureCanViewInvoice(invoice) {
 
 function ensureAdminAction(actionName = 'esta acción') {
     if (currentUser && currentUser.role === 'admin') return true;
-    Swal.fire({
+    showDialog({
         icon: 'error',
         title: 'Sin permisos',
         text: `Solo administradores pueden realizar ${actionName}.`,

@@ -47,7 +47,7 @@ function toggleDarkMode(storageKey = 'darkMode') {
     const html = document.documentElement;
     const nextIsDarkMode = !html.classList.contains('dark-mode');
     const prefersReducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const hasActiveToastTimer = !!document.querySelector('.swal2-popup.swal2-toast .swal2-timer-progress-bar');
+    const hasActiveToastTimer = !!document.querySelector('.ui-toast .ui-toast-progress');
 
 // Funcion: applyTheme
 // Que hace: Gestiona la logica de applyTheme.

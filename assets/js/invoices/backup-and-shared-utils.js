@@ -300,37 +300,29 @@ async function requestBackupPassword(mode) {
         ? 'Ingresa la clave usada al exportar para descifrar el respaldo.'
         : 'Crea una clave para cifrar este respaldo y proteger correos/datos sensibles.';
 
-    if (window.Swal) {
-        const result = await Swal.fire({
-            title,
-            text,
-            input: 'password',
-            inputPlaceholder: 'Clave (mínimo 6 caracteres)',
-            inputAttributes: {
-                autocapitalize: 'off',
-                autocorrect: 'off'
-            },
-            showCancelButton: true,
-            confirmButtonText: mode === 'import' ? 'Descifrar' : 'Cifrar y exportar',
-            cancelButtonText: 'Cancelar',
-            confirmButtonColor: '#1a1a1a',
-            cancelButtonColor: '#334155',
-            inputValidator: (value) => {
-                const safe = String(value || '').trim();
-                if (safe.length < 6) return 'Usa una clave de al menos 6 caracteres.';
-                return undefined;
-            }
-        });
+    const result = await showDialog({
+        title,
+        text,
+        input: 'password',
+        inputPlaceholder: 'Clave (mínimo 6 caracteres)',
+        inputAttributes: {
+            autocapitalize: 'off',
+            autocorrect: 'off'
+        },
+        showCancelButton: true,
+        confirmButtonText: mode === 'import' ? 'Descifrar' : 'Cifrar y exportar',
+        cancelButtonText: 'Cancelar',
+        confirmButtonColor: '#1a1a1a',
+        cancelButtonColor: '#334155',
+        inputValidator: (value) => {
+            const safe = String(value || '').trim();
+            if (safe.length < 6) return 'Usa una clave de al menos 6 caracteres.';
+            return undefined;
+        }
+    });
 
-        if (!result.isConfirmed) return '';
-        return String(result.value || '').trim();
-    }
-
-    const fallback = window.prompt(mode === 'import'
-        ? 'Ingresa la clave del respaldo:'
-        : 'Crea una clave para cifrar el respaldo:');
-    const safe = String(fallback || '').trim();
-    return safe.length >= 6 ? safe : '';
+    if (!result.isConfirmed) return '';
+    return String(result.value || '').trim();
 }
 
 async function encryptBackupPayload(payloadObject, password) {
@@ -386,7 +378,7 @@ async function decryptBackupPayload(encryptedJson, password) {
 async function exportInvoicesBackup() {
     if (!ensureAdminAction('el respaldo manual')) return;
     if (!(window.crypto && window.crypto.subtle)) {
-        Swal.fire({
+        showDialog({
             icon: 'error',
             title: 'Navegador no compatible',
             text: 'Tu navegador no soporta cifrado seguro para respaldos.',
@@ -437,7 +429,7 @@ async function importInvoicesBackupFile(file) {
     try {
         parsed = JSON.parse(text);
     } catch {
-        Swal.fire({
+        showDialog({
             icon: 'error',
             title: 'Archivo inválido',
             text: 'El JSON del respaldo no es válido.',
@@ -450,7 +442,7 @@ async function importInvoicesBackupFile(file) {
 
     if (parsed?.encryptedBackup?.cipher) {
         if (!(window.crypto && window.crypto.subtle)) {
-            Swal.fire({
+            showDialog({
                 icon: 'error',
                 title: 'Navegador no compatible',
                 text: 'No se puede descifrar este respaldo en este navegador.',
@@ -465,7 +457,7 @@ async function importInvoicesBackupFile(file) {
         try {
             sourceForImport = await decryptBackupPayload(parsed, password);
         } catch (error) {
-            Swal.fire({
+            showDialog({
                 icon: 'error',
                 title: 'No se pudo descifrar',
                 text: 'Clave incorrecta o archivo de respaldo dañado.',
@@ -478,7 +470,7 @@ async function importInvoicesBackupFile(file) {
     const incomingSource = sourceForImport?.invoices ?? sourceForImport;
     const normalizedIncoming = normalizeInvoices(incomingSource);
     if (!normalizedIncoming.length) {
-        Swal.fire({
+        showDialog({
             icon: 'warning',
             title: 'Sin facturas válidas',
             text: 'El respaldo no contiene facturas válidas para importar.',
@@ -487,7 +479,7 @@ async function importInvoicesBackupFile(file) {
         return;
     }
 
-    const confirm = await Swal.fire({
+    const confirm = await showDialog({
         icon: 'warning',
         title: '¿Importar respaldo? ',
         html: `<p>Se reemplazarán las facturas actuales por <strong>${normalizedIncoming.length}</strong> facturas del archivo.</p>`,
@@ -504,7 +496,7 @@ async function importInvoicesBackupFile(file) {
         await saveInvoices(normalizedIncoming);
     } catch (error) {
         console.error('Error importando respaldo:', error);
-        Swal.fire({
+        showDialog({
             icon: 'error',
             title: 'No se pudo importar',
             text: 'La base de datos rechazó la importación del respaldo.',

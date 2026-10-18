@@ -167,16 +167,16 @@ async function renderUsers() {
             const currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
 
             if (currentUser?.email && currentUser.email.toLowerCase() === String(target.email || '').toLowerCase()) {
-                Swal.fire({ icon: 'error', title: 'No permitido', text: 'No puedes eliminar la cuenta con la que estás logueado.' });
+                showDialog({ icon: 'error', title: 'No permitido', text: 'No puedes eliminar la cuenta con la que estás logueado.' });
                 return;
             }
 
             if (isTargetAdmin && adminCount <= 1) {
-                Swal.fire({ icon: 'error', title: 'No permitido', text: 'Debe existir al menos un administrador.' });
+                showDialog({ icon: 'error', title: 'No permitido', text: 'Debe existir al menos un administrador.' });
                 return;
             }
 
-            const result = await Swal.fire({
+            const result = await showDialog({
                 title: 'Eliminar usuario?',
                 html: `
                     <p>Eliminar <strong>${escapeHtml(target.email)}</strong> no se puede deshacer.</p>
@@ -216,7 +216,7 @@ async function renderUsers() {
                 await renderUsers();
             } catch (error) {
                 console.error('Error eliminando usuario:', error);
-                Swal.fire({
+                showDialog({
                     icon: 'error',
                     title: 'No se eliminó',
                     text: error.message || 'No se pudo eliminar el usuario.',
@@ -242,18 +242,18 @@ async function openEditDialog(index) {
 
     const current = JSON.parse(localStorage.getItem('currentUser') || 'null');
 
-    const { value: formValues } = await Swal.fire({
+    const { value: formValues } = await showDialog({
         title: `Editar ${escapeHtml(target.email)}`,
         html:
             `<div class="edit-user-form">` +
             `<p class="edit-user-note">Las contraseñas se gestionan mediante Supabase Auth. Los usuarios pueden cambiarlas desde su perfil.</p>` +
             `<div class="edit-user-group">` +
             `<label class="edit-user-field-label">Rol del usuario</label>` +
-            `<select id="swal-role" class="edit-user-select"><option value="user">Usuario</option><option value="admin">Administrador</option></select>` +
+            `<select id="edit-role" class="edit-user-select"><option value="user">Usuario</option><option value="admin">Administrador</option></select>` +
             `</div>` +
             `<div class="edit-user-group is-tight">` +
             `<label class="edit-user-field-label">Descripción</label>` +
-            `<textarea id="swal-description" class="edit-user-textarea" placeholder="Agrega notas sobre este usuario (proyectos, empresa, contacto, etc.)"></textarea>` +
+            `<textarea id="edit-description" class="edit-user-textarea" placeholder="Agrega notas sobre este usuario (proyectos, empresa, contacto, etc.)"></textarea>` +
             `</div>` +
             `</div>`,
         focusConfirm: false,
@@ -269,21 +269,21 @@ async function openEditDialog(index) {
             actions: 'edit-user-actions'
         },
         didOpen: () => {
-            const roleSelect = document.getElementById('swal-role');
+            const roleSelect = document.getElementById('edit-role');
             if (roleSelect) roleSelect.value = target.role;
-            const descField = document.getElementById('swal-description');
+            const descField = document.getElementById('edit-description');
             if (descField) descField.value = target.description || '';
         },
         preConfirm: () => ({
-            newRole: document.getElementById('swal-role').value,
-            newDescription: (document.getElementById('swal-description')?.value || '').trim()
+            newRole: document.getElementById('edit-role').value,
+            newDescription: (document.getElementById('edit-description')?.value || '').trim()
         })
     });
 
     if (!formValues) return;
 
     if (current?.email && current.email.toLowerCase() === String(target.email || '').toLowerCase() && formValues.newRole !== 'admin') {
-        Swal.fire({ icon: 'error', title: 'Acción no permitida', text: 'No puedes despromover tu propia cuenta.' });
+        showDialog({ icon: 'error', title: 'Acción no permitida', text: 'No puedes despromover tu propia cuenta.' });
         return;
     }
 
@@ -294,7 +294,7 @@ async function openEditDialog(index) {
         await renderUsers();
     } catch (error) {
         console.error('Error actualizando usuario:', error);
-        Swal.fire({ icon: 'error', title: 'Error', text: error.message || 'No se pudo actualizar el usuario' });
+        showDialog({ icon: 'error', title: 'Error', text: error.message || 'No se pudo actualizar el usuario' });
     }
 }
 
@@ -311,7 +311,7 @@ function bindAdminEvents() {
         const allowedDomains = ['gmail.com', 'yahoo.com', 'outlook.com', 'hotmail.com', 'protonmail.com', 'aol.com', 'icloud.com', 'mail.com', 'zoho.com', 'yandex.com'];
         const emailDomain = email.split('@')[1]?.toLowerCase();
         if (!emailDomain || !allowedDomains.includes(emailDomain)) {
-            Swal.fire({
+            showDialog({
                 icon: 'warning',
                 title: 'Dominio no permitido',
                 text: `Solo se permiten emails de: ${allowedDomains.join(', ')}`,
@@ -330,9 +330,9 @@ function bindAdminEvents() {
             console.error('Error creando usuario:', error);
             const message = error.message || 'Error al crear usuario';
             if (message.toLowerCase().includes('already')) {
-                Swal.fire({ icon: 'error', title: 'Error', text: 'El email ya está registrado', confirmButtonColor: '#dc2626' });
+                showDialog({ icon: 'error', title: 'Error', text: 'El email ya está registrado', confirmButtonColor: '#dc2626' });
             } else {
-                Swal.fire({ icon: 'error', title: 'Error', text: message, confirmButtonColor: '#dc2626' });
+                showDialog({ icon: 'error', title: 'Error', text: message, confirmButtonColor: '#dc2626' });
             }
         }
     });
@@ -383,7 +383,7 @@ function bindAdminEvents() {
                 showToast('Usuarios importados', 'success', 1200);
                 await renderUsers();
             } catch (err) {
-                Swal.fire({ icon: 'error', title: 'Error', text: err.message || 'Archivo inválido' });
+                showDialog({ icon: 'error', title: 'Error', text: err.message || 'Archivo inválido' });
             }
         };
         reader.readAsText(file);
